@@ -588,67 +588,6 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
 }
 .skip-line button:hover{color:var(--text);}
 
-/* --- Card Open Finance (sofisticado, fundo escuro) --- */
-.of-card{
-  background:linear-gradient(155deg, var(--verde-escuro) 0%, var(--verde-escuro-2) 100%);
-  border-radius:var(--radius);
-  padding:28px 24px;
-  color:var(--text-on-dark);
-  position:relative;
-  overflow:hidden;
-  margin-bottom:6px;
-}
-.of-card::before{
-  content:'';
-  position:absolute; inset:0;
-  background:radial-gradient(circle at 85% 0%, rgba(159,196,199,0.16), transparent 55%);
-  pointer-events:none;
-}
-.of-badge{
-  display:inline-flex; align-items:center; gap:6px;
-  font-family:var(--font-mono); font-size:10px; letter-spacing:.09em; text-transform:uppercase;
-  color:var(--gold-light);
-  border:1px solid rgba(159,196,199,0.4);
-  border-radius:20px; padding:4px 10px;
-  margin-bottom:14px;
-}
-.of-badge .dot-live{width:6px; height:6px; border-radius:50%; background:var(--verde-claro); box-shadow:0 0 0 0 rgba(159,196,199,.6); animation:pulseDot 1.8s infinite;}
-@keyframes pulseDot{0%{box-shadow:0 0 0 0 rgba(159,196,199,.55);} 70%{box-shadow:0 0 0 8px rgba(159,196,199,0);} 100%{box-shadow:0 0 0 0 rgba(159,196,199,0);}}
-.of-card h3{font-family:var(--font-display); font-weight:500; font-size:19px; margin:0 0 10px; line-height:1.32;}
-.of-card p{font-size:13.5px; color:var(--text-on-dark-muted); line-height:1.6; max-width:48ch; margin:0 0 20px;}
-.of-institutions{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px;}
-.of-institutions span{
-  font-family:var(--font-mono); font-size:10px; color:var(--text-on-dark-muted);
-  border:1px solid rgba(159,196,199,0.28); border-radius:6px; padding:5px 9px;
-}
-.btn-of{
-  width:100%; background:var(--gold); color:#04252C; font-weight:700; font-size:14.5px;
-  border:none; border-radius:8px; padding:15px 20px; cursor:pointer;
-  transition:background .15s, transform .15s;
-}
-.btn-of:hover{background:var(--gold-light);}
-.btn-of:active{transform:scale(.98);}
-.of-footnote{font-size:11px; color:var(--text-on-dark-muted); margin-top:14px; line-height:1.55;}
-
-/* --- Etapa de autorização simulada (Open Finance) --- */
-.auth-steps{list-style:none; margin:26px 0 0; padding:0; display:grid; gap:14px;}
-.auth-steps li{
-  display:flex; align-items:center; gap:12px;
-  font-size:13.5px; color:var(--text-muted);
-  opacity:.4;
-  transition:opacity .3s;
-}
-.auth-steps li.active{opacity:1; color:var(--text);}
-.auth-steps li.done{opacity:1; color:var(--verde-medio);}
-.auth-steps .step-dot{
-  flex-shrink:0; width:22px; height:22px; border-radius:50%;
-  border:2px solid var(--line);
-  display:flex; align-items:center; justify-content:center;
-  font-size:11px; font-family:var(--font-mono);
-}
-.auth-steps li.active .step-dot{border-color:var(--verde-medio);}
-.auth-steps li.done .step-dot{border-color:var(--verde-medio); background:var(--verde-medio); color:#fff;}
-
 /* --- Importação de carteira --- */
 .upload-grid{display:grid; gap:12px; margin-bottom:22px;}
 .upload-item{
@@ -674,15 +613,6 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
 .upload-check{font-size:12px; color:var(--verde-medio); font-family:var(--font-mono); display:none;}
 .upload-item.filled .upload-check{display:block;}
 .upload-item input[type=file]{display:none;}
-.import-consolidada{
-  display:flex; align-items:center; justify-content:space-between;
-  border:1px solid var(--line); border-radius:9px; padding:14px 16px; margin-bottom:22px;
-  font-size:12.5px; color:var(--text-muted); background:var(--surface);
-}
-.import-consolidada button{
-  background:transparent; border:1px solid var(--verde-medio); color:var(--verde-medio);
-  font-family:var(--font-mono); font-size:11px; padding:7px 12px; border-radius:6px; cursor:pointer;
-}
 
 /* --- Dashboard Patrimonial --- */
 .dash-section-title{
@@ -756,27 +686,6 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
 }
 .adv-crumb button{background:none; border:none; color:var(--verde-medio); font-family:inherit; font-size:inherit; cursor:pointer; padding:0; text-decoration:underline;}
 
-/* --- Seleção de instituição (Open Finance) --- */
-.institution-list{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;}
-.institution-item{
-  border:1.5px solid var(--line); border-radius:9px; padding:14px 12px;
-  font-size:13px; font-weight:600; color:var(--text);
-  text-align:center; cursor:pointer; background:var(--surface);
-  transition:border-color .15s, background .15s;
-}
-.institution-item:hover{border-color:var(--verde-medio);}
-.institution-item.selected{border-color:var(--verde-medio); background:var(--verde-claro-bg); color:var(--verde-escuro);}
-.institution-note{font-size:11px; color:var(--text-muted); margin:-10px 0 20px; line-height:1.5;}
-
-.of-explain-list{list-style:none; margin:0 0 24px; padding:0; display:grid; gap:12px;}
-.of-explain-list li{display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--text-muted); line-height:1.5;}
-.of-explain-list .n{
-  flex-shrink:0; width:20px; height:20px; border-radius:50%;
-  background:var(--verde-claro-bg); color:var(--verde-medio);
-  font-family:var(--font-mono); font-size:10.5px; font-weight:700;
-  display:flex; align-items:center; justify-content:center; margin-top:1px;
-}
-
 /* --- Tela de status genérica (erro / não configurado / indisponível) --- */
 .status-card{text-align:center; padding:36px 8px 8px;}
 .status-ico{
@@ -804,7 +713,6 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
   .dash-grid{grid-template-columns:1fr 1fr;}
   .exec-grid{grid-template-columns:1fr;}
   .alloc-wrap{flex-direction:column; align-items:stretch;}
-  .institution-list{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
@@ -980,7 +888,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
         <li><span class="check">✔</span><span class="lbl">Fatores que aceleram ou atrasam sua meta</span><span class="val locked">████████</span></li>
       </ul>
       <div class="report-cta">
-        <button class="btn btn-gold" onclick="goToStep('advanced')">Aprofundar meu diagnóstico</button>
+        <button class="btn btn-gold" onclick="goToStep(5)">Aprofundar meu diagnóstico</button>
       </div>
     </div>
 
@@ -1017,24 +925,10 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
         <div class="option-card">
           <div class="opt-top">
             <div class="opt-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12a8 8 0 0 1 14.5-4.6M20 12a8 8 0 0 1-14.5 4.6M8 7H4V3M16 17h4v4"/></svg>
-            </div>
-            <div class="opt-body">
-              <div class="opt-eyebrow">Opção 2</div>
-              <h3 class="opt-title">Importar via Open Finance <span class="opt-tag">Automático</span></h3>
-              <p class="opt-desc">Conecte suas instituições financeiras com autorização e deixe a Fincare organizar seu diagnóstico automaticamente.</p>
-            </div>
-          </div>
-          <button class="btn btn-primary opt-cta" onclick="goToStep('openfinance')">Conectar pelo Open Finance</button>
-        </div>
-
-        <div class="option-card">
-          <div class="opt-top">
-            <div class="opt-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
             </div>
             <div class="opt-body">
-              <div class="opt-eyebrow">Opção 3</div>
+              <div class="opt-eyebrow">Opção 2</div>
               <h3 class="opt-title">Importar minha carteira <span class="opt-tag">PDF · Excel · CSV</span></h3>
               <p class="opt-desc">Envie o extrato ou a posição consolidada da sua corretora para reconhecermos sua carteira automaticamente.</p>
             </div>
@@ -1044,7 +938,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
       </div>
 
       <div class="skip-line">
-        <button onclick="goToStep(5)">Prefiro continuar apenas com o diagnóstico rápido</button>
+        <button onclick="finalizeReport()">Prefiro continuar apenas com o diagnóstico rápido</button>
       </div>
     </div>
   </section>
@@ -1099,65 +993,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
     </div>
   </section>
 
-  <!-- ===================== OPÇÃO 2 — OPEN FINANCE ===================== -->
-  <section class="step" data-step="openfinance">
-    <div class="card">
-      <div class="adv-crumb"><button onclick="goToStep('advanced')">← Diagnóstico avançado</button><span>/ Open Finance</span></div>
-      <div class="of-card">
-        <div class="of-badge"><span class="dot-live"></span>Open Finance Brasil · Regulado pelo Banco Central</div>
-        <h3>Conecte seus dados financeiros com autorização.</h3>
-        <p>Com a sua autorização, a Fincare pode importar automaticamente informações financeiras por meio do Open Finance para gerar um diagnóstico patrimonial mais completo. Nenhum dado é criado ou estimado — apenas o que sua instituição financeira confirmar.</p>
-        <div class="of-institutions">
-          <span>Bancos</span><span>Corretoras</span><span>Fundos</span><span>Previdência</span><span>Cartões</span>
-        </div>
-        <button class="btn-of" onclick="goToStep('of-institution')">Conectar meus dados financeiros</button>
-        <div class="of-footnote">A Fincare nunca solicita ou armazena sua senha bancária. A autenticação acontece exclusivamente no ambiente oficial da sua instituição financeira, dentro do fluxo do Open Finance Brasil, e pode ser revogada por você a qualquer momento.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== OPÇÃO 2 — SELEÇÃO DE INSTITUIÇÃO ===================== -->
-  <section class="step" data-step="of-institution">
-    <div class="card">
-      <div class="adv-crumb"><button onclick="goToStep('openfinance')">← Open Finance</button><span>/ Selecionar instituição</span></div>
-      <div class="q-eyebrow">Passo 1 de 2</div>
-      <h2 class="q-title">Com qual instituição você quer conectar?</h2>
-      <p class="q-sub">Lista ilustrativa de participantes do Open Finance Brasil — a lista real é fornecida pela API do provedor de integração no momento da conexão.</p>
-
-      <div class="institution-list" id="institutionList">
-        <div class="institution-item" data-inst="itau">Itaú</div>
-        <div class="institution-item" data-inst="bradesco">Bradesco</div>
-        <div class="institution-item" data-inst="bb">Banco do Brasil</div>
-        <div class="institution-item" data-inst="santander">Santander</div>
-        <div class="institution-item" data-inst="xp">XP Investimentos</div>
-        <div class="institution-item" data-inst="btg">BTG Pactual</div>
-        <div class="institution-item" data-inst="nubank">Nubank</div>
-        <div class="institution-item" data-inst="outra">Outra instituição</div>
-      </div>
-
-      <div class="q-eyebrow" style="margin-top:4px;">O que vai acontecer</div>
-      <ul class="of-explain-list">
-        <li><span class="n">1</span><span>Você será redirecionado para o ambiente oficial de autenticação da instituição selecionada.</span></li>
-        <li><span class="n">2</span><span>O compartilhamento de dados é protegido pelo padrão Open Finance Brasil, regulado pelo Banco Central.</span></li>
-        <li><span class="n">3</span><span>Você escolhe exatamente quais dados autoriza compartilhar, e pode revogar o consentimento quando quiser.</span></li>
-      </ul>
-
-      <div class="btn-row">
-        <button class="btn btn-ghost" onclick="goToStep('openfinance')">Voltar</button>
-        <button class="btn btn-primary" id="ofContinueBtn" disabled onclick="attemptOpenFinanceConnect()">Continuar</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== OPÇÃO 2 — AGUARDANDO O BACKEND ===================== -->
-  <section class="step" data-step="of-loading">
-    <div class="card loading-box">
-      <div class="loading-ring"></div>
-      <div class="loading-text" id="ofLoadingText">Conectando com sua instituição financeira…</div>
-    </div>
-  </section>
-
-  <!-- ===================== TELA DE STATUS (erro / não configurado) — usada por Open Finance e Importação de carteira ===================== -->
+  <!-- ===================== TELA DE STATUS (erro / não configurado) — usada pela Importação de carteira ===================== -->
   <section class="step" data-step="integration-status">
     <div class="card status-card">
       <div class="status-ico" id="statusIco">i</div>
@@ -1172,7 +1008,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
   <section class="step" data-step="portfolio">
     <div class="card">
       <div class="adv-crumb"><button onclick="goToStep('advanced')">← Diagnóstico avançado</button><span>/ Importar carteira</span></div>
-      <div class="q-eyebrow">Opção 3</div>
+      <div class="q-eyebrow">Opção 2</div>
       <h2 class="q-title">Envie os arquivos da sua carteira.</h2>
       <p class="q-sub">Reconhecemos automaticamente ações, FIIs, ETFs, renda fixa, fundos, previdência, caixa e ativos internacionais.</p>
 
@@ -1197,11 +1033,6 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
         </label>
       </div>
 
-      <div class="import-consolidada">
-        <span>Prefere conectar direto com a sua corretora?</span>
-        <button onclick="goToStep('openfinance')">Usar Open Finance</button>
-      </div>
-
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="goToStep('advanced')">Voltar</button>
         <button class="btn btn-primary" onclick="startPortfolioImport()">Importar minha carteira</button>
@@ -1209,7 +1040,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
     </div>
   </section>
 
-  <!-- ===================== OPÇÃO 3 — LOADING / LEITURA ===================== -->
+  <!-- ===================== OPÇÃO 2 — LOADING / LEITURA ===================== -->
   <section class="step" data-step="port-loading">
     <div class="card loading-box">
       <div class="loading-ring"></div>
@@ -1248,7 +1079,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
       <div class="insights" id="dashConcentracaoBox"></div>
 
       <div class="btn-row">
-        <button class="btn btn-gold" onclick="goToStep(5)" style="flex:1;">Ver diagnóstico executivo completo</button>
+        <button class="btn btn-gold" onclick="finalizeReport()" style="flex:1;">Ver diagnóstico executivo completo</button>
       </div>
     </div>
   </section>
@@ -1258,8 +1089,8 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
     <div class="card">
       <div class="mini-progress"><span class="done"></span><span></span></div>
       <div class="q-eyebrow">Quase lá</div>
-      <h2 class="q-title">Para onde enviamos o seu relatório completo?</h2>
-      <p class="q-sub">Um especialista da Fincare também poderá comentar os resultados com você, se fizer sentido.</p>
+      <h2 class="q-title">Antes de aprofundar, para onde enviamos seu diagnóstico?</h2>
+      <p class="q-sub">Preencha seus dados para liberar o Diagnóstico Avançado. Um especialista da Fincare também poderá comentar os resultados com você, se fizer sentido.</p>
 
       <div class="field">
         <label for="leadNome">Nome completo</label>
@@ -1363,7 +1194,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
 
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="goToStep(5)">Voltar</button>
-        <button class="btn btn-primary" onclick="submitLead()">Ver meu relatório completo</button>
+        <button class="btn btn-primary" onclick="submitLead()">Continuar para o diagnóstico avançado</button>
       </div>
     </div>
   </section>
@@ -1419,516 +1250,6 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
 
 <script>
 /* ============================================================
-   MÓDULO OPEN FINANCE — inline nesta página para que o arquivo
-   funcione sozinho (ex.: aberto direto em um celular, enviado por
-   WhatsApp, hospedado sem servidor). O código é IDÊNTICO ao de
-   /assets/js/openfinance.js (entregue à parte para quem for plugar
-   isso num pipeline de build/backend). Se optar por servir os dois
-   arquivos separadamente em produção, troque este bloco por:
-   <script src="assets/js/openfinance.js"><\/script>
-   ============================================================ */
-/**
- * ============================================================================
- * FINCARE INVESTIMENTOS | SAFRA INVEST — MÓDULO OPEN FINANCE
- * ============================================================================
- *
- * Arquivo: /assets/js/openfinance.js
- *
- * Este módulo NÃO simula, NÃO inventa e NÃO preenche nenhum dado financeiro.
- * Ele existe apenas para deixar a arquitetura pronta para, no futuro, se
- * conectar a um backend real de Open Finance (Open Finance Brasil).
- *
- * Enquanto o backend não existir (OPEN_FINANCE_CONFIG.backendBaseUrl vazio),
- * todo método de OpenFinanceService rejeita a Promise com um erro controlado
- * (OpenFinanceNotConfiguredError). Nenhuma função aqui retorna número, saldo,
- * ativo ou instituição fictícios — apenas dados que vierem de fato da API.
- *
- * Quando o backend estiver disponível, basta preencher OPEN_FINANCE_CONFIG
- * abaixo. Nenhuma outra parte do código (HTML/CSS/JS da calculadora) precisa
- * ser refatorada: os métodos já fazem chamadas REST reais e já devolvem os
- * dados no formato dos typedefs declarados neste arquivo.
- *
- * Segurança / decisões de arquitetura:
- * - Este módulo NUNCA solicita, recebe ou armazena credenciais bancárias.
- * - Este módulo NUNCA guarda tokens de acesso em localStorage/sessionStorage
- *   ou em variáveis expostas globalmente. Toda chamada usa `credentials:
- *   'include'`, isto é, depende de um cookie de sessão HttpOnly emitido pelo
- *   PRÓPRIO BACKEND da Fincare — o navegador nunca manipula o token OAuth2 /
- *   OpenID Connect emitido pela instituição financeira ou pelo agregador
- *   (Belvo / Pluggy / Celcoin). O backend é quem troca, guarda e renova
- *   (refresh token) esse token; o front-end só conversa com o backend.
- * - A autorização (OAuth2 + OpenID Connect) e o consentimento (Open Finance
- *   Brasil) acontecem inteiramente no domínio da instituição financeira e/ou
- *   do backend da Fincare, nunca dentro deste arquivo.
- * ============================================================================
- */
-
-(function (global) {
-  'use strict';
-
-  /* ==========================================================================
-   * CONFIGURAÇÃO
-   * ==========================================================================
-   * Preencher quando o backend de Open Finance existir. Até lá, o serviço
-   * inteiro permanece em modo "não configurado" e nunca inventa dados.
-   * ========================================================================== */
-  const OPEN_FINANCE_CONFIG = {
-    // Base da API REST do backend da Fincare que fará a ponte com o Open
-    // Finance Brasil (diretamente ou via agregador). Ex.: 'https://api.fincare.com.br/openfinance'
-    backendBaseUrl: '',
-
-    // Endpoint OpenID Connect / OAuth2 de descoberta do backend (RFC 8414),
-    // usado pelo backend para orquestrar o Authorization Code Flow com a
-    // instituição financeira. O front-end nunca fala diretamente com o IdP.
-    oidcDiscoveryUrl: '',
-
-    // Identificador do client OAuth2 registrado no Diretório de Participantes
-    // do Open Finance Brasil (preenchido pelo backend/infra, não pelo front-end).
-    oauthClientId: '',
-
-    // URI de retorno após autorização, deve apontar para uma rota do backend
-    // (não para este HTML), que finaliza o Authorization Code Flow e cria a
-    // sessão autenticada (cookie HttpOnly) antes de redirecionar de volta.
-    redirectUri: '',
-
-    // Provedor/agregador de Open Finance por trás do backend. Nenhuma chamada
-    // é feita diretamente a esses provedores a partir do navegador — servem
-    // apenas para o backend saber qual integração orquestrar.
-    // Valores possíveis quando configurado: 'belvo' | 'pluggy' | 'celcoin' | 'direto'
-    provider: null,
-
-    // Tempo máximo (ms) que o front-end aguarda uma resposta do backend
-    // antes de reportar erro de comunicação.
-    requestTimeoutMs: 15000
-  };
-
-  function isConfigured() {
-    return Boolean(OPEN_FINANCE_CONFIG.backendBaseUrl);
-  }
-
-  /* ==========================================================================
-   * ERROS CONTROLADOS
-   * ==========================================================================
-   * Cada situação prevista tem uma classe própria, com um `code` estável
-   * (para lógica) e uma `userMessage` (para exibição). Nunca lançamos um
-   * erro genérico sem explicar o que aconteceu.
-   * ========================================================================== */
-  class OpenFinanceError extends Error {
-    constructor(code, userMessage, cause) {
-      super(userMessage);
-      this.name = 'OpenFinanceError';
-      this.code = code;
-      this.userMessage = userMessage;
-      if (cause) this.cause = cause;
-    }
-  }
-
-  class OpenFinanceNotConfiguredError extends OpenFinanceError {
-    constructor() {
-      super(
-        'NOT_CONFIGURED',
-        'Esta funcionalidade será habilitada quando a integração com Open Finance estiver configurada.'
-      );
-      this.name = 'OpenFinanceNotConfiguredError';
-    }
-  }
-
-  class OpenFinanceConsentDeniedError extends OpenFinanceError {
-    constructor(cause) {
-      super(
-        'CONSENT_DENIED',
-        'Você cancelou a autorização com a sua instituição financeira. Nenhum dado foi compartilhado.',
-        cause
-      );
-      this.name = 'OpenFinanceConsentDeniedError';
-    }
-  }
-
-  class OpenFinanceInstitutionUnavailableError extends OpenFinanceError {
-    constructor(institutionName, cause) {
-      super(
-        'INSTITUTION_UNAVAILABLE',
-        (institutionName ? 'A instituição "' + institutionName + '"' : 'Sua instituição financeira') +
-          ' está temporariamente indisponível para conexão via Open Finance. Tente novamente em alguns minutos.',
-        cause
-      );
-      this.name = 'OpenFinanceInstitutionUnavailableError';
-    }
-  }
-
-  class OpenFinanceTokenExpiredError extends OpenFinanceError {
-    constructor(cause) {
-      super(
-        'TOKEN_EXPIRED',
-        'Sua sessão com o Open Finance expirou. Conecte novamente para atualizar os dados.',
-        cause
-      );
-      this.name = 'OpenFinanceTokenExpiredError';
-    }
-  }
-
-  class OpenFinanceCommunicationError extends OpenFinanceError {
-    constructor(cause) {
-      super(
-        'COMMUNICATION_ERROR',
-        'Não foi possível se comunicar com o serviço de Open Finance agora. Verifique sua conexão e tente novamente.',
-        cause
-      );
-      this.name = 'OpenFinanceCommunicationError';
-    }
-  }
-
-  class OpenFinanceDataUnavailableError extends OpenFinanceError {
-    constructor(cause) {
-      super(
-        'DATA_UNAVAILABLE',
-        'Sua instituição financeira ainda não retornou os dados solicitados. Tente novamente em instantes.',
-        cause
-      );
-      this.name = 'OpenFinanceDataUnavailableError';
-    }
-  }
-
-  /* ==========================================================================
-   * ESTRUTURAS DE DADOS (typedefs)
-   * ==========================================================================
-   * Nenhum destes tipos é instanciado com valores neste arquivo. Servem para
-   * documentar o formato exato que a API deverá devolver, e que os
-   * componentes de dashboard (no HTML principal) já sabem consumir.
-   * ========================================================================== */
-
-  /**
-   * @typedef {Object} FinancialInstitution
-   * @property {string} id                 Identificador do participante no Diretório Open Finance
-   * @property {string} name
-   * @property {string} [logoUrl]
-   */
-
-  /**
-   * @typedef {Object} Account
-   * @property {string} id
-   * @property {string} institutionId
-   * @property {string} institutionName
-   * @property {'CONTA_CORRENTE'|'CONTA_POUPANCA'|'CONTA_INVESTIMENTO'|'CONTA_PAGAMENTO'} type
-   * @property {string} currency
-   */
-
-  /**
-   * @typedef {Object} Balance
-   * @property {string} accountId
-   * @property {number} availableAmount
-   * @property {number} blockedAmount
-   * @property {string} currency
-   * @property {string} referenceDate  ISO 8601
-   */
-
-  /**
-   * @typedef {Object} FixedIncomeInvestment
-   * @property {string} id
-   * @property {string} accountId
-   * @property {string} issuer
-   * @property {'CDB'|'LCI'|'LCA'|'TESOURO_DIRETO'|'DEBENTURE'|'OUTRO'} kind
-   * @property {number} grossAmount
-   * @property {string} maturityDate
-   */
-
-  /**
-   * @typedef {Object} EquityInvestment
-   * @property {string} id
-   * @property {string} accountId
-   * @property {string} ticker
-   * @property {'ACAO'|'FII'|'ETF'|'BDR'} kind
-   * @property {number} quantity
-   * @property {number} currentPrice
-   * @property {number} grossAmount
-   */
-
-  /**
-   * @typedef {Object} FundInvestment
-   * @property {string} id
-   * @property {string} accountId
-   * @property {string} fundName
-   * @property {string} cnpj
-   * @property {number} quotaAmount
-   * @property {number} grossAmount
-   */
-
-  /**
-   * @typedef {Object} PensionInvestment
-   * @property {string} id
-   * @property {string} accountId
-   * @property {'PGBL'|'VGBL'} kind
-   * @property {number} grossAmount
-   */
-
-  /**
-   * @typedef {Object} CreditCard
-   * @property {string} id
-   * @property {string} institutionName
-   * @property {number} currentInvoiceAmount
-   * @property {number} availableLimit
-   */
-
-  /**
-   * @typedef {Object} Loan
-   * @property {string} id
-   * @property {string} institutionName
-   * @property {number} outstandingBalance
-   * @property {number} monthlyInstallment
-   */
-
-  /**
-   * @typedef {Object} Financing
-   * @property {string} id
-   * @property {string} institutionName
-   * @property {number} outstandingBalance
-   * @property {number} monthlyInstallment
-   */
-
-  /**
-   * @typedef {Object} CashFlowEntry
-   * @property {string} accountId
-   * @property {string} date  ISO 8601
-   * @property {number} amount
-   * @property {'CREDITO'|'DEBITO'} direction
-   * @property {string} description
-   */
-
-  /**
-   * @typedef {Object} ConsolidatedPosition
-   * Formato agregado que o backend deverá devolver (ou que o front-end monta
-   * a partir das chamadas individuais) para alimentar o Dashboard Patrimonial.
-   * @property {Account[]} accounts
-   * @property {Balance[]} balances
-   * @property {(FixedIncomeInvestment|EquityInvestment|FundInvestment|PensionInvestment)[]} investments
-   * @property {CreditCard[]} cards
-   * @property {Loan[]} loans
-   * @property {Financing[]} financings
-   * @property {CashFlowEntry[]} cashFlow
-   * @property {string} retrievedAt ISO 8601
-   */
-
-  /* ==========================================================================
-   * CLIENTE HTTP INTERNO
-   * ==========================================================================
-   * Centraliza toda chamada ao backend e traduz falhas de rede/HTTP em erros
-   * controlados. Usa cookies de sessão (HttpOnly) — nunca lê ou grava tokens
-   * via JavaScript.
-   * ========================================================================== */
-  async function request(path, options) {
-    if (!isConfigured()) {
-      throw new OpenFinanceNotConfiguredError();
-    }
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), OPEN_FINANCE_CONFIG.requestTimeoutMs);
-
-    let response;
-    try {
-      response = await fetch(OPEN_FINANCE_CONFIG.backendBaseUrl + path, Object.assign(
-        {
-          credentials: 'include', // sessão HttpOnly emitida pelo backend — nunca um token manipulado aqui
-          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
-        },
-        options || {}
-      ));
-    } catch (networkError) {
-      throw new OpenFinanceCommunicationError(networkError);
-    } finally {
-      clearTimeout(timeout);
-    }
-
-    if (response.status === 401) {
-      throw new OpenFinanceTokenExpiredError();
-    }
-    if (response.status === 403) {
-      throw new OpenFinanceConsentDeniedError();
-    }
-    if (response.status === 503 || response.status === 502) {
-      throw new OpenFinanceInstitutionUnavailableError();
-    }
-    if (response.status === 204) {
-      throw new OpenFinanceDataUnavailableError();
-    }
-    if (!response.ok) {
-      throw new OpenFinanceCommunicationError(new Error('HTTP ' + response.status));
-    }
-
-    try {
-      return await response.json();
-    } catch (parseError) {
-      throw new OpenFinanceDataUnavailableError(parseError);
-    }
-  }
-
-  /* ==========================================================================
-   * OpenFinanceService
-   * ==========================================================================
-   * Ponto único de acesso do front-end ao Open Finance. Nenhum método aqui
-   * retorna dado inventado — ou o backend responde de verdade, ou a Promise
-   * é rejeitada com um dos erros controlados acima.
-   * ========================================================================== */
-  const OpenFinanceService = {
-    /**
-     * Indica se este front-end está apontando para um backend real.
-     * A interface deve usar isto para decidir se mostra a funcionalidade
-     * como disponível ou como "em preparação".
-     */
-    isConfigured,
-
-    /**
-     * @returns {{connected: boolean, institution: FinancialInstitution|null, consentExpiresAt: string|null}}
-     * Consulta o backend se já existe uma sessão/consentimento ativo.
-     * Nunca retorna dados fictícios: sem backend, o próprio estado
-     * "connected: false" é a verdade.
-     */
-    async getConnectionStatus() {
-      if (!isConfigured()) {
-        return { connected: false, institution: null, consentExpiresAt: null };
-      }
-      return request('/status', { method: 'GET' });
-    },
-
-    /**
-     * Fluxo completo de conexão: autoriza + solicita consentimento.
-     * Sem backend configurado, rejeita imediatamente com
-     * OpenFinanceNotConfiguredError — nunca simula sucesso.
-     * @param {string} institutionId
-     */
-    async connect(institutionId) {
-      if (!isConfigured()) {
-        throw new OpenFinanceNotConfiguredError();
-      }
-      await this.authorize(institutionId);
-      return this.requestConsent();
-    },
-
-    /**
-     * Inicia o Authorization Code Flow (OAuth2 + OpenID Connect) delegando
-     * ao backend, que sabe o client_id, o redirect_uri e o discovery
-     * document do Open Finance Brasil. O front-end nunca monta a URL de
-     * autorização nem manipula o `code`/token retornado.
-     * @param {string} institutionId
-     */
-    async authorize(institutionId) {
-      if (!isConfigured()) {
-        throw new OpenFinanceNotConfiguredError();
-      }
-      return request('/authorize', {
-        method: 'POST',
-        body: JSON.stringify({ institutionId })
-      });
-    },
-
-    /**
-     * Solicita/confirma o consentimento (escopos de dados autorizados pelo
-     * usuário) junto ao backend, conforme o padrão Open Finance Brasil.
-     * @param {string[]} [scopes]
-     */
-    async requestConsent(scopes) {
-      if (!isConfigured()) {
-        throw new OpenFinanceNotConfiguredError();
-      }
-      return request('/consent', {
-        method: 'POST',
-        body: JSON.stringify({ scopes: scopes || [] })
-      });
-    },
-
-    /** @returns {Promise<Account[]>} */
-    async getAccounts() {
-      if (!isConfigured()) throw new OpenFinanceNotConfiguredError();
-      return request('/accounts', { method: 'GET' });
-    },
-
-    /**
-     * @param {string} [accountId]
-     * @returns {Promise<Balance[]>}
-     */
-    async getBalances(accountId) {
-      if (!isConfigured()) throw new OpenFinanceNotConfiguredError();
-      return request('/balances' + (accountId ? '?accountId=' + encodeURIComponent(accountId) : ''), { method: 'GET' });
-    },
-
-    /**
-     * @param {string} [accountId]
-     * @returns {Promise<(FixedIncomeInvestment|EquityInvestment|FundInvestment|PensionInvestment)[]>}
-     */
-    async getInvestments(accountId) {
-      if (!isConfigured()) throw new OpenFinanceNotConfiguredError();
-      return request('/investments' + (accountId ? '?accountId=' + encodeURIComponent(accountId) : ''), { method: 'GET' });
-    },
-
-    /**
-     * @param {string} accountId
-     * @param {{from?: string, to?: string}} [range]
-     * @returns {Promise<CashFlowEntry[]>}
-     */
-    async getTransactions(accountId, range) {
-      if (!isConfigured()) throw new OpenFinanceNotConfiguredError();
-      const params = new URLSearchParams(Object.assign({ accountId }, range || {}));
-      return request('/transactions?' + params.toString(), { method: 'GET' });
-    },
-
-    /**
-     * Busca, em uma única chamada, a posição consolidada (contas + saldos +
-     * investimentos + cartões + empréstimos + financiamentos). É o formato
-     * que os componentes de Dashboard Patrimonial no HTML esperam receber.
-     * @returns {Promise<ConsolidatedPosition>}
-     */
-    async getConsolidatedPosition() {
-      if (!isConfigured()) throw new OpenFinanceNotConfiguredError();
-      return request('/consolidated-position', { method: 'GET' });
-    },
-
-    /**
-     * Revoga a sessão/consentimento no backend. O backend é responsável por
-     * invalidar o refresh token junto ao provedor.
-     */
-    async disconnect() {
-      if (!isConfigured()) {
-        throw new OpenFinanceNotConfiguredError();
-      }
-      return request('/disconnect', { method: 'POST' });
-    }
-  };
-
-  /* ==========================================================================
-   * PONTOS DE INTEGRAÇÃO COM AGREGADORES (não implementados)
-   * ==========================================================================
-   * Nenhuma chamada é feita a estes provedores a partir do navegador — isso
-   * seria uma falha de segurança. Esta lista existe apenas para documentar,
-   * dentro do próprio código, onde o backend deverá plugar cada opção.
-   * ========================================================================== */
-  const OPEN_FINANCE_PROVIDERS_TODO = {
-    belvo: 'TODO (backend): orquestrar Open Finance Brasil via Belvo — https://developers.belvo.com',
-    pluggy: 'TODO (backend): orquestrar Open Finance Brasil via Pluggy — https://docs.pluggy.ai',
-    celcoin: 'TODO (backend): orquestrar Open Finance Brasil via Celcoin — https://docs.celcoin.com.br'
-  };
-
-  /* ==========================================================================
-   * EXPORTAÇÃO
-   * ========================================================================== */
-  global.OpenFinance = {
-    config: OPEN_FINANCE_CONFIG,
-    service: OpenFinanceService,
-    providers: OPEN_FINANCE_PROVIDERS_TODO,
-    errors: {
-      OpenFinanceError,
-      OpenFinanceNotConfiguredError,
-      OpenFinanceConsentDeniedError,
-      OpenFinanceInstitutionUnavailableError,
-      OpenFinanceTokenExpiredError,
-      OpenFinanceCommunicationError,
-      OpenFinanceDataUnavailableError
-    }
-  };
-})(window);
-
-/* Fim do módulo Open Finance — o restante do arquivo consome
-   window.OpenFinance = { config, service, providers, errors } */
-
-/* ============================================================
    ESTADO GLOBAL
    ============================================================ */
 const state = {
@@ -1936,12 +1257,12 @@ const state = {
   totalWizardSteps: 4,
   calc: null,        // resultado do cálculo principal, preenchido em calcular()
   advanced: {
-    source: null,      // 'manual' | 'openfinance' | 'portfolio' | null
+    source: null,      // 'manual' | 'portfolio' | null
     extraLiquido: 0,   // patrimônio adicional líquido informado/importado
     allocation: null,  // distribuição por classe de ativo para o dashboard
     manualDetalhe: null
   },
-  openFinanceData: null, // ConsolidatedPosition real, só existe após conexão bem-sucedida
+  lead: null, // dados de contato/qualificação, preenchidos em submitLead() antes do Diagnóstico Avançado
   utm: {}
 };
 
@@ -2270,15 +1591,35 @@ function submitLead(){
   const consentimento = document.getElementById('leadConsentimento').checked;
 
   if(!faixaPatrimonio || !faixaRenda || !assessor || !gerente || !objetivoEl){
-    alert('Preencha todos os campos para liberar seu relatório.');
+    alert('Preencha todos os campos para continuar.');
     return;
   }
   if(!consentimento){
-    alert('É necessário autorizar o contato para receber seu relatório.');
+    alert('É necessário autorizar o contato para continuar.');
     return;
   }
 
+  // Guarda o lead qualificado antes de liberar o Diagnóstico Avançado —
+  // finalizeReport() reaproveita esses dados sem pedir de novo ao usuário.
+  state.lead = {
+    nome: document.getElementById('leadNome').value.trim(),
+    telefone: document.getElementById('leadWhats').value.trim(),
+    email: document.getElementById('leadEmail').value.trim(),
+    cidade: document.getElementById('leadCidade').value.trim(),
+    faixa_patrimonio: faixaPatrimonio,
+    faixa_renda: faixaRenda,
+    instituicao_financeira_atual: document.getElementById('leadInstituicao').value.trim(),
+    possui_assessor: assessor,
+    possui_gerente_banco: gerente,
+    objetivo_financeiro: objetivoEl.value
+  };
+
+  goToStep('advanced');
+}
+
+function finalizeReport(){
   const c = state.calc;
+  const lead = state.lead;
   const scorePatrimonial = Math.round(Math.max(0, Math.min(100, (c.patrimonio0 / c.necessario) * 100)));
 
   // Payload estruturado para envio ao Webhook / CRM.
@@ -2287,18 +1628,18 @@ function submitLead(){
   // o Diagnóstico Avançado, quando preenchido) e atribuição de origem/UTM.
   const payload = {
     // Identificação
-    nome: document.getElementById('leadNome').value.trim(),
-    telefone: document.getElementById('leadWhats').value.trim(),
-    email: document.getElementById('leadEmail').value.trim(),
-    cidade: document.getElementById('leadCidade').value.trim(),
+    nome: lead.nome,
+    telefone: lead.telefone,
+    email: lead.email,
+    cidade: lead.cidade,
 
     // Qualificação
-    faixa_patrimonio: faixaPatrimonio,
-    faixa_renda: faixaRenda,
-    instituicao_financeira_atual: document.getElementById('leadInstituicao').value.trim(),
-    possui_assessor: assessor,
-    possui_gerente_banco: gerente,
-    objetivo_financeiro: objetivoEl.value,
+    faixa_patrimonio: lead.faixa_patrimonio,
+    faixa_renda: lead.faixa_renda,
+    instituicao_financeira_atual: lead.instituicao_financeira_atual,
+    possui_assessor: lead.possui_assessor,
+    possui_gerente_banco: lead.possui_gerente_banco,
+    objetivo_financeiro: lead.objetivo_financeiro,
 
     // Dados da simulação (Nível 1 — Diagnóstico Rápido)
     dados_simulacao: {
@@ -2314,7 +1655,7 @@ function submitLead(){
 
     // Diagnóstico avançado (Nível 2), quando o usuário complementou os dados
     diagnostico_avancado: {
-      fonte: state.advanced.source,                 // 'manual' | 'openfinance' | 'portfolio' | null
+      fonte: state.advanced.source,                 // 'manual' | 'portfolio' | null
       patrimonio_liquido_adicional: state.advanced.extraLiquido || 0,
       alocacao_por_classe: state.advanced.allocation || null
     },
@@ -2412,22 +1753,11 @@ function dispatchToCRM(payload){
 }
 
 /* ============================================================
-   ARQUITETURA — OPEN FINANCE (preparado, sem conexão real)
-   ============================================================ */
-// Estrutura pronta para, futuramente, autenticar via APIs autorizadas
-// de Open Finance (Banco Central) e importar posição consolidada.
-const openFinanceConnector = {
-  connect: async () => { /* TODO: iniciar fluxo OAuth de autorização */ },
-  fetchConsolidatedPosition: async () => { /* TODO: buscar posição consolidada real */ }
-};
-
-/* ============================================================
    ARQUITETURA — IMPORTAÇÃO DE CARTEIRA (preparado, sem leitura real)
    ============================================================ */
 // Leitores dedicados por formato — hoje apenas placeholders.
 const portfolioReaders = {
   // Cada leitor, quando implementado, deve retornar uma ConsolidatedPosition
-  // (mesmo formato usado pelo Open Finance — ver /assets/js/openfinance.js)
   // extraída de verdade do arquivo. Até lá, nunca inventamos números: o
   // leitor apenas informa que a leitura automática ainda não está disponível.
   pdf: async (file) => { throw new Error('A leitura automática de extratos em PDF ainda não está disponível. Esta funcionalidade será habilitada quando o leitor de PDF estiver configurado.'); },
@@ -2474,54 +1804,7 @@ function submitManual(){
 }
 
 /* ============================================================
-   NÍVEL 2 · OPÇÃO 2 — OPEN FINANCE
-   Fluxo real: seleção de instituição → OpenFinance.service.connect()
-   Nenhum dado é inventado. Sem backend configurado, o serviço rejeita
-   com OpenFinanceNotConfiguredError e a tela de status explica isso.
-   ============================================================ */
-let selectedInstitutionId = null;
-
-function initInstitutionList(){
-  const list = document.getElementById('institutionList');
-  if(!list || list.dataset.bound) return;
-  list.dataset.bound = '1';
-  list.addEventListener('click', (e)=>{
-    const item = e.target.closest('.institution-item');
-    if(!item) return;
-    list.querySelectorAll('.institution-item').forEach(el=>el.classList.remove('selected'));
-    item.classList.add('selected');
-    selectedInstitutionId = item.dataset.inst;
-    document.getElementById('ofContinueBtn').disabled = false;
-  });
-}
-
-async function attemptOpenFinanceConnect(){
-  goToStep('of-loading');
-  try{
-    // Chamada real ao serviço — hoje sempre rejeita com
-    // OpenFinanceNotConfiguredError porque nenhum backend foi configurado
-    // em OpenFinance.config.backendBaseUrl (ver /assets/js/openfinance.js).
-    const result = await OpenFinance.service.connect(selectedInstitutionId);
-
-    // A partir daqui só é executado quando um backend real responder.
-    // O formato esperado é o typedef ConsolidatedPosition documentado em
-    // openfinance.js — nenhuma transformação estrutural é necessária.
-    const position = await OpenFinance.service.getConsolidatedPosition();
-    state.advanced.source = 'openfinance';
-    state.openFinanceData = position;
-    goToStep('dashboard');
-  } catch(err){
-    showIntegrationStatus(err, {
-      retryStep: 'of-institution',
-      retryLabel: 'Selecionar outra instituição',
-      secondaryStep: 'advanced',
-      secondaryLabel: 'Voltar ao diagnóstico avançado'
-    });
-  }
-}
-
-/* ============================================================
-   NÍVEL 2 · OPÇÃO 3 — IMPORTAR CARTEIRA
+   NÍVEL 2 · OPÇÃO 2 — IMPORTAR CARTEIRA
    Fluxo real: arquivos enviados → portfolioReaders.* (não implementados).
    Nenhum dado é inventado a partir do upload.
    ============================================================ */
@@ -2539,7 +1822,7 @@ async function startPortfolioImport(){
     // Cada leitor real hoje lança "não implementado" — nenhum dado é
     // inventado a partir dos arquivos enviados. Quando os leitores forem
     // implementados, o retorno deve seguir o mesmo formato ConsolidatedPosition
-    // usado pelo Open Finance (ver openfinance.js) para reaproveitar o dashboard.
+    // para reaproveitar o dashboard.
     if(pdfFile) await portfolioReaders.pdf(pdfFile);
     else if(xlsFile) await portfolioReaders.excel(xlsFile);
     else if(csvFile) await portfolioReaders.csv(csvFile);
@@ -2555,32 +1838,16 @@ async function startPortfolioImport(){
 }
 
 /* ============================================================
-   TELA DE STATUS — traduz erros controlados (Open Finance e
-   Importação de carteira) em uma mensagem elegante, sem nunca
-   inventar dados para "disfarçar" a ausência de integração.
+   TELA DE STATUS — traduz erros controlados da Importação de
+   carteira em uma mensagem elegante, sem nunca inventar dados
+   para "disfarçar" a ausência de integração.
    ============================================================ */
 function showIntegrationStatus(err, actions){
-  const isNotImplemented = !(err && err.code); // erros locais (ex.: leitor de arquivo) não usam OpenFinanceError
-  const code = (err && err.code) || 'NOT_IMPLEMENTED';
-  const message = (err && err.userMessage) || (err && err.message) || 'Esta funcionalidade será habilitada quando a integração estiver configurada.';
+  const message = (err && err.message) || 'Esta funcionalidade será habilitada quando a integração estiver configurada.';
 
-  const titles = {
-    NOT_CONFIGURED: 'Integração ainda não configurada',
-    CONSENT_DENIED: 'Autorização cancelada',
-    INSTITUTION_UNAVAILABLE: 'Instituição indisponível',
-    TOKEN_EXPIRED: 'Sessão expirada',
-    COMMUNICATION_ERROR: 'Falha de comunicação',
-    DATA_UNAVAILABLE: 'Dados indisponíveis',
-    NOT_IMPLEMENTED: 'Funcionalidade em preparação'
-  };
-  const icons = {
-    NOT_CONFIGURED: 'i', CONSENT_DENIED: '!', INSTITUTION_UNAVAILABLE: '!',
-    TOKEN_EXPIRED: '!', COMMUNICATION_ERROR: '!', DATA_UNAVAILABLE: 'i', NOT_IMPLEMENTED: 'i'
-  };
-
-  document.getElementById('statusIco').textContent = icons[code] || 'i';
-  document.getElementById('statusIco').classList.toggle('warn', icons[code] === '!');
-  document.getElementById('statusTitle').textContent = titles[code] || titles.NOT_IMPLEMENTED;
+  document.getElementById('statusIco').textContent = 'i';
+  document.getElementById('statusIco').classList.remove('warn');
+  document.getElementById('statusTitle').textContent = 'Funcionalidade em preparação';
   document.getElementById('statusMsg').textContent = message;
 
   const wrap = document.getElementById('statusActions');
@@ -2625,7 +1892,6 @@ function renderDashboardPatrimonial(){
   const adv = state.advanced;
   const fonteLabels = {
     manual: 'a partir dos dados que você informou manualmente',
-    openfinance: 'a partir da conexão simulada via Open Finance',
     portfolio: 'a partir dos arquivos importados da sua carteira'
   };
   document.getElementById('dashSub').textContent = adv.source
@@ -2764,7 +2030,6 @@ function renderExecutiveDashboard(){
 /* ============================================================
    INICIALIZAÇÃO
    ============================================================ */
-initInstitutionList();
 goToStep(1);
 </script>
 </body>
