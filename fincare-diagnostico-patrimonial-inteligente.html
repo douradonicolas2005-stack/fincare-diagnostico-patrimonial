@@ -1641,24 +1641,24 @@ function finalizeReport(){
     possui_gerente_banco: lead.possui_gerente_banco,
     objetivo_financeiro: lead.objetivo_financeiro,
 
-    // Dados da simulação (Nível 1 — Diagnóstico Rápido)
-    dados_simulacao: {
-      patrimonio_atual: c.patrimonio0,
-      aporte_mensal: c.aporte,
-      renda_desejada: c.renda,
-      rentabilidade_esperada: c.rent,
-      taxa_retirada: c.retirada,
-      patrimonio_necessario: c.necessario,
-      anos_ate_independencia: c.anos,
-      idade_atual: c.idade
-    },
+    // Dados da simulação (Nível 1 — Diagnóstico Rápido) — campos "achatados"
+    // (em vez de um objeto aninhado) para aparecerem como colunas legíveis
+    // no painel/e-mail/CSV do Formspree.
+    patrimonio_atual: c.patrimonio0,
+    aporte_mensal: c.aporte,
+    renda_desejada: c.renda,
+    rentabilidade_esperada: c.rent,
+    taxa_retirada: c.retirada,
+    patrimonio_necessario: c.necessario,
+    anos_ate_independencia: c.anos,
+    idade_atual: c.idade,
 
     // Diagnóstico avançado (Nível 2), quando o usuário complementou os dados
-    diagnostico_avancado: {
-      fonte: state.advanced.source,                 // 'manual' | 'portfolio' | null
-      patrimonio_liquido_adicional: state.advanced.extraLiquido || 0,
-      alocacao_por_classe: state.advanced.allocation || null
-    },
+    diagnostico_avancado_fonte: state.advanced.source || 'nenhuma (apenas diagnóstico rápido)', // 'manual' | 'portfolio' | null
+    diagnostico_avancado_patrimonio_liquido_adicional: state.advanced.extraLiquido || 0,
+    diagnostico_avancado_alocacao_por_classe: state.advanced.allocation
+      ? JSON.stringify(state.advanced.allocation)
+      : '',
 
     score_patrimonial: scorePatrimonial,
     data: new Date().toISOString(),
