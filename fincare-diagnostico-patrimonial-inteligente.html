@@ -1295,6 +1295,14 @@ const state = {
 // todo o resto do código continua funcionando exatamente igual.)
 const WEBHOOK_URL = 'https://formspree.io/f/xjgqndvn';
 
+// --------------------------------------------------------------
+// PLANILHA GOOGLE SHEETS (visão tabular dos leads, sem custo)
+// --------------------------------------------------------------
+// 1. Siga o passo a passo em google-sheets-integration.gs (neste repositório)
+//    para implantar o script como "App da Web" no Google Apps Script.
+// 2. Cole aqui a URL gerada (termina em /exec), no lugar de 'COLE-AQUI-A-URL-DO-APPS-SCRIPT'.
+const SHEETS_WEBHOOK_URL = 'COLE-AQUI-A-URL-DO-APPS-SCRIPT';
+
 // Link do WhatsApp do escritório — ajuste o número (formato internacional, só dígitos)
 const WHATSAPP_NUMERO = '5511941819794';
 
@@ -1698,6 +1706,25 @@ function finalizeReport(){
     .catch(err => console.error('Erro de rede ao enviar lead:', err));
   } else {
     console.warn('WEBHOOK_URL não configurado — os dados NÃO estão sendo enviados para lugar nenhum. Configure a constante WEBHOOK_URL no topo do script.');
+  }
+
+  // Envio em paralelo para a planilha Google Sheets (ver google-sheets-integration.gs).
+  // mode:'no-cors' e Content-Type:'text/plain' evitam o preflight CORS que o
+  // Apps Script não responde — o doPost() lá do outro lado faz JSON.parse()
+  // do corpo normalmente, então o payload chega intacto mesmo assim. Como
+  // consequência, a resposta fica opaca (não dá pra checar sucesso/falha daqui).
+  const sheetsConfigurado = SHEETS_WEBHOOK_URL && !SHEETS_WEBHOOK_URL.includes('COLE-AQUI-A-URL-DO-APPS-SCRIPT');
+
+  if(sheetsConfigurado){
+    fetch(SHEETS_WEBHOOK_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    })
+    .catch(err => console.error('Erro de rede ao enviar para o Google Sheets:', err));
+  } else {
+    console.warn('SHEETS_WEBHOOK_URL não configurado — os dados NÃO estão sendo enviados para o Google Sheets. Configure a constante no topo do script.');
   }
 
   renderRelatorioFinal();
