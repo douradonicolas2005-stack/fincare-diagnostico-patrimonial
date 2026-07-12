@@ -66,6 +66,15 @@ var LABELS_FONTE_AVANCADO = {
   'nenhuma (apenas diagnostico rapido)': 'So fez o diagnostico rapido'
 };
 
+// Formatos numericos do Sheets (moeda/percentual) precisam de aspas duplas
+// literais dentro da string de formato. Montamos o caractere de aspas assim,
+// em vez de aninhar aspas duplas dentro de aspas simples no codigo-fonte,
+// para o script nao quebrar se o editor onde voce colar trocar aspas retas
+// por aspas curvas automaticamente.
+var ASPAS = String.fromCharCode(34);
+var FORMATO_MOEDA = ASPAS + 'R$' + ASPAS + ' #,##0.00';
+var FORMATO_SCORE = '0' + ASPAS + '%' + ASPAS;
+
 // ================================================================
 // RECEBIMENTO DOS DADOS
 // ================================================================
@@ -122,18 +131,17 @@ function formatarCabecalho_(sheet) {
 }
 
 function formatarLinha_(sheet, row) {
-  var moeda = '"R$" #,##0.00';
   var percentual = '0.0%';
 
   [COLS.patrimonio_atual, COLS.aporte_mensal, COLS.renda_desejada,
    COLS.patrimonio_necessario, COLS.diagnostico_avancado_patrimonio_liquido_adicional]
-    .forEach(function (c) { sheet.getRange(row, c).setNumberFormat(moeda); });
+    .forEach(function (c) { sheet.getRange(row, c).setNumberFormat(FORMATO_MOEDA); });
 
   [COLS.rentabilidade_esperada, COLS.taxa_retirada]
     .forEach(function (c) { sheet.getRange(row, c).setNumberFormat(percentual); });
 
   sheet.getRange(row, COLS.data).setNumberFormat('dd/mm/yyyy hh:mm');
-  sheet.getRange(row, COLS.score_patrimonial).setNumberFormat('0"%"');
+  sheet.getRange(row, COLS.score_patrimonial).setNumberFormat(FORMATO_SCORE);
 }
 
 function aplicarFormatacaoCondicionalScore_(sheet) {
@@ -229,7 +237,7 @@ function atualizarDashboard() {
     var linha = 3 + i;
     dash.getRange(linha, 1).setValue(kpiLabels[i]).setFontWeight('bold');
     var cell = dash.getRange(linha, 2).setValue(kpiValues[i]);
-    if (i === 2) cell.setNumberFormat('"R$" #,##0.00');
+    if (i === 2) cell.setNumberFormat(FORMATO_MOEDA);
   }
 
   // --- Tabelas auxiliares + graficos ---
