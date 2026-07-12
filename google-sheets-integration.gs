@@ -253,17 +253,24 @@ function detectarValoresDistintos_(sheet, coluna) {
 // COLUNAS AUXILIARES NA ABA "Leads" (AD = data_real, AE = lead_valido)
 // ================================================================
 function configurarColunasAuxiliares_(sheet, sep) {
+  // O cabecalho (linha 1) fica sempre como texto simples, igual as outras
+  // 29 colunas - o Sheets bloqueia formula direto na linha de cabecalho
+  // quando o intervalo esta configurado como Tabela nativa. A formula
+  // comeca na linha 2 e se expande sozinha dali pra baixo.
+  sheet.getRange(1, COL_DATA_REAL).setValue('data_real');
+  sheet.getRange(1, COL_LEAD_VALIDO).setValue('lead_valido');
+
   var formulaDataReal = montarFormula_(
-    '=ARRAYFORMULA(IF(ROW(A:A)=1;~data_real~;IF(A:A=~~;~~;IFERROR(DATEVALUE(LEFT(A:A;10));~~))))',
+    '=ARRAYFORMULA(IF(A2:A=~~;~~;IFERROR(DATEVALUE(LEFT(A2:A;10));~~)))',
     sep
   );
   var formulaLeadValido = montarFormula_(
-    '=ARRAYFORMULA(IF(ROW(A:A)=1;~lead_valido~;IF(D:D=~~;~~;1)))',
+    '=ARRAYFORMULA(IF(D2:D=~~;~~;1))',
     sep
   );
 
-  sheet.getRange(1, COL_DATA_REAL).setFormula(formulaDataReal);
-  sheet.getRange(1, COL_LEAD_VALIDO).setFormula(formulaLeadValido);
+  sheet.getRange(2, COL_DATA_REAL).setFormula(formulaDataReal);
+  sheet.getRange(2, COL_LEAD_VALIDO).setFormula(formulaLeadValido);
 
   [COL_DATA_REAL, COL_LEAD_VALIDO].forEach(function (c) {
     sheet.getRange(1, c).setFontWeight('bold').setFontColor('#FFFFFF').setBackground('#003B49');
@@ -666,7 +673,7 @@ function construirComoUsar_(ss) {
     ['Como o webhook alimenta',
      'O simulador do site grava um lead novo por linha na aba Leads, sempre nas colunas A ate AC (29 colunas). O script nunca escreve nas colunas AD (data_real) e AE (lead_valido) - essas sao calculadas automaticamente pela planilha.'],
     ['Colunas auxiliares (AD e AE)',
-     'AD (data_real) converte o texto de data/hora da coluna A numa data de verdade, formatada dd/mm/aaaa. AE (lead_valido) marca 1 quando o lead tem e-mail preenchido (coluna D), vazio quando nao tem. Sao formulas ARRAYFORMULA unicas na linha 1 que se expandem sozinhas conforme novas linhas chegam.'],
+     'AD (data_real) converte o texto de data/hora da coluna A numa data de verdade, formatada dd/mm/aaaa. AE (lead_valido) marca 1 quando o lead tem e-mail preenchido (coluna D), vazio quando nao tem. Sao formulas ARRAYFORMULA unicas na linha 2 que se expandem sozinhas conforme novas linhas chegam.'],
     ['O que e lead valido',
      'Lead valido = tem e-mail preenchido. Todas as metricas do Dashboard, Aquisicao e Priorizacao contam apenas leads validos, para nao misturar linhas de teste/lixo com dados reais.'],
     ['Escala do Score Patrimonial',
