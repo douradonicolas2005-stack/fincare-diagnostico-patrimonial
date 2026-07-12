@@ -78,13 +78,31 @@ var FORMATO_SCORE = '0' + ASPAS + '%' + ASPAS;
 // ================================================================
 // RECEBIMENTO DOS DADOS
 // ================================================================
+// Acha a ultima linha com dado real na coluna "data" (coluna A). Nao usamos
+// sheet.getLastRow() para isso porque ele considera conteudo em QUALQUER
+// coluna da planilha - se colunas calculadas depois de AC (ex: "data_real",
+// "lead_valido") tiverem formulas preenchidas bem mais abaixo dos leads
+// reais, getLastRow() retornaria essa linha distante e o proximo lead
+// gravado (via appendRow ou range baseado nele) cairia num buraco vazio,
+// longe de onde deveria. Olhando so a coluna A evitamos isso.
+function getUltimaLinhaComDados_(sheet) {
+  var maxRows = sheet.getMaxRows();
+  var colunaData = sheet.getRange(1, COLS.data, maxRows, 1).getValues();
+  for (var i = colunaData.length - 1; i >= 0; i--) {
+    if (colunaData[i][0] !== '') return i + 1;
+  }
+  return 0;
+}
+
 function doPost(e) {
   var sheet = getLeadsSheet_();
   var data = JSON.parse(e.postData.contents);
 
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(HEADERS);
+  var ultimaLinha = getUltimaLinhaComDados_(sheet);
+  if (ultimaLinha === 0) {
+    sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
     formatarCabecalho_(sheet);
+    ultimaLinha = 1;
   }
 
   var row = HEADERS.map(function (h) {
@@ -93,8 +111,11 @@ function doPost(e) {
   });
   row[COLS.data - 1] = data.data ? new Date(data.data) : new Date();
 
-  sheet.appendRow(row);
-  formatarLinha_(sheet, sheet.getLastRow());
+  // Escreve so nas colunas A:AC (o tamanho exato de "row"), nunca em
+  // colunas calculadas que existam depois delas.
+  var novaLinha = ultimaLinha + 1;
+  sheet.getRange(novaLinha, 1, 1, row.length).setValues([row]);
+  formatarLinha_(sheet, novaLinha);
   aplicarFormatacaoCondicionalScore_(sheet);
   atualizarDashboard();
 
@@ -145,7 +166,7 @@ function formatarLinha_(sheet, row) {
 }
 
 function aplicarFormatacaoCondicionalScore_(sheet) {
-  var lastRow = Math.max(2, sheet.getLastRow());
+  var lastRow = Math.max(2, getUltimaLinhaComDados_(sheet));
   var range = sheet.getRange(2, COLS.score_patrimonial, lastRow - 1, 1);
   var rule = SpreadsheetApp.newConditionalFormatRule()
     .setGradientMaxpointWithValue('#2B7E7E', SpreadsheetApp.InterpolationType.NUMBER, '100')
@@ -162,7 +183,7 @@ function aplicarFormatacaoCondicionalScore_(sheet) {
 function formatarTodasAsLinhas() {
   var sheet = getLeadsSheet_();
   formatarCabecalho_(sheet);
-  var lastRow = sheet.getLastRow();
+  var lastRow = getUltimaLinhaComDados_(sheet);
   for (var r = 2; r <= lastRow; r++) {
     formatarLinha_(sheet, r);
   }
@@ -176,7 +197,7 @@ function formatarTodasAsLinhas() {
 function atualizarDashboard() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var leads = getLeadsSheet_();
-  var lastRow = leads.getLastRow();
+  var lastRow = getUltimaLinhaComDados_(leads);
   var dash = ss.getSheetByName('Dashboard');
   if (!dash) {
     dash = ss.insertSheet('Dashboard');
