@@ -155,6 +155,7 @@ function getLeadsSheet_() {
 // ================================================================
 function formatarCabecalho_(sheet) {
   var header = sheet.getRange(1, 1, 1, HEADERS.length);
+  header.setValues([HEADERS]);
   header.setFontWeight('bold');
   header.setFontColor('#FFFFFF');
   header.setBackground('#003B49');
@@ -250,10 +251,26 @@ function detectarValoresDistintos_(sheet, coluna) {
   return distintos;
 }
 
+// Antes desta versao (que adicionou a coluna de dados perfil_investidor),
+// data_real/lead_valido ficavam logo depois de utm_term - ou seja, exatamente
+// na coluna que perfil_investidor ocupa agora. Se o script rodou antes nessa
+// planilha, a formula ARRAYFORMULA antiga ainda pode estar la, ocupando o
+// lugar da nova coluna de dados e bloqueando a escrita de leads novos.
+// Limpa esse resquicio (reconhecido pelo cabecalho antigo "data_real" estar
+// numa coluna que hoje deveria ser uma coluna comum de dados).
+function limparColunaAuxiliarAntiga_(sheet) {
+  var col = COLS.perfil_investidor;
+  if (sheet.getRange(1, col).getValue() === 'data_real') {
+    sheet.getRange(1, col, sheet.getMaxRows(), 1).clearContent().clearFormat();
+  }
+}
+
 // ================================================================
-// COLUNAS AUXILIARES NA ABA "Leads" (AD = data_real, AE = lead_valido)
+// COLUNAS AUXILIARES NA ABA "Leads" (AE = data_real, AF = lead_valido)
 // ================================================================
 function configurarColunasAuxiliares_(sheet, sep) {
+  limparColunaAuxiliarAntiga_(sheet);
+
   // O cabecalho (linha 1) fica sempre como texto simples, igual as outras
   // 30 colunas - o Sheets bloqueia formula direto na linha de cabecalho
   // quando o intervalo esta configurado como Tabela nativa. A formula
