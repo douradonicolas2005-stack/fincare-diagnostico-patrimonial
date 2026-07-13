@@ -827,7 +827,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
 
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="goToStep(3)">Voltar</button>
-        <button class="btn btn-primary" onclick="startCalculation()">Gerar meu diagnóstico</button>
+        <button class="btn btn-primary" onclick="goToStep(5)">Continuar</button>
       </div>
     </div>
   </section>
@@ -888,7 +888,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
         <li><span class="check">✔</span><span class="lbl">Fatores que aceleram ou atrasam sua meta</span><span class="val locked">████████</span></li>
       </ul>
       <div class="report-cta">
-        <button class="btn btn-gold" onclick="goToStep(5)">Aprofundar meu diagnóstico</button>
+        <button class="btn btn-gold" onclick="goToStep('advanced')">Aprofundar meu diagnóstico</button>
       </div>
     </div>
 
@@ -1089,8 +1089,8 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
     <div class="card">
       <div class="mini-progress"><span class="done"></span><span></span></div>
       <div class="q-eyebrow">Quase lá</div>
-      <h2 class="q-title">Antes de aprofundar, para onde enviamos seu diagnóstico?</h2>
-      <p class="q-sub">Preencha seus dados para liberar o Diagnóstico Avançado. Um especialista da Fincare também poderá comentar os resultados com você, se fizer sentido.</p>
+      <h2 class="q-title">Antes de gerar seu diagnóstico, para onde enviamos o resultado?</h2>
+      <p class="q-sub">Preencha seus dados para liberar seu Diagnóstico Patrimonial. Um especialista da Fincare também poderá comentar os resultados com você, se fizer sentido.</p>
 
       <div class="field">
         <label for="leadNome">Nome completo</label>
@@ -1112,7 +1112,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
       </div>
 
       <div class="btn-row">
-        <button class="btn btn-ghost" onclick="goToStep('result')">Voltar</button>
+        <button class="btn btn-ghost" onclick="goToStep(4)">Voltar</button>
         <button class="btn btn-primary" onclick="validateStep5AndContinue()">Continuar</button>
       </div>
     </div>
@@ -1194,7 +1194,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
 
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="goToStep(5)">Voltar</button>
-        <button class="btn btn-primary" onclick="submitLead()">Continuar para o diagnóstico avançado</button>
+        <button class="btn btn-primary" onclick="submitLead()">Gerar meu diagnóstico</button>
       </div>
     </div>
   </section>
@@ -1227,6 +1227,15 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
         <h3>Detalhamento completo</h3>
       </div>
       <ul class="report-list" id="finalReportList"></ul>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="badge-simulado">Classificação de referência</div>
+      <div class="q-eyebrow">Perfil de investidor</div>
+      <h2 class="q-title" style="font-size:19px;" id="perfilNome">—</h2>
+      <p class="q-sub" id="perfilDescricao">—</p>
+      <div class="alloc-legend" id="perfilAlocacao" style="margin-top:4px;"></div>
+      <p class="final-note" style="margin-top:14px;">Classificação estimada com base na metodologia de perfis do Safra Report, considerando capacidade financeira, tolerância a oscilações e conhecimento/experiência declarados nesta simulação. O enquadramento oficial do seu perfil e a alocação definitiva devem ser validados com um assessor Fincare Investimentos.</p>
     </div>
 
     <div class="card" style="margin-bottom:16px;">
@@ -1371,6 +1380,98 @@ function startCalculation(){
   setTimeout(calcular, 900);
 }
 
+/* ============================================================
+   CLASSIFICAÇÃO DE PERFIL DE INVESTIDOR
+   Metodologia de referência: Safra Report (Jun/2026) — perfis
+   Ultraconservador, Conservador, Moderado e Dinâmico, definidos pela
+   combinação de 1) capacidade para investir, 2) tolerância a oscilações
+   e 3) conhecimento/experiência. Alocações abaixo replicam as faixas
+   de referência divulgadas no relatório para cada perfil.
+   ============================================================ */
+const PERFIS_INVESTIDOR = {
+  ultraconservador: {
+    nome: 'Ultraconservador',
+    descricao: 'Baixíssima tolerância a oscilações. Prioriza estabilidade e previsibilidade, com carteira concentrada em Renda Fixa.',
+    alocacao: [
+      {nome:'Renda Fixa', pct:100, cor:'var(--verde-escuro)'},
+      {nome:'Multimercado', pct:0, cor:'var(--gold)'},
+      {nome:'Renda Variável Local', pct:0, cor:'var(--verde-medio)'},
+      {nome:'Internacional', pct:0, cor:'var(--verde-claro)'},
+      {nome:'Alternativos', pct:0, cor:'var(--text-muted)'}
+    ]
+  },
+  conservador: {
+    nome: 'Conservador',
+    descricao: 'Baixa aceitação a oscilações, com espaço para diversificar além da Renda Fixa, somando Multimercado, Renda Variável Local e ativos internacionais.',
+    alocacao: [
+      {nome:'Renda Fixa', pct:77, cor:'var(--verde-escuro)'},
+      {nome:'Multimercado', pct:8, cor:'var(--gold)'},
+      {nome:'Renda Variável Local', pct:5, cor:'var(--verde-medio)'},
+      {nome:'Internacional', pct:6, cor:'var(--verde-claro)'},
+      {nome:'Alternativos', pct:4, cor:'var(--text-muted)'}
+    ]
+  },
+  moderado: {
+    nome: 'Moderado',
+    descricao: 'Aceita oscilações em prol de maior potencial de retorno. Fundos Multimercado ganham peso relevante, com visão de longo prazo.',
+    alocacao: [
+      {nome:'Renda Fixa', pct:54, cor:'var(--verde-escuro)'},
+      {nome:'Multimercado', pct:16, cor:'var(--gold)'},
+      {nome:'Renda Variável Local', pct:10, cor:'var(--verde-medio)'},
+      {nome:'Internacional', pct:13, cor:'var(--verde-claro)'},
+      {nome:'Alternativos', pct:7, cor:'var(--text-muted)'}
+    ]
+  },
+  dinamico: {
+    nome: 'Dinâmico',
+    descricao: 'Aceita oscilações significativas em busca de maiores retornos, com maior exposição a Renda Variável, Fundos Imobiliários e Internacional. Foco em longo prazo.',
+    alocacao: [
+      {nome:'Renda Fixa', pct:36, cor:'var(--verde-escuro)'},
+      {nome:'Multimercado', pct:16, cor:'var(--gold)'},
+      {nome:'Renda Variável Local', pct:17, cor:'var(--verde-medio)'},
+      {nome:'Internacional', pct:21, cor:'var(--verde-claro)'},
+      {nome:'Alternativos', pct:10, cor:'var(--text-muted)'}
+    ]
+  }
+};
+
+// Pontuação 0-3 por dimensão (tolerância, capacidade, conhecimento) a partir
+// dos dados já coletados no simulador e na qualificação do lead — sem exigir
+// novas perguntas do prospect. Faixas de corte na soma (0-9) mapeiam para os
+// 4 perfis do Safra Report.
+function classificarPerfilInvestidor(lead, calc){
+  const mapaFaixaPatrimonio = {ate_500k:0, '500k_1m':1, '1m_5m':2, '5m_mais':3};
+  const mapaFaixaRenda = {ate_15k:0, '15k_40k':1, '40k_100k':2, '100k_mais':3};
+
+  // 1) Tolerância a oscilações — proxy: rentabilidade-alvo e taxa de retirada
+  // escolhidas pelo próprio usuário no Passo 4 (slider "Conservador → Arrojado").
+  let pontosTolerancia = 0;
+  if(calc.rent > 0.04) pontosTolerancia++;
+  if(calc.rent > 0.06) pontosTolerancia++;
+  if(calc.rent > 0.09) pontosTolerancia++;
+  if(calc.retirada >= 0.05) pontosTolerancia += 0.5;
+  if(calc.retirada <= 0.03) pontosTolerancia -= 0.5;
+
+  // 2) Capacidade para investir — faixas de patrimônio e renda da qualificação
+  const pontosCapacidade = (
+    (mapaFaixaPatrimonio[lead.faixa_patrimonio] || 0) +
+    (mapaFaixaRenda[lead.faixa_renda] || 0)
+  ) / 2;
+
+  // 3) Conhecimento e experiência — já possui assessor e/ou gerente bancário
+  const pontosConhecimento = (lead.possui_assessor === 'sim' ? 2 : 0) + (lead.possui_gerente_banco === 'sim' ? 1 : 0);
+
+  const pontuacao = pontosTolerancia + pontosCapacidade + pontosConhecimento;
+
+  let chave;
+  if(pontuacao <= 2) chave = 'ultraconservador';
+  else if(pontuacao <= 4) chave = 'conservador';
+  else if(pontuacao <= 6) chave = 'moderado';
+  else chave = 'dinamico';
+
+  return Object.assign({pontuacao}, PERFIS_INVESTIDOR[chave]);
+}
+
 function calcular(){
   const idade = parseFloat(document.getElementById('idade').value) || 0;
   const patrimonio0 = parseFloat(document.getElementById('patrimonio').value) || 0;
@@ -1391,6 +1492,7 @@ function calcular(){
     anosCenarioAporte: cenarioAporte.anos,
     anosCenarioRent: cenarioRent.anos
   };
+  state.calc.perfilInvestidor = classificarPerfilInvestidor(state.lead, state.calc);
 
   renderResultado();
   goToStep('result');
@@ -1607,8 +1709,8 @@ function submitLead(){
     return;
   }
 
-  // Guarda o lead qualificado antes de liberar o Diagnóstico Avançado —
-  // finalizeReport() reaproveita esses dados sem pedir de novo ao usuário.
+  // Guarda o lead qualificado antes de gerar o diagnóstico — calcular()
+  // e finalizeReport() reaproveitam esses dados sem pedir de novo ao usuário.
   state.lead = {
     nome: document.getElementById('leadNome').value.trim(),
     telefone: document.getElementById('leadWhats').value.trim(),
@@ -1622,7 +1724,7 @@ function submitLead(){
     objetivo_financeiro: objetivoEl.value
   };
 
-  goToStep('advanced');
+  startCalculation();
 }
 
 function finalizeReport(){
@@ -1669,6 +1771,7 @@ function finalizeReport(){
       : '',
 
     score_patrimonial: scorePatrimonial,
+    perfil_investidor: c.perfilInvestidor.nome,
     data: new Date().toISOString(),
     origem_lead: 'calculadora-fincare-instagram',
 
@@ -1747,6 +1850,13 @@ function renderRelatorioFinal(){
 
   list.innerHTML = linhas.map(l =>
     '<li><span class="check">✔</span><span class="lbl">'+l[0]+'</span><span class="val">'+l[1]+'</span></li>'
+  ).join('');
+
+  const perfil = c.perfilInvestidor;
+  document.getElementById('perfilNome').textContent = perfil.nome;
+  document.getElementById('perfilDescricao').textContent = perfil.descricao;
+  document.getElementById('perfilAlocacao').innerHTML = perfil.alocacao.map(a =>
+    '<div class="alloc-row"><span class="sw" style="background:'+a.cor+'"></span><span class="nm">'+a.nome+'</span><span class="pc">'+a.pct+'%</span></div>'
   ).join('');
 
   document.getElementById('successBanner').style.display = 'block';
