@@ -1217,12 +1217,10 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
       </div>
 
       <div class="field">
-        <label class="radio-opt" style="align-items:flex-start;">
-          <input type="checkbox" id="leadConsentimento" style="margin-top:3px;">
-          <span style="font-size:12.5px; color:var(--text-muted); line-height:1.5;">
-            Autorizo a Fincare Investimentos a entrar em contato comigo por e-mail e WhatsApp para apresentar meu relatório e, se eu desejar, uma análise personalizada. Meus dados serão tratados conforme a <a href="#" style="color:var(--verde-medio);">Política de Privacidade</a> da Fincare, em conformidade com a LGPD.
-          </span>
-        </label>
+        <p style="font-size:12.5px; color:var(--text-muted); line-height:1.5; margin:0 0 12px;">
+          A Fincare Investimentos gostaria de te contatar por e-mail e WhatsApp para apresentar seu relatório e, se você desejar, uma análise personalizada, em conformidade com a LGPD.
+        </p>
+        <button type="button" class="btn btn-ghost" id="consentBtn" style="width:100%;" onclick="toggleConsentimento()">Autorizar contato</button>
       </div>
 
       <div class="btn-row">
@@ -1305,8 +1303,25 @@ const state = {
     manualDetalhe: null
   },
   lead: null, // dados de contato/qualificação, preenchidos em submitLead() antes do Diagnóstico Avançado
+  consentimento: { autorizado: false, dataHora: null }, // prova de opt-in, alternada em toggleConsentimento()
   utm: {}
 };
+
+function toggleConsentimento(){
+  state.consentimento.autorizado = !state.consentimento.autorizado;
+  state.consentimento.dataHora = state.consentimento.autorizado ? new Date().toISOString() : null;
+
+  const btn = document.getElementById('consentBtn');
+  if(state.consentimento.autorizado){
+    btn.classList.remove('btn-ghost');
+    btn.classList.add('btn-primary');
+    btn.textContent = '✓ Contato autorizado';
+  } else {
+    btn.classList.remove('btn-primary');
+    btn.classList.add('btn-ghost');
+    btn.textContent = 'Autorizar contato';
+  }
+}
 
 // --------------------------------------------------------------
 // UTMs de campanha — capturados automaticamente da URL de chegada
@@ -1731,13 +1746,12 @@ function submitLead(){
   const assessor = document.getElementById('leadAssessor').value;
   const gerente = document.getElementById('leadGerente').value;
   const objetivoEl = document.querySelector('input[name="objetivo"]:checked');
-  const consentimento = document.getElementById('leadConsentimento').checked;
 
   if(!faixaPatrimonio || !faixaRenda || !assessor || !gerente || !objetivoEl){
     alert('Preencha todos os campos para continuar.');
     return;
   }
-  if(!consentimento){
+  if(!state.consentimento.autorizado){
     alert('É necessário autorizar o contato para continuar.');
     return;
   }
@@ -1755,7 +1769,9 @@ function submitLead(){
     instituicao_financeira_atual: document.getElementById('leadInstituicao').value.trim(),
     possui_assessor: assessor,
     possui_gerente_banco: gerente,
-    objetivo_financeiro: objetivoEl.value
+    objetivo_financeiro: objetivoEl.value,
+    consentimento_contato: state.consentimento.autorizado,
+    consentimento_data_hora: state.consentimento.dataHora
   };
 
   startCalculation();
@@ -1785,6 +1801,8 @@ function finalizeReport(){
     possui_assessor: lead.possui_assessor,
     possui_gerente_banco: lead.possui_gerente_banco,
     objetivo_financeiro: lead.objetivo_financeiro,
+    consentimento_contato: lead.consentimento_contato ? 'sim' : 'nao',
+    consentimento_data_hora: lead.consentimento_data_hora || '',
 
     // Dados da simulação (Nível 1 — Diagnóstico Rápido) — campos "achatados"
     // (em vez de um objeto aninhado) para aparecerem como colunas legíveis
