@@ -30,7 +30,7 @@ var COLS = {
   diagnostico_avancado_fonte: 20, diagnostico_avancado_patrimonio_liquido_adicional: 21,
   diagnostico_avancado_alocacao_por_classe: 22, score_patrimonial: 23,
   origem_lead: 24, utm_campaign: 25, utm_source: 26, utm_medium: 27,
-  utm_content: 28, utm_term: 29, perfil_investidor: 30
+  utm_content: 28, utm_term: 29, perfil_investidor: 30, estado: 31
 };
 
 var HEADERS = [
@@ -42,7 +42,7 @@ var HEADERS = [
   'diagnostico_avancado_fonte', 'diagnostico_avancado_patrimonio_liquido_adicional',
   'diagnostico_avancado_alocacao_por_classe', 'score_patrimonial',
   'origem_lead', 'utm_campaign', 'utm_source', 'utm_medium', 'utm_content', 'utm_term',
-  'perfil_investidor'
+  'perfil_investidor', 'estado'
 ];
 
 var LABELS_FAIXA_PATRIMONIO = {
@@ -82,9 +82,9 @@ var FORMATO_SCORE = '0' + ASPAS + '%' + ASPAS;
 var FORMATO_AVG_ANOS = '0.0' + ASPAS + ' anos' + ASPAS;
 var FORMATO_IDADE = '0' + ASPAS + ' anos' + ASPAS;
 
-// Colunas auxiliares calculadas, logo depois da ultima coluna de dados (AD).
-var COL_DATA_REAL = COLS.perfil_investidor + 1;   // 31 = AE
-var COL_LEAD_VALIDO = COLS.perfil_investidor + 2; // 32 = AF
+// Colunas auxiliares calculadas, logo depois da ultima coluna de dados (AE).
+var COL_DATA_REAL = COLS.estado + 1;   // 32 = AF
+var COL_LEAD_VALIDO = COLS.estado + 2; // 33 = AG
 
 var PALETA_CARDS = [
   '#2A9D8F', '#E9C46A', '#87A96B',
@@ -128,7 +128,7 @@ function doPost(e) {
   });
   row[COLS.data - 1] = data.data ? new Date(data.data) : new Date();
 
-  // Escreve so nas colunas A:AD (o tamanho exato de "row"), nunca em
+  // Escreve so nas colunas A:AE (o tamanho exato de "row"), nunca em
   // colunas calculadas que existam depois delas.
   var novaLinha = ultimaLinha + 1;
   sheet.getRange(novaLinha, 1, 1, row.length).setValues([row]);
@@ -251,28 +251,33 @@ function detectarValoresDistintos_(sheet, coluna) {
   return distintos;
 }
 
-// Antes desta versao (que adicionou a coluna de dados perfil_investidor),
-// data_real/lead_valido ficavam logo depois de utm_term - ou seja, exatamente
-// na coluna que perfil_investidor ocupa agora. Se o script rodou antes nessa
-// planilha, a formula ARRAYFORMULA antiga ainda pode estar la, ocupando o
-// lugar da nova coluna de dados e bloqueando a escrita de leads novos.
-// Limpa esse resquicio (reconhecido pelo cabecalho antigo "data_real" estar
-// numa coluna que hoje deveria ser uma coluna comum de dados).
-function limparColunaAuxiliarAntiga_(sheet) {
-  var col = COLS.perfil_investidor;
-  if (sheet.getRange(1, col).getValue() === 'data_real') {
-    sheet.getRange(1, col, sheet.getMaxRows(), 1).clearContent().clearFormat();
+// Toda vez que uma coluna de dados nova e adicionada ao final (ex:
+// perfil_investidor, estado), data_real/lead_valido empurram para a frente
+// e a formula ARRAYFORMULA antiga fica presa na coluna que passou a ser de
+// dados comuns - bloqueando a escrita de leads novos ali. Varre uma faixa
+// de colunas perto do fim do cabecalho e limpa qualquer "data_real"/
+// "lead_valido" que nao esteja mais na posicao atual de COL_DATA_REAL/
+// COL_LEAD_VALIDO.
+function limparColunasAuxiliaresAntigas_(sheet) {
+  var margem = 5;
+  var ultimaColuna = HEADERS.length + margem;
+  for (var c = 1; c <= ultimaColuna; c++) {
+    if (c === COL_DATA_REAL || c === COL_LEAD_VALIDO) continue;
+    var valor = sheet.getRange(1, c).getValue();
+    if (valor === 'data_real' || valor === 'lead_valido') {
+      sheet.getRange(1, c, sheet.getMaxRows(), 1).clearContent().clearFormat();
+    }
   }
 }
 
 // ================================================================
-// COLUNAS AUXILIARES NA ABA "Leads" (AE = data_real, AF = lead_valido)
+// COLUNAS AUXILIARES NA ABA "Leads" (AF = data_real, AG = lead_valido)
 // ================================================================
 function configurarColunasAuxiliares_(sheet, sep) {
-  limparColunaAuxiliarAntiga_(sheet);
+  limparColunasAuxiliaresAntigas_(sheet);
 
   // O cabecalho (linha 1) fica sempre como texto simples, igual as outras
-  // 30 colunas - o Sheets bloqueia formula direto na linha de cabecalho
+  // 31 colunas - o Sheets bloqueia formula direto na linha de cabecalho
   // quando o intervalo esta configurado como Tabela nativa. A formula
   // comeca na linha 2 e se expande sozinha dali pra baixo.
   sheet.getRange(1, COL_DATA_REAL).setValue('data_real');
@@ -689,11 +694,13 @@ function construirComoUsar_(ss) {
 
   var linhas = [
     ['Como o webhook alimenta',
-     'O simulador do site grava um lead novo por linha na aba Leads, sempre nas colunas A ate AD (30 colunas), incluindo AD (perfil_investidor). O script nunca escreve nas colunas AE (data_real) e AF (lead_valido) - essas sao calculadas automaticamente pela planilha.'],
+     'O simulador do site grava um lead novo por linha na aba Leads, sempre nas colunas A ate AE (31 colunas), incluindo AD (perfil_investidor) e AE (estado). O script nunca escreve nas colunas AF (data_real) e AG (lead_valido) - essas sao calculadas automaticamente pela planilha.'],
     ['Perfil de investidor (coluna AD)',
      'Classificacao de referencia (Ultraconservador, Conservador, Moderado ou Dinamico) calculada no simulador com base na metodologia de perfis do Safra Report, a partir da faixa de patrimonio/renda, do slider de rentabilidade-alvo e de possuir ou nao assessor/gerente bancario. E uma estimativa para priorizacao comercial, nao substitui o enquadramento oficial de perfil feito por um assessor.'],
-    ['Colunas auxiliares (AE e AF)',
-     'AE (data_real) converte o texto de data/hora da coluna A numa data de verdade, formatada dd/mm/aaaa. AF (lead_valido) marca 1 quando o lead tem e-mail preenchido (coluna D), vazio quando nao tem. Sao formulas ARRAYFORMULA unicas na linha 2 que se expandem sozinhas conforme novas linhas chegam.'],
+    ['Estado (coluna AE)',
+     'Sigla da UF que o lead selecionou no site, ao lado do campo Cidade. Ajuda a identificar rapidamente de onde o lead esta testando, sem depender so do texto livre da cidade.'],
+    ['Colunas auxiliares (AF e AG)',
+     'AF (data_real) converte o texto de data/hora da coluna A numa data de verdade, formatada dd/mm/aaaa. AG (lead_valido) marca 1 quando o lead tem e-mail preenchido (coluna D), vazio quando nao tem. Sao formulas ARRAYFORMULA unicas na linha 2 que se expandem sozinhas conforme novas linhas chegam.'],
     ['O que e lead valido',
      'Lead valido = tem e-mail preenchido. Todas as metricas do Dashboard, Aquisicao e Priorizacao contam apenas leads validos, para nao misturar linhas de teste/lixo com dados reais.'],
     ['Escala do Score Patrimonial',

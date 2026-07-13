@@ -1100,14 +1100,47 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
         <label for="leadEmail">E-mail</label>
         <input type="email" id="leadEmail" placeholder="voce@email.com">
       </div>
+      <div class="field">
+        <label for="leadWhats">WhatsApp</label>
+        <input type="tel" id="leadWhats" placeholder="(11) 90000-0000">
+      </div>
       <div class="row2">
-        <div class="field">
-          <label for="leadWhats">WhatsApp</label>
-          <input type="tel" id="leadWhats" placeholder="(11) 90000-0000">
-        </div>
         <div class="field">
           <label for="leadCidade">Cidade</label>
           <input type="text" id="leadCidade" placeholder="Sua cidade">
+        </div>
+        <div class="field">
+          <label for="leadEstado">Estado</label>
+          <select id="leadEstado">
+            <option value="">Selecione</option>
+            <option value="AC">Acre</option>
+            <option value="AL">Alagoas</option>
+            <option value="AP">Amapá</option>
+            <option value="AM">Amazonas</option>
+            <option value="BA">Bahia</option>
+            <option value="CE">Ceará</option>
+            <option value="DF">Distrito Federal</option>
+            <option value="ES">Espírito Santo</option>
+            <option value="GO">Goiás</option>
+            <option value="MA">Maranhão</option>
+            <option value="MT">Mato Grosso</option>
+            <option value="MS">Mato Grosso do Sul</option>
+            <option value="MG">Minas Gerais</option>
+            <option value="PA">Pará</option>
+            <option value="PB">Paraíba</option>
+            <option value="PR">Paraná</option>
+            <option value="PE">Pernambuco</option>
+            <option value="PI">Piauí</option>
+            <option value="RJ">Rio de Janeiro</option>
+            <option value="RN">Rio Grande do Norte</option>
+            <option value="RS">Rio Grande do Sul</option>
+            <option value="RO">Rondônia</option>
+            <option value="RR">Roraima</option>
+            <option value="SC">Santa Catarina</option>
+            <option value="SP">São Paulo</option>
+            <option value="SE">Sergipe</option>
+            <option value="TO">Tocantins</option>
+          </select>
         </div>
       </div>
 
@@ -1716,6 +1749,7 @@ function submitLead(){
     telefone: document.getElementById('leadWhats').value.trim(),
     email: document.getElementById('leadEmail').value.trim(),
     cidade: document.getElementById('leadCidade').value.trim(),
+    estado: document.getElementById('leadEstado').value,
     faixa_patrimonio: faixaPatrimonio,
     faixa_renda: faixaRenda,
     instituicao_financeira_atual: document.getElementById('leadInstituicao').value.trim(),
@@ -1742,6 +1776,7 @@ function finalizeReport(){
     telefone: lead.telefone,
     email: lead.email,
     cidade: lead.cidade,
+    estado: lead.estado,
 
     // Qualificação
     faixa_patrimonio: lead.faixa_patrimonio,
