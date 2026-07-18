@@ -4,6 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fincare Investimentos | Safra Invest — Diagnóstico Patrimonial</title>
+
+<!-- ==================== META PIXEL (Facebook/Instagram Ads) ====================
+     Pegue o ID no Gerenciador de Eventos da Meta e cole nas DUAS marcações
+     abaixo (a constante META_PIXEL_ID e a URL da tag <noscript>).
+     Eventos de conversão (Lead / IniciouSimulacao) são disparados mais
+     abaixo, junto da lógica do simulador (ver goToStep() e finalizeReport()).
+     ============================================================================ -->
+<script>
+  const META_PIXEL_ID = "517991158551582";
+
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', META_PIXEL_ID);
+  fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=517991158551582&ev=PageView&noscript=1"
+/></noscript>
+<!-- ==================== FIM META PIXEL ==================== -->
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -1218,7 +1244,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
 
       <div class="field">
         <p style="font-size:12.5px; color:var(--text-muted); line-height:1.5; margin:0 0 12px;">
-          A Fincare Investimentos gostaria de te contatar por e-mail e WhatsApp para apresentar seu relatório e, se você desejar, uma análise personalizada, em conformidade com a LGPD.
+          Ao autorizar, você receberá por e-mail o seu Diagnóstico Patrimonial completo em PDF assim que a simulação for concluída, e a Fincare Investimentos poderá te contatar por e-mail e WhatsApp para uma análise personalizada, em conformidade com a LGPD.
         </p>
         <button type="button" class="btn btn-ghost" id="consentBtn" style="width:100%;" onclick="toggleConsentimento()">Autorizar contato</button>
       </div>
@@ -1295,6 +1321,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
 const state = {
   currentStep: 1,
   totalWizardSteps: 4,
+  trackedInicioSimulacao: false, // vira true no 1º avanço do Passo 1→2 (Meta Pixel)
   calc: null,        // resultado do cálculo principal, preenchido em calcular()
   advanced: {
     source: null,      // 'manual' | 'portfolio' | null
@@ -1360,6 +1387,14 @@ const WEBHOOK_URL = 'https://formspree.io/f/xjgqndvn';
 // 2. Cole aqui a URL gerada (termina em /exec), no lugar de 'COLE-AQUI-A-URL-DO-APPS-SCRIPT'.
 const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwR38_BmoDnh6jqCX3m97oz4B04p9-Z9ax4ub5H-zcCMSm_LcrdWYEeQ8czK7vdRYjw/exec';
 
+// Chave enviada junto no payload do Sheets e conferida no doPost() do
+// Apps Script (ver WEBHOOK_TOKEN em google-sheets-integration.gs) - os dois
+// valores precisam ser IGUAIS. Isso so filtra bots/scanners genericos
+// batendo direto na URL do webhook, nao e sigilo real (qualquer um que
+// abrir o codigo-fonte da pagina ve essa mesma chave). Se trocar o valor
+// aqui, troque tambem no .gs e reimplante uma nova versao.
+const SHEETS_WEBHOOK_TOKEN = 'b50b0b80ca404100c3d58bf1b972755d';
+
 // Link do WhatsApp do escritório — ajuste o número (formato internacional, só dígitos)
 const WHATSAPP_NUMERO = '5511941819794';
 
@@ -1376,6 +1411,14 @@ function showStep(id){
 }
 
 function goToStep(n){
+  // Evento customizado do Meta Pixel: dispara uma única vez, na primeira
+  // vez que a pessoa avança do Passo 1 para o Passo 2 (primeiro engajamento
+  // real com o simulador, distinto do PageView disparado no carregamento).
+  if(n === 2 && !state.trackedInicioSimulacao && typeof fbq === 'function'){
+    fbq('trackCustom', 'IniciouSimulacao');
+    state.trackedInicioSimulacao = true;
+  }
+
   state.currentStep = n;
   showStep(n);
   if(typeof n === 'number' && n >= 1 && n <= 4){
@@ -1815,6 +1858,13 @@ function finalizeReport(){
     patrimonio_necessario: c.necessario,
     anos_ate_independencia: c.anos,
     idade_atual: c.idade,
+    patrimonio_projetado_10anos: c.trajetoria[Math.min(10, c.trajetoria.length - 1)],
+    // Cenários auxiliares usados só para montar as recomendações do relatório
+    // final (renderExecutiveDashboard/renderInsights) — sem esses dois campos,
+    // o PDF enviado por e-mail não consegue reproduzir as mesmas recomendações
+    // de "aumentar aporte" / "rentabilidade +1pp" mostradas na tela.
+    anos_cenario_aporte: c.anosCenarioAporte,
+    anos_cenario_rentabilidade: c.anosCenarioRent,
 
     // Diagnóstico avançado (Nível 2), quando o usuário complementou os dados
     diagnostico_avancado_fonte: state.advanced.source || 'nenhuma (apenas diagnostico rapido)', // 'manual' | 'portfolio' | null
@@ -1825,6 +1875,10 @@ function finalizeReport(){
 
     score_patrimonial: scorePatrimonial,
     perfil_investidor: c.perfilInvestidor.nome,
+    perfil_investidor_descricao: c.perfilInvestidor.descricao,
+    perfil_investidor_alocacao: JSON.stringify(
+      c.perfilInvestidor.alocacao.map(a => ({ nome: a.nome, pct: a.pct }))
+    ),
     data: new Date().toISOString(),
     origem_lead: 'calculadora-fincare-instagram',
 
@@ -1835,6 +1889,11 @@ function finalizeReport(){
     utm_content: state.utm.utm_content || '',
     utm_term: state.utm.utm_term || ''
   };
+
+  // Evento de conversão do Meta Pixel: a pessoa completou a simulação e
+  // virou lead. Ponto único, chamado tanto pelo diagnóstico rápido quanto
+  // pelo diagnóstico avançado (ver os dois onclick="finalizeReport()" na página).
+  if(typeof fbq === 'function') fbq('track', 'Lead');
 
   // Encaminhamento estruturado para CRM (não implementado — apenas arquitetura
   // pronta para plugar o provedor escolhido futuramente). Ver crmAdapters abaixo.
@@ -1872,11 +1931,15 @@ function finalizeReport(){
   const sheetsConfigurado = SHEETS_WEBHOOK_URL && !SHEETS_WEBHOOK_URL.includes('COLE-AQUI-A-URL-DO-APPS-SCRIPT');
 
   if(sheetsConfigurado){
+    // webhook_token só vai nesse envio (não no payload do Formspree/CRM lá em
+    // cima) - é conferido pelo doPost() do Apps Script antes de gravar
+    // qualquer coisa na planilha ou disparar e-mail.
+    const payloadSheets = Object.assign({webhook_token: SHEETS_WEBHOOK_TOKEN}, payload);
     fetch(SHEETS_WEBHOOK_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payloadSheets)
     })
     .catch(err => console.error('Erro de rede ao enviar para o Google Sheets:', err));
   } else {
