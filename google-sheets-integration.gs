@@ -44,7 +44,7 @@ var COLS = {
   diagnostico_avancado_alocacao_por_classe: 22, score_patrimonial: 23,
   origem_lead: 24, utm_campaign: 25, utm_source: 26, utm_medium: 27,
   utm_content: 28, utm_term: 29, perfil_investidor: 30, estado: 31,
-  consentimento_contato: 32, consentimento_data_hora: 33
+  consentimento_contato: 32, consentimento_data_hora: 33, diagnostico_completo: 34
 };
 
 var HEADERS = [
@@ -56,7 +56,8 @@ var HEADERS = [
   'diagnostico_avancado_fonte', 'diagnostico_avancado_patrimonio_liquido_adicional',
   'diagnostico_avancado_alocacao_por_classe', 'score_patrimonial',
   'origem_lead', 'utm_campaign', 'utm_source', 'utm_medium', 'utm_content', 'utm_term',
-  'perfil_investidor', 'estado', 'consentimento_contato', 'consentimento_data_hora'
+  'perfil_investidor', 'estado', 'consentimento_contato', 'consentimento_data_hora',
+  'diagnostico_completo'
 ];
 
 var LABELS_FAIXA_PATRIMONIO = {
@@ -96,9 +97,9 @@ var FORMATO_SCORE = '0' + ASPAS + '%' + ASPAS;
 var FORMATO_AVG_ANOS = '0.0' + ASPAS + ' anos' + ASPAS;
 var FORMATO_IDADE = '0' + ASPAS + ' anos' + ASPAS;
 
-// Colunas auxiliares calculadas, logo depois da ultima coluna de dados (AG).
-var COL_DATA_REAL = COLS.consentimento_data_hora + 1;   // 34 = AH
-var COL_LEAD_VALIDO = COLS.consentimento_data_hora + 2; // 35 = AI
+// Colunas auxiliares calculadas, logo depois da ultima coluna de dados (AH).
+var COL_DATA_REAL = COLS.diagnostico_completo + 1;   // 35 = AI
+var COL_LEAD_VALIDO = COLS.diagnostico_completo + 2; // 36 = AJ
 
 var PALETA_CARDS = [
   '#2A9D8F', '#E9C46A', '#87A96B',
@@ -183,19 +184,27 @@ function doPost(e) {
   });
   row[COLS.data - 1] = data.data ? new Date(data.data) : new Date();
 
-  // Escreve so nas colunas A:AG (o tamanho exato de "row"), nunca em
+  // Escreve so nas colunas A:AH (o tamanho exato de "row"), nunca em
   // colunas calculadas que existam depois delas.
   var novaLinha = ultimaLinha + 1;
   sheet.getRange(novaLinha, 1, 1, row.length).setValues([row]);
   formatarLinha_(sheet, novaLinha);
   aplicarFormatacaoCondicionalScore_(sheet);
 
-  // Falha no envio do e-mail (cota do Gmail, endereco invalido, etc.) nao
-  // pode derrubar o registro do lead na planilha - por isso o try/catch.
-  try {
-    enviarEmailDiagnostico_(data);
-  } catch (err) {
-    Logger.log('Falha ao enviar e-mail do diagnostico: ' + err);
+  // Leads parciais (diagnostico_completo === 'nao', gravados assim que a
+  // pessoa autoriza contato, antes de terminar a simulacao) ainda nao tem
+  // score/perfil/projecao calculados - nao faz sentido mandar o e-mail de
+  // "seu diagnostico em PDF" pra eles agora. So envia quando o front-end
+  // manda diagnostico_completo:'sim' (ou omite o campo, por compatibilidade
+  // com chamadas antigas que nao tinham esse campo).
+  if (data.diagnostico_completo !== 'nao') {
+    // Falha no envio do e-mail (cota do Gmail, endereco invalido, etc.) nao
+    // pode derrubar o registro do lead na planilha - por isso o try/catch.
+    try {
+      enviarEmailDiagnostico_(data);
+    } catch (err) {
+      Logger.log('Falha ao enviar e-mail do diagnostico: ' + err);
+    }
   }
 
   return ContentService
@@ -1082,15 +1091,17 @@ function construirComoUsar_(ss) {
 
   var linhas = [
     ['Como o webhook alimenta',
-     'O simulador do site grava um lead novo por linha na aba Leads, sempre nas colunas A ate AG (33 colunas), incluindo AD (perfil_investidor), AE (estado), AF (consentimento_contato) e AG (consentimento_data_hora). O script nunca escreve nas colunas AH (data_real) e AI (lead_valido) - essas sao calculadas automaticamente pela planilha.'],
+     'O simulador do site grava um lead novo por linha na aba Leads, sempre nas colunas A ate AH (34 colunas), incluindo AD (perfil_investidor), AE (estado), AF (consentimento_contato), AG (consentimento_data_hora) e AH (diagnostico_completo). O script nunca escreve nas colunas AI (data_real) e AJ (lead_valido) - essas sao calculadas automaticamente pela planilha.'],
     ['Perfil de investidor (coluna AD)',
      'Classificacao de referencia (Ultraconservador, Conservador, Moderado ou Dinamico) calculada no simulador com base na metodologia de perfis do Safra Report, a partir da faixa de patrimonio/renda, do slider de rentabilidade-alvo e de possuir ou nao assessor/gerente bancario. E uma estimativa para priorizacao comercial, nao substitui o enquadramento oficial de perfil feito por um assessor.'],
     ['Estado (coluna AE)',
      'Sigla da UF que o lead selecionou no site, ao lado do campo Cidade. Ajuda a identificar rapidamente de onde o lead esta testando, sem depender so do texto livre da cidade.'],
     ['Consentimento de contato (colunas AF e AG)',
      'AF (consentimento_contato) marca "sim" quando o lead tocou no botao de autorizar contato no site, antes de gerar o diagnostico. AG (consentimento_data_hora) grava o momento exato (ISO 8601) em que o consentimento foi dado, servindo de comprovante de opt-in caso seja preciso auditar depois.'],
-    ['Colunas auxiliares (AH e AI)',
-     'AH (data_real) converte o texto de data/hora da coluna A numa data de verdade, formatada dd/mm/aaaa. AI (lead_valido) marca 1 quando o lead tem e-mail preenchido (coluna D), vazio quando nao tem. Sao formulas ARRAYFORMULA unicas na linha 2 que se expandem sozinhas conforme novas linhas chegam.'],
+    ['Diagnostico completo (coluna AH)',
+     '"nao" = lead parcial: a pessoa autorizou contato e preencheu os dados basicos mas fechou a pagina antes de ver o resultado (score/perfil ainda nao existem para essa linha). "sim" = lead completo: chegou ate o final e recebeu o diagnostico por e-mail. Quem completa aparece duas vezes na aba (uma linha parcial e uma completa) - use esta coluna pra filtrar quem vale a pena reimpactar por nao ter terminado.'],
+    ['Colunas auxiliares (AI e AJ)',
+     'AI (data_real) converte o texto de data/hora da coluna A numa data de verdade, formatada dd/mm/aaaa. AJ (lead_valido) marca 1 quando o lead tem e-mail preenchido (coluna D), vazio quando nao tem. Sao formulas ARRAYFORMULA unicas na linha 2 que se expandem sozinhas conforme novas linhas chegam.'],
     ['O que e lead valido',
      'Lead valido = tem e-mail preenchido. Todas as metricas do Dashboard, Aquisicao e Priorizacao contam apenas leads validos, para nao misturar linhas de teste/lixo com dados reais.'],
     ['Escala do Score Patrimonial',

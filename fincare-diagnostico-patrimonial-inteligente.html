@@ -1395,6 +1395,29 @@ const SHEETS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwR38_BmoDnh
 // aqui, troque tambem no .gs e reimplante uma nova versao.
 const SHEETS_WEBHOOK_TOKEN = 'b50b0b80ca404100c3d58bf1b972755d';
 
+// Envio compartilhado para a planilha do Sheets — usado tanto pelo lead
+// parcial (submitLead(), antes de terminar a simulação) quanto pelo lead
+// completo (finalizeReport()). mode:'no-cors' e Content-Type:'text/plain'
+// evitam o preflight CORS que o Apps Script não responde - o doPost() lá
+// do outro lado faz JSON.parse() do corpo normalmente, então o payload
+// chega intacto mesmo assim. Como consequência, a resposta fica opaca
+// (não dá pra checar sucesso/falha daqui).
+function enviarParaSheets(payload){
+  const sheetsConfigurado = SHEETS_WEBHOOK_URL && !SHEETS_WEBHOOK_URL.includes('COLE-AQUI-A-URL-DO-APPS-SCRIPT');
+  if(!sheetsConfigurado){
+    console.warn('SHEETS_WEBHOOK_URL não configurado — os dados NÃO estão sendo enviados para o Google Sheets. Configure a constante no topo do script.');
+    return;
+  }
+  const payloadSheets = Object.assign({webhook_token: SHEETS_WEBHOOK_TOKEN}, payload);
+  fetch(SHEETS_WEBHOOK_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payloadSheets)
+  })
+  .catch(err => console.error('Erro de rede ao enviar para o Google Sheets:', err));
+}
+
 // Link do WhatsApp do escritório — ajuste o número (formato internacional, só dígitos)
 const WHATSAPP_NUMERO = '5511941819794';
 
@@ -1817,6 +1840,36 @@ function submitLead(){
     consentimento_data_hora: state.consentimento.dataHora
   };
 
+  // Lead parcial — grava na planilha assim que o contato é autorizado,
+  // mesmo que a pessoa abandone antes de ver o resultado (calcular() ainda
+  // nem rodou aqui, então não há score/perfil/projeção para enviar).
+  // diagnostico_completo:'nao' avisa o Apps Script para NÃO disparar o
+  // e-mail de "seu diagnóstico em PDF" agora (ver google-sheets-integration.gs) -
+  // isso só faz sentido depois que finalizeReport() gerar o resultado de verdade.
+  enviarParaSheets({
+    nome: state.lead.nome,
+    telefone: state.lead.telefone,
+    email: state.lead.email,
+    cidade: state.lead.cidade,
+    estado: state.lead.estado,
+    faixa_patrimonio: state.lead.faixa_patrimonio,
+    faixa_renda: state.lead.faixa_renda,
+    instituicao_financeira_atual: state.lead.instituicao_financeira_atual,
+    possui_assessor: state.lead.possui_assessor,
+    possui_gerente_banco: state.lead.possui_gerente_banco,
+    objetivo_financeiro: state.lead.objetivo_financeiro,
+    consentimento_contato: state.lead.consentimento_contato ? 'sim' : 'nao',
+    consentimento_data_hora: state.lead.consentimento_data_hora || '',
+    diagnostico_completo: 'nao',
+    data: new Date().toISOString(),
+    origem_lead: 'calculadora-fincare-instagram',
+    utm_campaign: state.utm.utm_campaign || '',
+    utm_source: state.utm.utm_source || '',
+    utm_medium: state.utm.utm_medium || '',
+    utm_content: state.utm.utm_content || '',
+    utm_term: state.utm.utm_term || ''
+  });
+
   startCalculation();
 }
 
@@ -1881,6 +1934,7 @@ function finalizeReport(){
     ),
     data: new Date().toISOString(),
     origem_lead: 'calculadora-fincare-instagram',
+    diagnostico_completo: 'sim',
 
     // Atribuição de campanha (preenchido automaticamente pela URL de chegada)
     utm_campaign: state.utm.utm_campaign || '',
@@ -1924,27 +1978,12 @@ function finalizeReport(){
   }
 
   // Envio em paralelo para a planilha Google Sheets (ver google-sheets-integration.gs).
-  // mode:'no-cors' e Content-Type:'text/plain' evitam o preflight CORS que o
-  // Apps Script não responde — o doPost() lá do outro lado faz JSON.parse()
-  // do corpo normalmente, então o payload chega intacto mesmo assim. Como
-  // consequência, a resposta fica opaca (não dá pra checar sucesso/falha daqui).
-  const sheetsConfigurado = SHEETS_WEBHOOK_URL && !SHEETS_WEBHOOK_URL.includes('COLE-AQUI-A-URL-DO-APPS-SCRIPT');
-
-  if(sheetsConfigurado){
-    // webhook_token só vai nesse envio (não no payload do Formspree/CRM lá em
-    // cima) - é conferido pelo doPost() do Apps Script antes de gravar
-    // qualquer coisa na planilha ou disparar e-mail.
-    const payloadSheets = Object.assign({webhook_token: SHEETS_WEBHOOK_TOKEN}, payload);
-    fetch(SHEETS_WEBHOOK_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payloadSheets)
-    })
-    .catch(err => console.error('Erro de rede ao enviar para o Google Sheets:', err));
-  } else {
-    console.warn('SHEETS_WEBHOOK_URL não configurado — os dados NÃO estão sendo enviados para o Google Sheets. Configure a constante no topo do script.');
-  }
+  // Essa chamada grava uma SEGUNDA linha completa na aba Leads (além da linha
+  // parcial já gravada em submitLead()) — o Apps Script hoje não faz
+  // dedup/update por e-mail, então quem completa o diagnóstico aparece duas
+  // vezes: uma vez como parcial (diagnostico_completo=nao) e uma vez completo
+  // (diagnostico_completo=sim). É esperado; filtre pela coluna se for reportar.
+  enviarParaSheets(payload);
 
   renderRelatorioFinal();
   goToStep('final');
