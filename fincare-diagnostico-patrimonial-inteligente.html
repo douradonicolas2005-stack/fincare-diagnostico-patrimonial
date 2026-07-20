@@ -5,6 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fincare Investimentos | Safra Invest — Diagnóstico Patrimonial</title>
 
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<!-- Open Graph / Twitter Card — controla o preview do link quando compartilhado
+     no Instagram, WhatsApp, Facebook etc. (essencial pro CTR de anúncio). -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Fincare Investimentos">
+<meta property="og:title" content="Diagnóstico Patrimonial Fincare — Safra Invest">
+<meta property="og:description" content="Descubra em 1 minuto quanto falta para sua independência financeira, com metodologia de Wealth Management.">
+<meta property="og:image" content="https://fincare-diagnostico.github.io/Fincarediagn-sticopatrimonial/logo-fincare.png">
+<meta property="og:url" content="https://fincare-diagnostico.github.io/Fincarediagn-sticopatrimonial/fincare-diagnostico-patrimonial-inteligente.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Diagnóstico Patrimonial Fincare — Safra Invest">
+<meta name="twitter:description" content="Descubra em 1 minuto quanto falta para sua independência financeira, com metodologia de Wealth Management.">
+<meta name="twitter:image" content="https://fincare-diagnostico.github.io/Fincarediagn-sticopatrimonial/logo-fincare.png">
+
 <!-- ==================== META PIXEL (Facebook/Instagram Ads) ====================
      Pegue o ID no Gerenciador de Eventos da Meta e cole nas DUAS marcações
      abaixo (a constante META_PIXEL_ID e a URL da tag <noscript>).
@@ -536,6 +552,17 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
   background:var(--verde-claro-bg);
   border:1px solid #BFE0CC;
   color:var(--verde-escuro-2);
+  padding:11px 14px;
+  border-radius:8px;
+  font-size:13px;
+  margin-bottom:16px;
+  display:none;
+}
+
+.warning-banner{
+  background:#FFF8E8;
+  border:1px solid #F0DFAE;
+  color:#6b5a1f;
   padding:11px 14px;
   border-radius:8px;
   font-size:13px;
@@ -1118,6 +1145,15 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
       <h2 class="q-title">Antes de gerar seu diagnóstico, para onde enviamos o resultado?</h2>
       <p class="q-sub">Preencha seus dados para liberar seu Diagnóstico Patrimonial. Um especialista da Fincare também poderá comentar os resultados com você, se fizer sentido.</p>
 
+      <!-- Honeypot anti-bot: invisível para humanos, mas bots que preenchem
+           formulário automaticamente costumam preencher todo campo que
+           encontram. Se vier preenchido, o Apps Script descarta o envio
+           silenciosamente (ver doPost() em google-sheets-integration.gs). -->
+      <div style="position:absolute; left:-9999px; top:-9999px; height:0; width:0; overflow:hidden;" aria-hidden="true">
+        <label for="leadWebsite">Não preencha este campo</label>
+        <input type="text" id="leadWebsite" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
       <div class="field">
         <label for="leadNome">Nome completo</label>
         <input type="text" id="leadNome" placeholder="Como podemos te chamar">
@@ -1244,7 +1280,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
 
       <div class="field">
         <p style="font-size:12.5px; color:var(--text-muted); line-height:1.5; margin:0 0 12px;">
-          Ao autorizar, você receberá por e-mail o seu Diagnóstico Patrimonial completo em PDF assim que a simulação for concluída, e a Fincare Investimentos poderá te contatar por e-mail e WhatsApp para uma análise personalizada, em conformidade com a LGPD.
+          Ao autorizar, você receberá por e-mail o seu Diagnóstico Patrimonial completo em PDF assim que a simulação for concluída, e a Fincare Investimentos poderá te contatar por e-mail e WhatsApp para uma análise personalizada, em conformidade com a LGPD. Veja nossa <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.
         </p>
         <button type="button" class="btn btn-ghost" id="consentBtn" style="width:100%;" onclick="toggleConsentimento()">Autorizar contato</button>
       </div>
@@ -1260,6 +1296,7 @@ svg text{font-family:var(--font-mono); fill:var(--text-muted);}
   <section class="step" data-step="final">
     <div class="card" style="margin-bottom:16px;">
       <div class="success-banner" id="successBanner">Relatório liberado. Confira o detalhamento completo abaixo.</div>
+      <div class="warning-banner" id="sendWarningBanner">Seu relatório foi gerado normalmente, mas não conseguimos confirmar o registro dele em nosso sistema agora. Se quiser garantir que um especialista receba seus dados, chame no WhatsApp ao final desta página.</div>
       <div class="exec-header">
         <span class="badge">Dashboard Executivo · Fincare Investimentos</span>
         <h3>Seu diagnóstico patrimonial completo</h3>
@@ -1322,6 +1359,7 @@ const state = {
   currentStep: 1,
   totalWizardSteps: 4,
   trackedInicioSimulacao: false, // vira true no 1º avanço do Passo 1→2 (Meta Pixel)
+  funilStepsEnviados: [], // guarda quais passos (1-5) já mandaram evento de funil, pra não duplicar em idas/voltas
   calc: null,        // resultado do cálculo principal, preenchido em calcular()
   advanced: {
     source: null,      // 'manual' | 'portfolio' | null
@@ -1418,6 +1456,30 @@ function enviarParaSheets(payload){
   .catch(err => console.error('Erro de rede ao enviar para o Google Sheets:', err));
 }
 
+// Evento anônimo de funil (sem PII - nenhum nome/telefone/e-mail aqui) usado
+// pra medir em qual etapa as pessoas abandonam. Vai pra uma aba "Funil"
+// separada da aba Leads (ver tipo:'funil' no doPost() do Apps Script).
+// Usa sendBeacon em vez de fetch porque ele é feito pra exatamente esse
+// caso: um ping de analytics que precisa sair mesmo se a pessoa fechar a
+// aba/trocar de página um instante depois - um fetch normal pode ser
+// cancelado nesse momento, justamente o instante que mais nos interessa
+// medir (abandono).
+function enviarEventoFunil(evento){
+  const sheetsConfigurado = SHEETS_WEBHOOK_URL && !SHEETS_WEBHOOK_URL.includes('COLE-AQUI-A-URL-DO-APPS-SCRIPT');
+  if(!sheetsConfigurado || typeof navigator.sendBeacon !== 'function') return;
+  const payload = {
+    webhook_token: SHEETS_WEBHOOK_TOKEN,
+    tipo: 'funil',
+    evento: evento,
+    utm_source: state.utm.utm_source || '',
+    utm_campaign: state.utm.utm_campaign || '',
+    utm_medium: state.utm.utm_medium || '',
+    utm_content: state.utm.utm_content || ''
+  };
+  const blob = new Blob([JSON.stringify(payload)], {type: 'text/plain;charset=utf-8'});
+  navigator.sendBeacon(SHEETS_WEBHOOK_URL, blob);
+}
+
 // Link do WhatsApp do escritório — ajuste o número (formato internacional, só dígitos)
 const WHATSAPP_NUMERO = '5511941819794';
 
@@ -1440,6 +1502,14 @@ function goToStep(n){
   if(n === 2 && !state.trackedInicioSimulacao && typeof fbq === 'function'){
     fbq('trackCustom', 'IniciouSimulacao');
     state.trackedInicioSimulacao = true;
+  }
+
+  // Funil de abandono por etapa (1 a 5) - só a primeira vez que cada etapa
+  // é alcançada nesta sessão, pra idas-e-voltas no "Voltar" não inflarem a
+  // contagem.
+  if(typeof n === 'number' && n >= 1 && n <= 5 && !state.funilStepsEnviados.includes(n)){
+    state.funilStepsEnviados.push(n);
+    enviarEventoFunil('etapa_' + n);
   }
 
   state.currentStep = n;
@@ -1861,6 +1931,7 @@ function submitLead(){
     consentimento_contato: state.lead.consentimento_contato ? 'sim' : 'nao',
     consentimento_data_hora: state.lead.consentimento_data_hora || '',
     diagnostico_completo: 'nao',
+    honeypot: document.getElementById('leadWebsite').value.trim(),
     data: new Date().toISOString(),
     origem_lead: 'calculadora-fincare-instagram',
     utm_campaign: state.utm.utm_campaign || '',
@@ -1935,6 +2006,7 @@ function finalizeReport(){
     data: new Date().toISOString(),
     origem_lead: 'calculadora-fincare-instagram',
     diagnostico_completo: 'sim',
+    honeypot: document.getElementById('leadWebsite').value.trim(),
 
     // Atribuição de campanha (preenchido automaticamente pela URL de chegada)
     utm_campaign: state.utm.utm_campaign || '',
@@ -1970,9 +2042,15 @@ function finalizeReport(){
       body: JSON.stringify(payload)
     })
     .then(res => {
-      if(!res.ok) console.error('Falha ao enviar lead:', res.status);
+      if(!res.ok){
+        console.error('Falha ao enviar lead:', res.status);
+        exibirAvisoFalhaEnvio();
+      }
     })
-    .catch(err => console.error('Erro de rede ao enviar lead:', err));
+    .catch(err => {
+      console.error('Erro de rede ao enviar lead:', err);
+      exibirAvisoFalhaEnvio();
+    });
   } else {
     console.warn('WEBHOOK_URL não configurado — os dados NÃO estão sendo enviados para lugar nenhum. Configure a constante WEBHOOK_URL no topo do script.');
   }
@@ -1987,6 +2065,17 @@ function finalizeReport(){
 
   renderRelatorioFinal();
   goToStep('final');
+}
+
+// Mostra um aviso discreto na tela final quando o envio pro WEBHOOK_URL
+// (Formspree) falha - a pessoa já vê o relatório normalmente, mas fica
+// sabendo que talvez precise nos procurar ativamente, em vez de achar que
+// já estamos com os dados dela. Só cobre o Formspree: o envio pro Sheets
+// usa mode:'no-cors' e a resposta fica sempre opaca, então não dá pra
+// detectar falha dele por aqui (ver comentário em enviarParaSheets()).
+function exibirAvisoFalhaEnvio(){
+  const aviso = document.getElementById('sendWarningBanner');
+  if(aviso) aviso.style.display = 'block';
 }
 
 function renderRelatorioFinal(){

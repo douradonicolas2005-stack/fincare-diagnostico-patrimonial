@@ -104,7 +104,8 @@ var COL_LEAD_VALIDO = COLS.diagnostico_completo + 2; // 36 = AJ
 var PALETA_CARDS = [
   '#2A9D8F', '#E9C46A', '#87A96B',
   '#E76F51', '#2A9D8F', '#E9C46A',
-  '#87A96B', '#E76F51', '#2A9D8F'
+  '#87A96B', '#E76F51', '#2A9D8F',
+  '#E9C46A', '#87A96B', '#E76F51'
 ];
 
 // Mesmo numero usado no botao de WhatsApp da calculadora (ver WHATSAPP_NUMERO
@@ -167,6 +168,48 @@ function doPost(e) {
       .createTextOutput(JSON.stringify({ ok: false, erro: 'token invalido' }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+
+  // Evento anonimo de funil (sem email/PII) - grava numa aba separada
+  // ("Funil") e sai cedo, antes das validacoes abaixo que sao especificas
+  // de lead (honeypot de formulario, email valido, rate limit por email).
+  if (data.tipo === 'funil') {
+    registrarEventoFunil_(data);
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // Honeypot: campo escondido via CSS no site, invisivel pra gente mas que
+  // bots que preenchem formulario automaticamente costumam preencher.
+  // Responde ok:true (nao denuncia pro bot que foi barrado) mas nao escreve
+  // nada na planilha nem manda e-mail.
+  if (data.honeypot) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // Validacao minima server-side - barra chamadas diretas ao webhook (fora
+  // do site) com payload incompleto ou email obviamente invalido.
+  if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(data.email))) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, erro: 'email invalido' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // Rate limit por e-mail: um lead legitimo manda no maximo 2 chamadas
+  // (parcial em submitLead() + completo em finalizeReport()). 8 numa janela
+  // de 10 minutos ja sobra de folga pra reenvios/dupla aba, mas barra
+  // flood automatizado batendo direto no webhook com o mesmo e-mail.
+  var cache = CacheService.getScriptCache();
+  var rlKey = 'rl_' + String(data.email).toLowerCase().trim();
+  var chamadasRecentes = Number(cache.get(rlKey) || 0);
+  if (chamadasRecentes >= 8) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, erro: 'limite de envios atingido' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  cache.put(rlKey, String(chamadasRecentes + 1), 600);
 
   var sheet = getLeadsSheet_();
 
@@ -548,6 +591,41 @@ function getLeadsSheet_() {
 }
 
 // ================================================================
+// ABA "Funil" - eventos anonimos de qual etapa cada visitante alcancou
+// (sem email/nome/telefone), usados so pra medir onde o funil vaza.
+// Sheet simples, sem colunas calculadas depois dela, entao appendRow() e
+// seguro aqui (diferente da aba Leads - ver comentario em
+// getUltimaLinhaComDados_).
+// ================================================================
+function getFunilSheet_() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Funil');
+  if (!sheet) {
+    sheet = ss.insertSheet('Funil');
+    sheet.getRange(1, 1, 1, 6).setValues([[
+      'data', 'evento', 'utm_source', 'utm_campaign', 'utm_medium', 'utm_content'
+    ]]);
+    sheet.getRange(1, 1, 1, 6)
+      .setFontWeight('bold').setFontColor('#FFFFFF').setBackground('#003B49');
+    sheet.setColumnWidths(1, 6, 150);
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function registrarEventoFunil_(data) {
+  var sheet = getFunilSheet_();
+  sheet.appendRow([
+    new Date(),
+    data.evento || '',
+    data.utm_source || '',
+    data.utm_campaign || '',
+    data.utm_medium || '',
+    data.utm_content || ''
+  ]);
+}
+
+// ================================================================
 // FORMATACAO DA ABA "Leads"
 // ================================================================
 function formatarCabecalho_(sheet) {
@@ -855,13 +933,24 @@ function construirDashboard_(ss, leadsSheet, sep) {
     { titulo: 'ANOS MEDIOS ATE INDEPENDENCIA',
       formula: '=IFERROR(AVERAGEIFS(Leads!$R$2:$R;Leads!$D$2:$D;~?*~);0)', formato: FORMATO_AVG_ANOS },
     { titulo: 'IDADE MEDIA',
-      formula: '=IFERROR(AVERAGEIFS(Leads!$S$2:$S;Leads!$D$2:$D;~?*~);0)', formato: FORMATO_IDADE }
+      formula: '=IFERROR(AVERAGEIFS(Leads!$S$2:$S;Leads!$D$2:$D;~?*~);0)', formato: FORMATO_IDADE },
+    { titulo: 'LEADS QUE AUTORIZARAM CONTATO (INICIARAM)',
+      // Toda vez que alguem autoriza contato, uma linha "nao" e gravada -
+      // inclusive pra quem depois termina (essa linha nao e apagada, so
+      // ganha uma segunda linha "sim" ao lado). Por isso esta e a contagem
+      // de quem INICIOU, nao so de quem abandonou.
+      formula: '=COUNTIFS(Leads!$AH$2:$AH;~nao~;Leads!$D$2:$D;~?*~)', formato: '0' },
+    { titulo: 'LEADS QUE CONCLUIRAM O DIAGNOSTICO',
+      formula: '=COUNTIFS(Leads!$AH$2:$AH;~sim~;Leads!$D$2:$D;~?*~)', formato: '0' },
+    { titulo: 'TAXA DE CONCLUSAO DO DIAGNOSTICO',
+      formula: '=IFERROR(COUNTIFS(Leads!$AH$2:$AH;~sim~;Leads!$D$2:$D;~?*~)/COUNTIFS(Leads!$AH$2:$AH;~nao~;Leads!$D$2:$D;~?*~);0)',
+      formato: '0.0%' }
   ];
 
   var colunasCard = [1, 4, 7];
-  var linhasBanda = [4, 8, 12];
+  var linhasBanda = [4, 8, 12, 16];
   var idx = 0;
-  for (var bloco = 0; bloco < 3; bloco++) {
+  for (var bloco = 0; bloco < 4; bloco++) {
     for (var c = 0; c < 3; c++) {
       var kpi = kpis[idx];
       var valueRange = escreverKpiCard_(dash, linhasBanda[bloco], colunasCard[c], kpi.titulo, PALETA_CARDS[idx]);
@@ -875,7 +964,7 @@ function construirDashboard_(ss, leadsSheet, sep) {
   var valoresG = detectarValoresDistintos_(leadsSheet, COLS.faixa_renda);
   var valoresK = detectarValoresDistintos_(leadsSheet, COLS.objetivo_financeiro);
 
-  var linha = 17;
+  var linha = 21;
   linha = escreverBlocoDistribuicao_(dash, linha, 'Distribuicao por Faixa de Patrimonio', 'F', valoresF, LABELS_FAIXA_PATRIMONIO, sep);
   linha = escreverBlocoDistribuicao_(dash, linha, 'Distribuicao por Faixa de Renda', 'G', valoresG, LABELS_FAIXA_RENDA, sep);
   linha = escreverBlocoDistribuicao_(dash, linha, 'Distribuicao por Objetivo Financeiro', 'K', valoresK, LABELS_OBJETIVO, sep);
