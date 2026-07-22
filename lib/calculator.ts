@@ -18,7 +18,7 @@ export const PROFILES: Record<string, Omit<InvestorProfile, "pontuacao">> = {
       "Baixíssima tolerância a oscilações. Prioriza estabilidade e previsibilidade, com carteira concentrada em Renda Fixa.",
     alocacao: [
       { nome: "Renda Fixa", pct: 100, cor: "#003B49" },
-      { nome: "Multimercado", pct: 0, cor: "#C99A36" },
+      { nome: "Multimercado", pct: 0, cor: "#2B7E7E" },
       { nome: "Renda Variável Local", pct: 0, cor: "#2B7E7E" },
       { nome: "Internacional", pct: 0, cor: "#9FC4C7" },
       { nome: "Alternativos", pct: 0, cor: "#5C7278" }
@@ -27,10 +27,10 @@ export const PROFILES: Record<string, Omit<InvestorProfile, "pontuacao">> = {
   conservador: {
     nome: "Conservador",
     descricao:
-      "Baixa aceitação a oscilações, com espaço para diversificar além da Renda Fixa.",
+      "Baixa aceitação a oscilações, com espaço para diversificar além da Renda Fixa, somando Multimercado, Renda Variável Local e ativos internacionais.",
     alocacao: [
       { nome: "Renda Fixa", pct: 77, cor: "#003B49" },
-      { nome: "Multimercado", pct: 8, cor: "#C99A36" },
+      { nome: "Multimercado", pct: 8, cor: "#2B7E7E" },
       { nome: "Renda Variável Local", pct: 5, cor: "#2B7E7E" },
       { nome: "Internacional", pct: 6, cor: "#9FC4C7" },
       { nome: "Alternativos", pct: 4, cor: "#5C7278" }
@@ -39,10 +39,10 @@ export const PROFILES: Record<string, Omit<InvestorProfile, "pontuacao">> = {
   moderado: {
     nome: "Moderado",
     descricao:
-      "Aceita oscilações em prol de maior potencial de retorno. Fundos Multimercado ganham peso relevante.",
+      "Aceita oscilações em prol de maior potencial de retorno. Fundos Multimercado ganham peso relevante, com visão de longo prazo.",
     alocacao: [
       { nome: "Renda Fixa", pct: 54, cor: "#003B49" },
-      { nome: "Multimercado", pct: 16, cor: "#C99A36" },
+      { nome: "Multimercado", pct: 16, cor: "#2B7E7E" },
       { nome: "Renda Variável Local", pct: 10, cor: "#2B7E7E" },
       { nome: "Internacional", pct: 13, cor: "#9FC4C7" },
       { nome: "Alternativos", pct: 7, cor: "#5C7278" }
@@ -51,10 +51,10 @@ export const PROFILES: Record<string, Omit<InvestorProfile, "pontuacao">> = {
   dinamico: {
     nome: "Dinâmico",
     descricao:
-      "Aceita oscilações significativas em busca de maiores retornos, com maior exposição a Renda Variável e Internacional.",
+      "Aceita oscilações significativas em busca de maiores retornos, com maior exposição a Renda Variável, Fundos Imobiliários e Internacional. Foco em longo prazo.",
     alocacao: [
       { nome: "Renda Fixa", pct: 36, cor: "#003B49" },
-      { nome: "Multimercado", pct: 16, cor: "#C99A36" },
+      { nome: "Multimercado", pct: 16, cor: "#2B7E7E" },
       { nome: "Renda Variável Local", pct: 17, cor: "#2B7E7E" },
       { nome: "Internacional", pct: 21, cor: "#9FC4C7" },
       { nome: "Alternativos", pct: 10, cor: "#5C7278" }

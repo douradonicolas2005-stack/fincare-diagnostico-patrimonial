@@ -57,7 +57,6 @@ export function Dashboard({
         ))}
       </div>
       <div className="dashboard-section-title">Distribuição por classe de ativos</div>
-      <span className="badge-simulado">Dados simulados para fins ilustrativos</span>
       <div className="allocation-wrap">
         <AllocationDonut allocation={allocation} />
         <div className="allocation-legend">

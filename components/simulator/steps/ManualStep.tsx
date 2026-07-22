@@ -39,6 +39,7 @@ export function ManualStep({
             key={key}
             label={label}
             value={values[key]}
+            emptyWhenZero
             onChange={value => update(key, value)}
           />
         ))}
@@ -46,6 +47,7 @@ export function ManualStep({
       <MoneyInput
         label="Empréstimos em aberto"
         value={values.emprestimos}
+        emptyWhenZero
         onChange={value => update("emprestimos", value)}
       />
       <div className="btn-row">

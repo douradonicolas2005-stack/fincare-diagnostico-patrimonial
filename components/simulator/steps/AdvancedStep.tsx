@@ -44,7 +44,10 @@ export function AdvancedStep({
             </span>
             <span className="advanced-option-body">
               <span className="option-eyebrow">Opção 2</span>
-              <b>Importar minha carteira <small>PDF · Excel · CSV</small></b>
+              <span className="advanced-option-title-row">
+                <b>Importar minha carteira</b>
+                <small className="advanced-option-file-tag">PDF · Excel · CSV</small>
+              </span>
               <p>
                 Envie o extrato ou a posição consolidada da sua corretora para
                 reconhecermos sua carteira automaticamente.
