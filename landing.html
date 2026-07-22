@@ -1,104 +1,225 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fincare Investimentos | Safra Invest — Diagnóstico Patrimonial</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Fincare Investimentos | Safra Invest — Diagnóstico Patrimonial
+    </title>
 
-<link rel="icon" href="favicon.ico" sizes="any">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" href="favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 
-<!-- Open Graph / Twitter Card — controla o preview do link quando compartilhado
+    <!-- Open Graph / Twitter Card — controla o preview do link quando compartilhado
      no Instagram, WhatsApp, Facebook etc. (essencial pro CTR de anúncio). -->
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Fincare Investimentos">
-<meta property="og:title" content="Descubra em 1 minuto quanto falta para seu objetivo">
-<meta property="og:description" content="Diagnóstico patrimonial gratuito, com metodologia de Wealth Management, da Fincare Investimentos.">
-<meta property="og:image" content="https://fincare-diagnostico.github.io/Fincarediagn-sticopatrimonial/logo-fincare.png">
-<meta property="og:url" content="https://fincare-diagnostico.github.io/Fincarediagn-sticopatrimonial/landing.html">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Descubra em 1 minuto quanto falta para seu objetivo">
-<meta name="twitter:description" content="Diagnóstico patrimonial gratuito, com metodologia de Wealth Management, da Fincare Investimentos.">
-<meta name="twitter:image" content="https://fincare-diagnostico.github.io/Fincarediagn-sticopatrimonial/logo-fincare.png">
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Fincare Investimentos" />
+    <meta
+      property="og:title"
+      content="Descubra em 1 minuto quanto falta para seu objetivo"
+    />
+    <meta
+      property="og:description"
+      content="Diagnóstico patrimonial gratuito, com metodologia de Wealth Management, da Fincare Investimentos."
+    />
+    <meta
+      property="og:image"
+      content="https://fincare-diagnostico.github.io/Fincarediagn-sticopatrimonial/logo-fincare.png"
+    />
+    <meta
+      property="og:url"
+      content="https://fincare-diagnostico.github.io/Fincarediagn-sticopatrimonial/landing.html"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Descubra em 1 minuto quanto falta para seu objetivo"
+    />
+    <meta
+      name="twitter:description"
+      content="Diagnóstico patrimonial gratuito, com metodologia de Wealth Management, da Fincare Investimentos."
+    />
+    <meta
+      name="twitter:image"
+      content="https://fincare-diagnostico.github.io/Fincarediagn-sticopatrimonial/logo-fincare.png"
+    />
 
-<!-- ==================== META PIXEL (Facebook/Instagram Ads) ====================
+    <!-- ==================== META PIXEL (Facebook/Instagram Ads) ====================
      Pegue o ID no Gerenciador de Eventos da Meta e cole nas DUAS marcações
      abaixo (a constante META_PIXEL_ID e a URL da tag <noscript>).
      ============================================================================ -->
-<script>
-  const META_PIXEL_ID = "COLOCAR_ID_AQUI"; // <-- COLE SEU PIXEL ID AQUI
+    <script>
+      const META_PIXEL_ID = "COLOCAR_ID_AQUI" // <-- COLE SEU PIXEL ID AQUI
 
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', META_PIXEL_ID);
-  fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=COLOCAR_ID_AQUI&ev=PageView&noscript=1"
-/></noscript>
-<!-- ==================== FIM META PIXEL ==================== -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --verde-escuro:#003B49; --verde-escuro-2:#012730;
-    --verde-medio:#2B7E7E; --verde-claro:#9FC4C7; --verde-claro-bg:#EAF2F1;
-    --gold:#2B7E7E; --gold-light:#9FC4C7;
-    --bg:#F4F9FC; --text-on-dark:#F4F9FC; --text-on-dark-muted:#9FC4C7;
-    --font-display:'Fraunces',serif; --font-body:'Manrope',sans-serif; --font-mono:'IBM Plex Mono',monospace;
-  }
-  *{box-sizing:border-box;}
-  html{-webkit-text-size-adjust:100%;}
-  body{
-    margin:0; min-height:100vh; background:radial-gradient(circle at 50% 0%, var(--verde-escuro-2), var(--verde-escuro) 65%);
-    font-family:var(--font-body); color:var(--text-on-dark);
-    display:flex; align-items:center; justify-content:center; padding:32px 20px;
-  }
-  .card{
-    max-width:420px; width:100%; text-align:center;
-  }
-  .eyebrow{
-    font-family:var(--font-mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
-    color:var(--gold-light); border:1px solid rgba(159,196,199,.4); border-radius:20px;
-    padding:5px 14px; display:inline-block; margin-bottom:22px;
-  }
-  h1{font-family:var(--font-display); font-weight:500; font-size:30px; line-height:1.25; margin:0 0 14px;}
-  h1 span{color:var(--gold-light);}
-  p{font-size:14.5px; color:var(--text-on-dark-muted); line-height:1.6; margin:0 0 32px;}
-  a.cta{
-    display:block; width:100%; background:var(--gold); color:#04252C; font-weight:700; font-size:15.5px;
-    text-decoration:none; border-radius:9px; padding:17px 22px; transition:background .15s, transform .15s;
-  }
-  a.cta:hover{background:var(--gold-light);}
-  a.cta:active{transform:scale(.98);}
-  .foot{margin-top:20px; font-size:11px; color:rgba(159,196,199,.7); font-family:var(--font-mono);}
-</style>
-</head>
-<body>
-  <div class="card">
-    <span class="eyebrow">Fincare Investimentos · Safra Invest</span>
-    <h1>Descubra em <span>1 minuto</span> quanto falta para sua independência financeira.</h1>
-    <p>Um diagnóstico patrimonial gratuito, com metodologia de Wealth Management, para você entender sua trajetória até a liberdade financeira.</p>
-    <a class="cta" href="fincare-diagnostico-patrimonial-inteligente.html">Iniciar meu diagnóstico gratuito →</a>
-    <div class="foot">Sem compromisso · Leva menos de 1 minuto</div>
-    <div class="foot"><a href="privacidade.html" style="color:inherit;">Política de Privacidade</a></div>
-  </div>
+      !(function (f, b, e, v, n, t, s) {
+        if (f.fbq) return
+        n = f.fbq = function () {
+          n.callMethod
+            ? n.callMethod.apply(n, arguments)
+            : n.queue.push(arguments)
+        }
+        if (!f._fbq) f._fbq = n
+        n.push = n
+        n.loaded = !0
+        n.version = "2.0"
+        n.queue = []
+        t = b.createElement(e)
+        t.async = !0
+        t.src = v
+        s = b.getElementsByTagName(e)[0]
+        s.parentNode.insertBefore(t, s)
+      })(
+        window,
+        document,
+        "script",
+        "https://connect.facebook.net/en_US/fbevents.js"
+      )
+      fbq("init", META_PIXEL_ID)
+      fbq("track", "PageView")
+    </script>
+    <noscript
+      ><img
+        height="1"
+        width="1"
+        style="display: none"
+        src="https://www.facebook.com/tr?id=COLOCAR_ID_AQUI&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- ==================== FIM META PIXEL ==================== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --verde-escuro: #003b49;
+        --verde-escuro-2: #012730;
+        --verde-medio: #2b7e7e;
+        --verde-claro: #9fc4c7;
+        --verde-claro-bg: #eaf2f1;
+        --gold: #2b7e7e;
+        --gold-light: #9fc4c7;
+        --bg: #f4f9fc;
+        --text-on-dark: #f4f9fc;
+        --text-on-dark-muted: #9fc4c7;
+        --font-display: "Fraunces", serif;
+        --font-body: "Manrope", sans-serif;
+        --font-mono: "IBM Plex Mono", monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(
+          circle at 50% 0%,
+          var(--verde-escuro-2),
+          var(--verde-escuro) 65%
+        );
+        font-family: var(--font-body);
+        color: var(--text-on-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 20px;
+      }
+      .card {
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--gold-light);
+        border: 1px solid rgba(159, 196, 199, 0.4);
+        border-radius: 20px;
+        padding: 5px 14px;
+        display: inline-block;
+        margin-bottom: 22px;
+      }
+      h1 {
+        font-family: var(--font-display);
+        font-weight: 500;
+        font-size: 30px;
+        line-height: 1.25;
+        margin: 0 0 14px;
+      }
+      h1 span {
+        color: var(--gold-light);
+      }
+      p {
+        font-size: 14.5px;
+        color: var(--text-on-dark-muted);
+        line-height: 1.6;
+        margin: 0 0 32px;
+      }
+      a.cta {
+        display: block;
+        width: 100%;
+        background: var(--gold);
+        color: #04252c;
+        font-weight: 700;
+        font-size: 15.5px;
+        text-decoration: none;
+        border-radius: 9px;
+        padding: 17px 22px;
+        transition:
+          background 0.15s,
+          transform 0.15s;
+      }
+      a.cta:hover {
+        background: var(--gold-light);
+      }
+      a.cta:active {
+        transform: scale(0.98);
+      }
+      .foot {
+        margin-top: 20px;
+        font-size: 11px;
+        color: rgba(159, 196, 199, 0.7);
+        font-family: var(--font-mono);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <span class="eyebrow">Fincare Investimentos · Safra Invest</span>
+      <h1>
+        Descubra em <span>1 minuto</span> quanto falta para sua independência
+        financeira.
+      </h1>
+      <p>
+        Um diagnóstico patrimonial gratuito, com metodologia de Wealth
+        Management, para você entender sua trajetória até a liberdade
+        financeira.
+      </p>
+      <a class="cta" href="fincare-diagnostico-patrimonial-inteligente.html"
+        >Iniciar meu diagnóstico gratuito →</a
+      >
+      <div class="foot">Sem compromisso · Leva menos de 1 minuto</div>
+      <div class="foot">
+        <a href="privacidade.html" style="color: inherit"
+          >Política de Privacidade</a
+        >
+      </div>
+    </div>
 
-<script>
-  // Repassa os parâmetros UTM da URL de chegada (ex.: anúncio do Instagram)
-  // para o simulador, para o rastreamento de campanha não se perder nesse clique.
-  document.addEventListener('DOMContentLoaded', function(){
-    var cta = document.querySelector('a.cta');
-    if(cta && window.location.search){
-      cta.href = cta.getAttribute('href') + window.location.search;
-    }
-  });
-</script>
-</body>
+    <script>
+      // Repassa os parâmetros UTM da URL de chegada (ex.: anúncio do Instagram)
+      // para o simulador, para o rastreamento de campanha não se perder nesse clique.
+      document.addEventListener("DOMContentLoaded", function () {
+        var cta = document.querySelector("a.cta")
+        if (cta && window.location.search) {
+          cta.href = cta.getAttribute("href") + window.location.search
+        }
+      })
+    </script>
+  </body>
 </html>
