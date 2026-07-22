@@ -18,6 +18,10 @@ export async function forwardLead(payload: LeadPayload): Promise<boolean> {
     sheetsUrl && token ? post(sheetsUrl, { ...payload, webhook_token: token }, "text/plain;charset=utf-8") : null,
     formspreeUrl && payload.diagnostico_completo === "sim" ? post(formspreeUrl, payload) : null
   ].filter((job): job is RequestJob => Boolean(job))
+  // The report can still be generated when no provider is configured, but the
+  // lead cannot be confirmed as registered. The UI mirrors the original flow
+  // by showing a warning while keeping the result available.
+  if (jobs.length === 0) return false
   const results = await Promise.allSettled(jobs)
   return results.every(result => result.status === "fulfilled" && result.value.ok)
 }
