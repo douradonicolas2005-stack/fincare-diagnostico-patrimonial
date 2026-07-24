@@ -136,7 +136,7 @@ export function QualificationStep({
         <Button variant="ghost" onClick={onBack}>
           Voltar
         </Button>
-        <Button className="flex-1" onClick={onSubmit}>
+        <Button className="flex-1" onClick={onSubmit} disabled={sending}>
           {sending ? "Enviando..." : "Gerar meu diagnóstico"}
         </Button>
       </div>

@@ -1,10 +1,12 @@
 "use client"
 
-import { sendLead, trackFunnel } from "@/lib/api"
+import { sendFunnelEvent, sendLead } from "@/lib/api"
 import { allocationFromCategories, calculate } from "@/lib/calculator"
-import { leadSchema, type LeadPayload } from "@/lib/security"
+import { trackMetaPixelEvent } from "@/lib/meta-pixel"
+import { leadSchema, type FunnelPayload, type LeadPayload } from "@/lib/security"
 import type { AdvancedState, Calculation, Lead, Step } from "@/lib/types"
-import { useEffect, useMemo, useState } from "react"
+import { track } from "@vercel/analytics"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { BrandHeader } from "../layout/BrandHeader"
 import { AdvancedStep } from "./steps/AdvancedStep"
 import { ContactStep } from "./steps/ContactStep"
@@ -33,6 +35,22 @@ const emptyUtm = {
   utm_campaign: "",
   utm_content: "",
   utm_term: ""
+}
+const readUtmParams = () => {
+  const params = new URLSearchParams(window.location.search)
+  return Object.fromEntries(
+    Object.keys(emptyUtm).map(key => [key, params.get(key) || ""])
+  ) as typeof emptyUtm
+}
+const etapaFunil: Record<string, FunnelPayload["etapa"]> = {
+  "1": "1_patrimonio",
+  "2": "2_aporte",
+  "3": "3_renda",
+  "4": "4_premissas",
+  "5": "5_qualificacao",
+  "6": "6_contato",
+  result: "result",
+  final: "final"
 }
 const initialLead: Lead = {
   nome: "",
@@ -83,31 +101,28 @@ export default function Simulator() {
   const [sendError, setSendError] = useState(false)
   const [consent, setConsent] = useState(false)
   const [dialogMessage, setDialogMessage] = useState<string | null>(null)
+  const trackedSteps = useRef(new Set<string>())
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    setUtm(
-      Object.fromEntries(
-        Object.keys(emptyUtm).map(key => [key, params.get(key) || ""])
-      ) as typeof emptyUtm
-    )
+    setUtm(readUtmParams())
   }, [])
+
+  // Funil de etapas do simulador (Vercel Analytics + aba "Funil" no Sheets).
+  // So dispara uma vez por etapa por sessao, mesmo se a pessoa voltar/avancar
+  // entre telas - o objetivo e ver onde a maioria abandona, nao contar cliques.
+  useEffect(() => {
+    const etapa = etapaFunil[String(step)]
+    if (!etapa || trackedSteps.current.has(etapa)) return
+    trackedSteps.current.add(etapa)
+    track("funil_etapa", { etapa })
+    sendFunnelEvent({ etapa, ...readUtmParams() })
+  }, [step])
 
   const setValue = (key: keyof typeof values, value: string) =>
     setValues(current => ({ ...current, [key]: Number(value) || 0 }))
   const setLeadValue = (key: keyof Lead, value: string) =>
     setLead(current => ({ ...current, [key]: value }))
   const goTo = (next: Step) => {
-    if (typeof next === "number" && next >= 1 && next <= 5)
-      trackFunnel(
-        `etapa_${next}` as
-          | "etapa_1"
-          | "etapa_2"
-          | "etapa_3"
-          | "etapa_4"
-          | "etapa_5",
-        utm
-      )
     setStep(next)
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -195,6 +210,7 @@ export default function Simulator() {
     }
   }
   const submitLead = async () => {
+    if (sending) return
     if (
       !lead.faixa_patrimonio ||
       !lead.faixa_renda ||
@@ -227,10 +243,12 @@ export default function Simulator() {
     setStep("loading")
     await new Promise(resolve => setTimeout(resolve, 700))
     setCalc(currentCalc)
-    await send("nao", currentLead, currentCalc)
+    const ok = await send("nao", currentLead, currentCalc)
+    if (ok) trackMetaPixelEvent("Lead")
     goTo("result")
   }
   const finalize = async () => {
+    if (sending) return
     if (calc) await send("sim", lead, calc)
     goTo("final")
   }

@@ -107,6 +107,33 @@ var HEADERS = [
   "diagnostico_completo"
 ]
 
+// ================================================================
+// ABA "Funil" - eventos anonimos de entrada em cada etapa do simulador
+// (sem PII, so pra medir onde o visitante abandona antes mesmo de virar
+// lead nas colunas acima). Um evento por etapa por sessao, disparado pelo
+// front-end via sendBeacon assim que a pessoa entra na tela.
+// ================================================================
+var HEADERS_FUNIL = [
+  "data",
+  "etapa",
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term"
+]
+
+var ETAPAS_FUNIL = [
+  { valor: "1_patrimonio", rotulo: "1. Patrimonio atual" },
+  { valor: "2_aporte", rotulo: "2. Aporte mensal" },
+  { valor: "3_renda", rotulo: "3. Renda desejada" },
+  { valor: "4_premissas", rotulo: "4. Premissas avancadas" },
+  { valor: "5_qualificacao", rotulo: "5. Qualificacao" },
+  { valor: "6_contato", rotulo: "6. Dados de contato" },
+  { valor: "result", rotulo: "Resultado (diagnostico rapido)" },
+  { valor: "final", rotulo: "Diagnostico completo (finalizou)" }
+]
+
 var LABELS_FAIXA_PATRIMONIO = {
   ate_500k: "Ate R$ 500 mil",
   "500k_1m": "R$ 500 mil - R$ 1 milhao",
@@ -214,6 +241,22 @@ function getUltimaLinhaComDados_(sheet) {
   return 0
 }
 
+// Procura uma linha ja existente com o mesmo e-mail (comparacao sem acento
+// de caixa, so lowercase/trim) entre a linha 2 e ultimaLinha. Usado pra
+// garantir uma unica linha por prospect na aba Leads (ver doPost).
+function encontrarLinhaPorEmail_(sheet, email, ultimaLinha) {
+  if (ultimaLinha < 2) return 0
+  var alvo = String(email || "")
+    .toLowerCase()
+    .trim()
+  if (!alvo) return 0
+  var emails = sheet.getRange(2, COLS.email, ultimaLinha - 1, 1).getValues()
+  for (var i = emails.length - 1; i >= 0; i--) {
+    if (String(emails[i][0] || "").toLowerCase().trim() === alvo) return i + 2
+  }
+  return 0
+}
+
 function doPost(e) {
   var data = JSON.parse(e.postData.contents)
 
@@ -227,14 +270,12 @@ function doPost(e) {
     ).setMimeType(ContentService.MimeType.JSON)
   }
 
-  // Evento anonimo de funil (sem email/PII) - grava numa aba separada
-  // ("Funil") e sai cedo, antes das validacoes abaixo que sao especificas
-  // de lead (honeypot de formulario, email valido, rate limit por email).
+  // Evento de funil (entrada anonima numa etapa do simulador) segue um
+  // caminho totalmente separado do lead completo: nao tem e-mail, nao entra
+  // na aba Leads, nao dispara PDF/e-mail. Sai daqui antes de qualquer
+  // validacao/rate-limit pensada pra lead de verdade.
   if (data.tipo === "funil") {
-    registrarEventoFunil_(data)
-    return ContentService.createTextOutput(
-      JSON.stringify({ ok: true })
-    ).setMimeType(ContentService.MimeType.JSON)
+    return handleFunilEvent_(data)
   }
 
   // Honeypot: campo escondido via CSS no site, invisivel pra gente mas que
@@ -269,28 +310,68 @@ function doPost(e) {
   }
   cache.put(rlKey, String(chamadasRecentes + 1), 600)
 
-  var sheet = getLeadsSheet_()
+  // Sem lock, duas chamadas simultaneas ao webhook (lead parcial + completo
+  // quase juntos, ou dois visitantes ao mesmo tempo) podem ler a mesma
+  // "ultima linha com dados" antes de qualquer uma escrever, e as duas
+  // calculam o mesmo novo numero de linha - uma sobrescreve a outra (lead
+  // perdido) e deixa buracos que aparecem como linhas em branco mais adiante.
+  // LockService serializa esse trecho entre execucoes concorrentes.
+  var lock = LockService.getScriptLock()
+  lock.waitLock(30000)
+  var pulouEscrita = false
+  try {
+    var sheet = getLeadsSheet_()
 
-  var ultimaLinha = getUltimaLinhaComDados_(sheet)
-  if (ultimaLinha === 0) {
-    sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS])
-    formatarCabecalho_(sheet)
-    configurarColunasAuxiliares_(sheet, getSeparador_())
-    ultimaLinha = 1
+    var ultimaLinha = getUltimaLinhaComDados_(sheet)
+    if (ultimaLinha === 0) {
+      sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS])
+      formatarCabecalho_(sheet)
+      configurarColunasAuxiliares_(sheet, getSeparador_())
+      ultimaLinha = 1
+    }
+
+    // Cada prospect (identificado pelo e-mail) so pode ter UMA linha na aba
+    // Leads. Se ja existe uma linha com esse e-mail, atualiza ela em vez de
+    // acrescentar uma nova - assim o lead parcial (diagnostico_completo:
+    // 'nao', gravado ao autorizar contato) e o lead completo (gravado ao
+    // terminar a simulacao) viram a MESMA linha, nao duas.
+    var linhaExistente = encontrarLinhaPorEmail_(sheet, data.email, ultimaLinha)
+
+    // Protecao contra reenvio fora de ordem: nao deixa um lead parcial
+    // atrasado sobrescrever um diagnostico que ja chegou completo pro mesmo
+    // e-mail.
+    if (linhaExistente > 0) {
+      var completoAtual = sheet
+        .getRange(linhaExistente, COLS.diagnostico_completo)
+        .getValue()
+      if (completoAtual === "sim" && data.diagnostico_completo === "nao") {
+        pulouEscrita = true
+      }
+    }
+
+    if (!pulouEscrita) {
+      var row = HEADERS.map(function (h) {
+        var v = data[h]
+        return v === undefined || v === null ? "" : v
+      })
+      row[COLS.data - 1] = data.data ? new Date(data.data) : new Date()
+
+      // Escreve so nas colunas A:AH (o tamanho exato de "row"), nunca em
+      // colunas calculadas que existam depois delas.
+      var linhaAlvo = linhaExistente > 0 ? linhaExistente : ultimaLinha + 1
+      sheet.getRange(linhaAlvo, 1, 1, row.length).setValues([row])
+      formatarLinha_(sheet, linhaAlvo)
+      aplicarFormatacaoCondicionalScore_(sheet)
+    }
+  } finally {
+    lock.releaseLock()
   }
 
-  var row = HEADERS.map(function (h) {
-    var v = data[h]
-    return v === undefined || v === null ? "" : v
-  })
-  row[COLS.data - 1] = data.data ? new Date(data.data) : new Date()
-
-  // Escreve so nas colunas A:AH (o tamanho exato de "row"), nunca em
-  // colunas calculadas que existam depois delas.
-  var novaLinha = ultimaLinha + 1
-  sheet.getRange(novaLinha, 1, 1, row.length).setValues([row])
-  formatarLinha_(sheet, novaLinha)
-  aplicarFormatacaoCondicionalScore_(sheet)
+  if (pulouEscrita) {
+    return ContentService.createTextOutput(
+      JSON.stringify({ ok: true })
+    ).setMimeType(ContentService.MimeType.JSON)
+  }
 
   // Leads parciais (diagnostico_completo === 'nao', gravados assim que a
   // pessoa autoriza contato, antes de terminar a simulacao) ainda nao tem
@@ -799,50 +880,78 @@ function getLeadsSheet_() {
 }
 
 // ================================================================
-// ABA "Funil" - eventos anonimos de qual etapa cada visitante alcancou
-// (sem email/nome/telefone), usados so pra medir onde o funil vaza.
-// Sheet simples, sem colunas calculadas depois dela, entao appendRow() e
-// seguro aqui (diferente da aba Leads - ver comentario em
-// getUltimaLinhaComDados_).
+// RECEBIMENTO E FORMATACAO DA ABA "Funil"
 // ================================================================
 function getFunilSheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet()
   var sheet = ss.getSheetByName("Funil")
   if (!sheet) {
     sheet = ss.insertSheet("Funil")
-    sheet
-      .getRange(1, 1, 1, 6)
-      .setValues([
-        [
-          "data",
-          "evento",
-          "utm_source",
-          "utm_campaign",
-          "utm_medium",
-          "utm_content"
-        ]
-      ])
-    sheet
-      .getRange(1, 1, 1, 6)
-      .setFontWeight("bold")
-      .setFontColor("#FFFFFF")
-      .setBackground("#003B49")
-    sheet.setColumnWidths(1, 6, 150)
-    sheet.setFrozenRows(1)
   }
   return sheet
 }
 
-function registrarEventoFunil_(data) {
-  var sheet = getFunilSheet_()
-  sheet.appendRow([
-    new Date(),
-    data.evento || "",
-    data.utm_source || "",
-    data.utm_campaign || "",
-    data.utm_medium || "",
-    data.utm_content || ""
-  ])
+function formatarCabecalhoFunil_(sheet) {
+  var header = sheet.getRange(1, 1, 1, HEADERS_FUNIL.length)
+  header.setValues([HEADERS_FUNIL])
+  header.setFontWeight("bold")
+  header.setFontColor("#FFFFFF")
+  header.setBackground("#003B49")
+  header.setHorizontalAlignment("center")
+  sheet.setFrozenRows(1)
+  sheet.setColumnWidths(1, HEADERS_FUNIL.length, 140)
+}
+
+// Valida e grava um evento anonimo de entrada em etapa. Formato de payload
+// totalmente diferente do lead (sem e-mail, sem PII) - por isso nao reusa
+// getUltimaLinhaComDados_/dedup por e-mail do fluxo de Leads: aqui cada
+// evento vira uma linha nova, sem upsert.
+function handleFunilEvent_(data) {
+  var etapaValida = ETAPAS_FUNIL.some(function (e) {
+    return e.valor === data.etapa
+  })
+  if (!etapaValida) {
+    return ContentService.createTextOutput(
+      JSON.stringify({ ok: false, erro: "etapa invalida" })
+    ).setMimeType(ContentService.MimeType.JSON)
+  }
+
+  // Rate limit global bem folgado - so pra barrar um loop com bug mandando
+  // milhares de eventos. Trafego real desse funil e de poucas dezenas de
+  // visitantes por dia, entao 300 eventos em 10 min ja seria anomalia.
+  var cache = CacheService.getScriptCache()
+  var chamadasRecentes = Number(cache.get("rl_funil") || 0)
+  if (chamadasRecentes >= 300) {
+    return ContentService.createTextOutput(
+      JSON.stringify({ ok: false, erro: "limite atingido" })
+    ).setMimeType(ContentService.MimeType.JSON)
+  }
+  cache.put("rl_funil", String(chamadasRecentes + 1), 600)
+
+  var lock = LockService.getScriptLock()
+  lock.waitLock(30000)
+  try {
+    var sheet = getFunilSheet_()
+    var ultimaLinha = getUltimaLinhaComDados_(sheet)
+    if (ultimaLinha === 0) {
+      sheet.getRange(1, 1, 1, HEADERS_FUNIL.length).setValues([HEADERS_FUNIL])
+      formatarCabecalhoFunil_(sheet)
+      ultimaLinha = 1
+    }
+    var row = HEADERS_FUNIL.map(function (h) {
+      if (h === "data") return new Date()
+      var v = data[h]
+      return v === undefined || v === null ? "" : v
+    })
+    sheet.getRange(ultimaLinha + 1, 1, 1, row.length).setValues([row])
+    sheet.getRange(ultimaLinha + 1, 1).setNumberFormat("dd/mm/yyyy hh:mm:ss")
+  } finally {
+    lock.releaseLock()
+  }
+
+  return ContentService.createTextOutput(
+    JSON.stringify({ ok: true })
+  ).setMimeType(ContentService.MimeType.JSON)
 }
 
 // ================================================================
@@ -1219,6 +1328,74 @@ function escreverBlocoScore_(sheet, linhaInicial, sep) {
   return linhaHeader + 2 + faixas.length
 }
 
+// Funil sequencial das etapas 1-6 do simulador + resultado/final, a partir
+// dos eventos anonimos gravados na aba "Funil" (ver handleFunilEvent_).
+// Diferente de escreverBlocoDistribuicao_ (categorias sem ordem), aqui a
+// ordem importa: cada linha soma "% do topo" (vs a primeira etapa) e
+// "queda vs. etapa anterior", pra mostrar onde a maioria trava.
+function escreverBlocoFunil_(sheet, linhaInicial, sep) {
+  sheet
+    .getRange(linhaInicial, 1)
+    .setValue("Funil por Etapa do Simulador (visitantes, antes de virar lead)")
+    .setFontWeight("bold")
+    .setFontFamily("Arial")
+    .setFontSize(12)
+    .setFontColor("#1F2A44")
+
+  var linhaHeader = linhaInicial + 1
+  var headerRange = sheet.getRange(linhaHeader, 1, 1, 4)
+  headerRange.setValues([
+    ["Etapa", "Entradas", "% do topo do funil", "Queda vs. etapa anterior"]
+  ])
+  headerRange
+    .setBackground("#1F2A44")
+    .setFontColor("#FFFFFF")
+    .setFontWeight("bold")
+    .setFontFamily("Arial")
+
+  var linhaTopo = linhaHeader + 1
+  for (var i = 0; i < ETAPAS_FUNIL.length; i++) {
+    var etapa = ETAPAS_FUNIL[i]
+    var linha = linhaHeader + 1 + i
+
+    sheet.getRange(linha, 1).setValue(etapa.rotulo).setFontFamily("Arial")
+
+    var templateContagem = "=COUNTIF(Funil!$B$2:$B;~" + etapa.valor + "~)"
+    sheet.getRange(linha, 2).setFormula(montarFormula_(templateContagem, sep))
+
+    var templatePct = "=IFERROR(B" + linha + "/B" + linhaTopo + ";0)"
+    sheet.getRange(linha, 3).setFormula(montarFormula_(templatePct, sep))
+    sheet.getRange(linha, 3).setNumberFormat("0.0%")
+
+    if (i === 0) {
+      sheet
+        .getRange(linha, 4)
+        .setValue("-")
+        .setFontFamily("Arial")
+        .setHorizontalAlignment("center")
+    } else {
+      var templateQueda = "=IFERROR(1-B" + linha + "/B" + (linha - 1) + ";0)"
+      sheet.getRange(linha, 4).setFormula(montarFormula_(templateQueda, sep))
+      sheet.getRange(linha, 4).setNumberFormat("0.0%")
+    }
+  }
+
+  sheet
+    .getRange(linhaHeader, 1, ETAPAS_FUNIL.length + 1, 4)
+    .setBorder(
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      "#DDDDDD",
+      SpreadsheetApp.BorderStyle.SOLID
+    )
+
+  return linhaHeader + 2 + ETAPAS_FUNIL.length
+}
+
 // ================================================================
 // ABA "Dashboard"
 // ================================================================
@@ -1358,7 +1535,8 @@ function construirDashboard_(ss, leadsSheet, sep) {
     LABELS_OBJETIVO,
     sep
   )
-  escreverBlocoScore_(dash, linha, sep)
+  linha = escreverBlocoScore_(dash, linha, sep)
+  escreverBlocoFunil_(dash, linha, sep)
 
   return dash
 }
@@ -1843,6 +2021,15 @@ function construirEstruturaAnalitica() {
   var ss = SpreadsheetApp.getActiveSpreadsheet()
   var leadsSheet = getLeadsSheet_()
   var sep = getSeparador_()
+
+  // Garante que a aba "Funil" existe (com cabecalho) mesmo antes do primeiro
+  // evento chegar - o bloco de funil no Dashboard referencia Funil!$B$2:$B
+  // por formula, e isso quebra (#REF!) se a aba nao existir ainda.
+  var funilSheet = getFunilSheet_()
+  if (getUltimaLinhaComDados_(funilSheet) === 0) {
+    funilSheet.getRange(1, 1, 1, HEADERS_FUNIL.length).setValues([HEADERS_FUNIL])
+    formatarCabecalhoFunil_(funilSheet)
+  }
 
   configurarColunasAuxiliares_(leadsSheet, sep)
   var dash = construirDashboard_(ss, leadsSheet, sep)

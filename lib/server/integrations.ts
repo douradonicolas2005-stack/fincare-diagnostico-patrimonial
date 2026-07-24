@@ -1,4 +1,4 @@
-import type { LeadPayload } from "../security"
+import type { FunnelPayload, LeadPayload } from "../security"
 
 type RequestJob = Promise<Response>
 
@@ -26,12 +26,10 @@ export async function forwardLead(payload: LeadPayload): Promise<boolean> {
   return results.every(result => result.status === "fulfilled" && result.value.ok)
 }
 
-type FunnelPayload = { evento: string; utm_source?: string; utm_campaign?: string; utm_medium?: string; utm_content?: string }
-
-export async function forwardFunnel(payload: FunnelPayload): Promise<boolean> {
-  const url = configured("GOOGLE_SHEETS_WEBHOOK_URL")
+export async function forwardFunnelEvent(payload: FunnelPayload): Promise<boolean> {
+  const sheetsUrl = configured("GOOGLE_SHEETS_WEBHOOK_URL")
   const token = configured("GOOGLE_SHEETS_WEBHOOK_TOKEN")
-  if (!url || !token) return true
-  const response = await post(url, { webhook_token: token, tipo: "funil", evento: payload.evento, utm_source: payload.utm_source || "", utm_campaign: payload.utm_campaign || "", utm_medium: payload.utm_medium || "", utm_content: payload.utm_content || "" }, "text/plain;charset=utf-8")
+  if (!sheetsUrl || !token) return false
+  const response = await post(sheetsUrl, { ...payload, tipo: "funil", webhook_token: token }, "text/plain;charset=utf-8")
   return response.ok
 }

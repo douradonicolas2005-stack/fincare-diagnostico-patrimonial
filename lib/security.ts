@@ -53,6 +53,26 @@ export const leadSchema = z.object({
   utm_term: z.string().max(150)
 })
 
+export type FunnelPayload = z.infer<typeof funnelSchema>
+
+export const funnelSchema = z.object({
+  etapa: z.enum([
+    "1_patrimonio",
+    "2_aporte",
+    "3_renda",
+    "4_premissas",
+    "5_qualificacao",
+    "6_contato",
+    "result",
+    "final"
+  ]),
+  utm_source: z.string().max(150),
+  utm_medium: z.string().max(150),
+  utm_campaign: z.string().max(150),
+  utm_content: z.string().max(150),
+  utm_term: z.string().max(150)
+})
+
 export function escapeHtml(value: unknown) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")

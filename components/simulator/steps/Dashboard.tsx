@@ -90,7 +90,7 @@ export function Dashboard({
         )}
       </div>
       <div className="btn-row">
-        <Button variant="gold" className="flex-1" onClick={onFinalize}>
+        <Button variant="gold" className="flex-1" onClick={onFinalize} disabled={sending}>
           {sending ? "Enviando..." : "Ver diagnóstico executivo completo"}
         </Button>
       </div>
