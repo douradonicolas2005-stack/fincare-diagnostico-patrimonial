@@ -57,7 +57,21 @@ export function PremisesStep({
               />
             </svg>
           </button>
-          <div className="slider-value">{rentabilidade}% a.a.</div>
+          <div className="stepper-track-wrap">
+            <div className="slider-value">{rentabilidade}% a.a.</div>
+            <div
+              className="stepper-track"
+              role="progressbar"
+              aria-valuemin={2}
+              aria-valuemax={12}
+              aria-valuenow={rentabilidade}
+            >
+              <div
+                className="stepper-track-fill"
+                style={{ width: `${((rentabilidade - 2) / 10) * 100}%` }}
+              />
+            </div>
+          </div>
           <button
             type="button"
             className="stepper-btn"
