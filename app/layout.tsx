@@ -17,7 +17,7 @@ export const metadata: Metadata = {
       "Diagnóstico patrimonial gratuito, com metodologia de Wealth Management, da Fincare Investimentos.",
     url: "https://fincarescorepatrimonial.com.br",
     siteName: "Fincare Investimentos",
-    images: ["/logo-fincare.png"],
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
     locale: "pt_BR",
     type: "website"
   },
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     title: "Simulador Fincare | Score Patrimonial",
     description:
       "Diagnóstico patrimonial gratuito, com metodologia de Wealth Management, da Fincare Investimentos.",
-    images: ["/logo-fincare.png"]
+    images: ["/og-image.png"]
   }
 }
 
