@@ -1,7 +1,12 @@
 "use client"
 
+import { trackAnalyticsEvent } from "@/lib/analytics"
+
 export function LandingPage() {
   const startDiagnosis = () => {
+    trackAnalyticsEvent("landing_cta_click", {
+      action: "start_diagnosis"
+    })
     const query = window.location.search
     window.location.assign(`/diagnostico${query}`)
   }
@@ -108,7 +113,16 @@ export function LandingPage() {
         </div>
 
         <div className="landing-foot">
-          <a href="/privacidade">Política de Privacidade</a>
+          <a
+            href="/privacidade"
+            onClick={() =>
+              trackAnalyticsEvent("landing_privacy_click", {
+                action: "open_privacy"
+              })
+            }
+          >
+            Política de Privacidade
+          </a>
         </div>
       </section>
     </main>
