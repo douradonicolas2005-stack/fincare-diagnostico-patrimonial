@@ -7,12 +7,12 @@ import "./globals.css"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://fincarescorepatrimonial.com.br"),
-  title: "Diagnóstico Patrimonial | Fincare Investimentos",
+  title: "Simulador Fincare | Score Patrimonial",
   description:
     "Simule sua trajetória patrimonial e descubra caminhos para alcançar seus objetivos.",
   icons: { icon: "/favicon.ico" },
   openGraph: {
-    title: "Descubra em 1 minuto quanto falta para seu objetivo",
+    title: "Simulador Fincare | Score Patrimonial",
     description:
       "Diagnóstico patrimonial gratuito, com metodologia de Wealth Management, da Fincare Investimentos.",
     url: "https://fincarescorepatrimonial.com.br",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Descubra em 1 minuto quanto falta para seu objetivo",
+    title: "Simulador Fincare | Score Patrimonial",
     description:
       "Diagnóstico patrimonial gratuito, com metodologia de Wealth Management, da Fincare Investimentos.",
     images: ["/logo-fincare.png"]
