@@ -36,16 +36,49 @@ export function PremisesStep({
         <span className="field-label">
           Rentabilidade real esperada (acima da inflação, % ao ano)
         </span>
-        <div className="slider-value">{rentabilidade}% a.a.</div>
-        <input
-          className="range-input"
-          type="range"
-          min="2"
-          max="12"
-          step=".5"
-          value={rentabilidade}
-          onChange={event => setValue("rentabilidade", event.target.value)}
-        />
+        <div className="stepper">
+          <button
+            type="button"
+            className="stepper-btn"
+            aria-label="Diminuir rentabilidade"
+            disabled={rentabilidade <= 2}
+            onClick={() =>
+              setValue("rentabilidade", String(Math.max(2, rentabilidade - 0.5)))
+            }
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path
+                d="M15 6l-6 6 6 6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <div className="slider-value">{rentabilidade}% a.a.</div>
+          <button
+            type="button"
+            className="stepper-btn"
+            aria-label="Aumentar rentabilidade"
+            disabled={rentabilidade >= 12}
+            onClick={() =>
+              setValue("rentabilidade", String(Math.min(12, rentabilidade + 0.5)))
+            }
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path
+                d="M9 6l6 6-6 6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
         <div className="range-labels">
           <span>Conservador</span>
           <span>Arrojado</span>
