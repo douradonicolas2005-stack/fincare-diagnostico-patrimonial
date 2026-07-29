@@ -48,7 +48,7 @@ body {
 }
 .landing-page { display: flex; min-height: 100vh; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 0%, #012730, var(--verde-escuro) 65%); padding: 36px 20px; color: #f4f9fc; }
 .landing-card { width: 100%; max-width: 460px; text-align: center; }
-.landing-logo { height: 34px; margin-bottom: 16px; }
+.landing-logo { display: block; height: 34px; margin: 0 auto 16px; }
 .landing-card h1 { margin: 0 0 10px; font-family: var(--font-display); font-size: 27px; font-weight: 500; line-height: 1.25; }
 .landing-card h1 span { color: var(--gold-light); }
 
