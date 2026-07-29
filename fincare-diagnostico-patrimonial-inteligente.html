@@ -2346,7 +2346,7 @@
         currentStep: 1,
         totalWizardSteps: 4,
         trackedInicioSimulacao: false, // vira true no 1º avanço do Passo 1→2 (Meta Pixel)
-        funilStepsEnviados: [], // guarda quais passos (1-5) já mandaram evento de funil, pra não duplicar em idas/voltas
+        funilStepsEnviados: [], // guarda quais etapas de funil (1_patrimonio...final) já foram enviadas, pra não duplicar em idas/voltas
         calc: null, // resultado do cálculo principal, preenchido em calcular()
         advanced: {
           source: null, // 'manual' | 'portfolio' | null
@@ -2502,6 +2502,21 @@
         4: "Premissas avançadas"
       }
 
+      // Mapeia o "n" usado em goToStep() pro valor de etapa aceito pelo
+      // Apps Script (ETAPAS_FUNIL em google-sheets-integration.gs) - as duas
+      // listas precisam ficar em sincronia, senão o evento é rejeitado como
+      // "etapa invalida" e nada é gravado na aba Funil.
+      const FUNIL_ETAPA_POR_STEP = {
+        1: "1_patrimonio",
+        2: "2_aporte",
+        3: "3_renda",
+        4: "4_premissas",
+        5: "5_qualificacao",
+        6: "6_contato",
+        result: "result",
+        final: "final"
+      }
+
       function showStep(id) {
         document
           .querySelectorAll(".step")
@@ -2524,17 +2539,13 @@
           state.trackedInicioSimulacao = true
         }
 
-        // Funil de abandono por etapa (1 a 5) - só a primeira vez que cada etapa
-        // é alcançada nesta sessão, pra idas-e-voltas no "Voltar" não inflarem a
-        // contagem.
-        if (
-          typeof n === "number" &&
-          n >= 1 &&
-          n <= 5 &&
-          !state.funilStepsEnviados.includes(n)
-        ) {
-          state.funilStepsEnviados.push(n)
-          enviarEventoFunil("etapa_" + n)
+        // Funil de abandono por etapa (1 a 6, mais "result"/"final") - só a
+        // primeira vez que cada etapa é alcançada nesta sessão, pra idas-e-voltas
+        // no "Voltar" não inflarem a contagem.
+        const etapaFunil = FUNIL_ETAPA_POR_STEP[n]
+        if (etapaFunil && !state.funilStepsEnviados.includes(etapaFunil)) {
+          state.funilStepsEnviados.push(etapaFunil)
+          enviarEventoFunil(etapaFunil)
         }
 
         state.currentStep = n
