@@ -7,7 +7,7 @@ export const leadSchema = z.object({
   telefone: z.string().trim().min(8).max(30),
   email: z.string().trim().email().max(180),
   cidade: z.string().trim().max(100),
-  estado: z.string().length(2),
+  estado: z.string().max(2),
   faixa_patrimonio: z.enum(["ate_500k", "500k_1m", "1m_5m", "5m_mais"]),
   faixa_renda: z.enum(["ate_15k", "15k_40k", "40k_100k", "100k_mais"]),
   instituicao_financeira_atual: z.string().max(120),

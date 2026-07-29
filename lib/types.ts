@@ -3,6 +3,7 @@ export type Step =
   | 2
   | 3
   | 4
+  | "teaser"
   | "loading"
   | "result"
   | "advanced"

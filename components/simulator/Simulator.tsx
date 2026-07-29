@@ -20,6 +20,7 @@ import { PremisesStep } from "./steps/PremisesStep"
 import { QualificationStep } from "./steps/QualificationStep"
 import { Question } from "./steps/Question"
 import { ResultStep } from "./steps/ResultStep"
+import { ScoreTeaserStep } from "./steps/ScoreTeaserStep"
 import { Button } from "./ui/Button"
 import { Dialog } from "./ui/Dialog"
 
@@ -27,8 +28,11 @@ const stepNames: Record<number, string> = {
   1: "Patrimônio atual",
   2: "Aporte mensal",
   3: "Renda desejada",
-  4: "Premissas avançadas"
+  4: "Premissas avançadas",
+  5: "Dados de contato",
+  6: "Qualificação"
 }
+const TOTAL_STEPS = 6
 const emptyUtm = {
   utm_source: "",
   utm_medium: "",
@@ -234,9 +238,7 @@ export default function Simulator() {
     try {
       buildPayload("nao", currentLead, currentCalc)
     } catch {
-      setDialogMessage(
-        "Confira nome, e-mail, WhatsApp, cidade e estado antes de continuar."
-      )
+      setDialogMessage("Confira nome, e-mail e WhatsApp antes de continuar.")
       return
     }
     setLead(currentLead)
@@ -318,17 +320,11 @@ export default function Simulator() {
   const validateContact = () => {
     const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lead.email.trim())
     const phoneDigits = lead.telefone.replace(/\D/g, "")
-    if (
-      lead.nome.trim().length >= 2 &&
-      validEmail &&
-      phoneDigits.length >= 10 &&
-      lead.cidade.trim() &&
-      lead.estado.length === 2
-    ) {
+    if (lead.nome.trim().length >= 2 && validEmail && phoneDigits.length >= 10) {
       return goTo(6)
     }
     setDialogMessage(
-      "Preencha nome, e-mail, WhatsApp, cidade e estado corretamente para continuar."
+      "Preencha nome, e-mail e WhatsApp corretamente para continuar."
     )
   }
 
@@ -336,20 +332,29 @@ export default function Simulator() {
     <div className="page-bg min-h-screen">
       <BrandHeader />
       <main className="mx-auto max-w-[600px] px-5 py-9">
-        {typeof step === "number" && step <= 4 && (
-          <div className="progress-wrap">
-            <div className="progress-label">
-              <span>Passo {step} de 4</span>
-              <span>{stepNames[step]}</span>
+        {(() => {
+          const progressStep =
+            step === "teaser" ? 4 : typeof step === "number" && step <= 6 ? step : null
+          if (progressStep === null) return null
+          const label =
+            step === "teaser" ? "Prévia do resultado" : stepNames[progressStep]
+          return (
+            <div className="progress-wrap">
+              <div className="progress-label">
+                <span>
+                  Passo {progressStep} de {TOTAL_STEPS}
+                </span>
+                <span>{label}</span>
+              </div>
+              <div className="progress-track">
+                <div
+                  className="progress-value"
+                  style={{ width: `${(progressStep / TOTAL_STEPS) * 100}%` }}
+                />
+              </div>
             </div>
-            <div className="progress-track">
-              <div
-                className="progress-value"
-                style={{ width: `${(step / 4) * 100}%` }}
-              />
-            </div>
-          </div>
-        )}
+          )
+        })()}
         <section
           className={
             step === "result" ? "result-flow step-enter" : "card step-enter"
@@ -424,6 +429,22 @@ export default function Simulator() {
               retirada={values.retirada}
               setValue={setValue}
               onBack={() => goTo(3)}
+              onNext={() => goTo("teaser")}
+            />
+          )}
+
+          {step === "teaser" && (
+            <ScoreTeaserStep
+              percentage={Math.max(
+                0,
+                Math.min(
+                  100,
+                  (values.patrimonio /
+                    ((values.renda * 12) / (values.retirada / 100))) *
+                    100
+                )
+              )}
+              onBack={() => goTo(4)}
               onNext={() => goTo(5)}
             />
           )}

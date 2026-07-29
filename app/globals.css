@@ -186,9 +186,6 @@ select {
 }
 .field-money { padding-left: 44px; }
 .field-block { display: block; margin-bottom: 20px; }
-.mini-progress { display: flex; gap: 6px; margin-bottom: 18px; }
-.mini-progress span { height: 3px; flex: 1; border-radius: 2px; background: var(--surface-alt); }
-.mini-progress span.done { background: var(--verde-medio); }
 .qualification-grid-secondary .field-label { min-height: 36px; }
 .btn-row { display: flex; gap: 12px; margin-top: 28px; }
 .prefix-input { position: relative; }
@@ -227,6 +224,17 @@ select {
 .option-card small { color: var(--verde-medio); font-family: var(--font-mono); font-size: 10px; font-weight: 400; }
 .advanced-step .q-title, .advanced-step .q-sub { margin-right: auto; margin-left: auto; text-align: center; }
 .advanced-options { display: grid; gap: 16px; }
+
+.teaser-step { text-align: center; }
+.teaser-step .q-title, .teaser-step .q-sub { margin-right: auto; margin-left: auto; text-align: center; }
+.teaser-score-num { margin-top: -46px; position: relative; color: var(--verde-escuro); font-family: var(--font-mono); font-size: 34px; font-weight: 700; }
+.teaser-score-caption { margin-bottom: 20px; color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+.lock-card { display: flex; align-items: flex-start; gap: 12px; margin: 20px 0; border: 1px solid var(--verde-claro); border-radius: 10px; background: var(--verde-claro-bg); padding: 14px 16px; text-align: left; }
+.lock-card svg { flex-shrink: 0; margin-top: 2px; }
+.lock-card .lock-text { color: var(--text); font-size: 12.5px; line-height: 1.45; }
+.lock-card .lock-text b { display: block; margin-bottom: 2px; font-size: 13.5px; }
+
+.optional-toggle { display: flex; align-items: center; gap: 6px; margin: 4px 0 14px; border: 0; background: transparent; padding: 0; color: var(--verde-medio); font-size: 12.5px; font-weight: 600; cursor: pointer; }
 .advanced-option { display: grid; grid-template-columns: 48px 1fr; gap: 16px; width: 100%; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 18px 22px; text-align: left; color: var(--text); }
 .advanced-option:hover { border-color: var(--verde-claro); }
 .advanced-option-icon { display: grid; width: 48px; height: 48px; place-items: center; border-radius: 9px; background: var(--verde-claro-bg); color: var(--verde-medio); font-size: 24px; }

@@ -32,16 +32,7 @@ export function QualificationStep({
   sending
 }: QualificationStepProps) {
   return (
-    <Wizard
-      eyebrow="Últimos detalhes"
-      title="Isso ajuda a personalizar sua análise."
-      topContent={
-        <div className="mini-progress" aria-label="Etapa 2 de 2">
-          <span className="done" />
-          <span className="done" />
-        </div>
-      }
-    >
+    <Wizard eyebrow="Últimos detalhes" title="Isso ajuda a personalizar sua análise.">
       <div className="qualification-grid grid gap-4 md:grid-cols-2">
         <Select
           label="Faixa de patrimônio atual"
