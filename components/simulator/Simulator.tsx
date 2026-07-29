@@ -245,13 +245,18 @@ export default function Simulator() {
     setStep("loading")
     await new Promise(resolve => setTimeout(resolve, 700))
     setCalc(currentCalc)
-    const ok = await send("nao", currentLead, currentCalc)
-    if (ok) trackMetaPixelEvent("Lead")
+    // Fire-and-forget: o webhook do Apps Script pode demorar vários segundos
+    // pra responder, e nao ha motivo pra travar a tela de carregamento
+    // (que ja mostra o essencial) esperando por isso - goTo("result") ja
+    // acontecia incondicionalmente mesmo quando o envio falhava.
+    send("nao", currentLead, currentCalc).then(ok => {
+      if (ok) trackMetaPixelEvent("Lead")
+    })
     goTo("result")
   }
   const finalize = async () => {
     if (sending) return
-    if (calc) await send("sim", lead, calc)
+    if (calc) send("sim", lead, calc)
     goTo("final")
   }
   const allocation = useMemo(

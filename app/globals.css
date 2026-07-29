@@ -227,7 +227,7 @@ select {
 
 .teaser-step { text-align: center; }
 .teaser-step .q-title, .teaser-step .q-sub { margin-right: auto; margin-left: auto; text-align: center; }
-.teaser-score-num { margin-top: -46px; position: relative; color: var(--verde-escuro); font-family: var(--font-mono); font-size: 34px; font-weight: 700; }
+.teaser-score-num { margin-top: 8px; color: var(--verde-escuro); font-family: var(--font-mono); font-size: 34px; font-weight: 700; }
 .teaser-score-caption { margin-bottom: 20px; color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
 .lock-card { display: flex; align-items: flex-start; gap: 12px; margin: 20px 0; border: 1px solid var(--verde-claro); border-radius: 10px; background: var(--verde-claro-bg); padding: 14px 16px; text-align: left; }
 .lock-card svg { flex-shrink: 0; margin-top: 2px; }
