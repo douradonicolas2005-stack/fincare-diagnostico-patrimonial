@@ -6,6 +6,9 @@ type PhoneInputProps = {
   value: string
   placeholder?: string
   onChange: (value: string) => void
+  onBlur?: () => void
+  error?: string
+  valid?: boolean
 }
 
 function onlyDigits(value: string) {
@@ -36,7 +39,10 @@ export function PhoneInput({
   label,
   value,
   placeholder,
-  onChange
+  onChange,
+  onBlur,
+  error,
+  valid
 }: PhoneInputProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const nextCaretRef = useRef<number | null>(null)
@@ -63,14 +69,18 @@ export function PhoneInput({
       <span className="field-label">{label}</span>
       <input
         ref={inputRef}
-        className="field"
+        className={`field${error ? " field-error" : valid ? " field-valid" : ""}`}
         type="tel"
         inputMode="numeric"
         autoComplete="tel"
         value={value}
         placeholder={placeholder}
         onChange={handleChange}
+        onBlur={onBlur}
+        aria-invalid={Boolean(error)}
       />
+      {error && <div className="field-error-msg">⚠ {error}</div>}
+      {!error && valid && <div className="field-valid-check">✓</div>}
     </label>
   )
 }

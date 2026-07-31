@@ -63,7 +63,10 @@ export function ResultStep({ calc, onAdvanced }: ResultStepProps) {
     ) : null,
     <>
       Mantendo sua trajetória atual, em 10 anos seu patrimônio pode chegar a{" "}
-      <b className="blurred-value">{formatCurrency(projectedPatrimony10)}</b> —
+      <b className="blurred-value" aria-hidden="true">
+        {formatCurrency(projectedPatrimony10)}
+      </b>
+      <span className="sr-only">um valor disponível ao aprofundar seu diagnóstico</span> —
       veja a projeção completa ano a ano aprofundando seu diagnóstico.
     </>
   ].filter(Boolean)
@@ -98,8 +101,11 @@ export function ResultStep({ calc, onAdvanced }: ResultStepProps) {
           <span className="l2">
             Patrimônio necessário
             <br />
-            <span className="text-[13px] blurred-value">
+            <span className="text-[13px] blurred-value" aria-hidden="true">
               {formatCurrency(calc.necessario)}
+            </span>
+            <span className="sr-only">
+              valor disponível ao aprofundar seu diagnóstico
             </span>
           </span>
         </div>

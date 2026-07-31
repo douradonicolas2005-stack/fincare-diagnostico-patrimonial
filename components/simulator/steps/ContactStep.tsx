@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { isValidPhoneBR } from "@/lib/security"
 import type { Lead } from "@/lib/types"
 import { Button } from "../ui/Button"
 import { Input } from "../ui/Input"
@@ -13,6 +14,8 @@ type ContactStepProps = {
   onNext: () => void
 }
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 export function ContactStep({
   lead,
   setLeadValue,
@@ -22,6 +25,21 @@ export function ContactStep({
   const [showOptional, setShowOptional] = useState(
     Boolean(lead.cidade || lead.estado)
   )
+  const [touched, setTouched] = useState({ nome: false, email: false, telefone: false })
+  const touch = (campo: keyof typeof touched) => setTouched(current => ({ ...current, [campo]: true }))
+
+  const nomeValido = lead.nome.trim().length >= 2
+  const emailValido = EMAIL_REGEX.test(lead.email.trim())
+  const telefoneValido = isValidPhoneBR(lead.telefone)
+
+  const handleNext = () => {
+    // Se a pessoa clicar "Continuar" sem nunca ter saído de um campo
+    // inválido (ex: colou os 3 dados e clicou direto), garante que os
+    // erros específicos apareçam mesmo assim, não só o diálogo genérico
+    // que o passo pai ainda mostra como reforço.
+    setTouched({ nome: true, email: true, telefone: true })
+    onNext()
+  }
 
   return (
     <Wizard
@@ -34,6 +52,9 @@ export function ContactStep({
         placeholder="Como podemos te chamar"
         value={lead.nome}
         onChange={value => setLeadValue("nome", value)}
+        onBlur={() => touch("nome")}
+        error={touched.nome && !nomeValido ? "Informe seu nome completo" : undefined}
+        valid={touched.nome && nomeValido}
       />
       <Input
         label="E-mail"
@@ -41,12 +62,30 @@ export function ContactStep({
         placeholder="voce@email.com"
         value={lead.email}
         onChange={value => setLeadValue("email", value)}
+        onBlur={() => touch("email")}
+        error={
+          touched.email && !emailValido
+            ? lead.email.trim()
+              ? "Confira o e-mail — parece incompleto"
+              : "Informe seu e-mail"
+            : undefined
+        }
+        valid={touched.email && emailValido}
       />
       <PhoneInput
         label="WhatsApp"
         placeholder="(11) 90000-0000"
         value={lead.telefone}
         onChange={value => setLeadValue("telefone", value)}
+        onBlur={() => touch("telefone")}
+        error={
+          touched.telefone && !telefoneValido
+            ? lead.telefone.trim()
+              ? "Confira o número — parece incompleto"
+              : "Informe seu WhatsApp com DDD"
+            : undefined
+        }
+        valid={touched.telefone && telefoneValido}
       />
       <input
         type="text"
@@ -110,7 +149,7 @@ export function ContactStep({
         <Button variant="ghost" onClick={onBack}>
           Voltar
         </Button>
-        <Button className="flex-1" onClick={onNext}>
+        <Button className="flex-1" onClick={handleNext}>
           Continuar
         </Button>
       </div>

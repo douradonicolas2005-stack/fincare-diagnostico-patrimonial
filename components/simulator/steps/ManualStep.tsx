@@ -36,6 +36,17 @@ export function ManualStep({
       eyebrow="Diagnóstico avançado Fincare"
       title="Vamos deixar sua análise ainda mais precisa."
       sub="Adicione imóveis, aplicações, previdência, empresas, caixa e dívidas para um cálculo de patrimônio líquido mais completo. Preencha o que se aplicar — campos em branco são considerados zero, você pode ajustar depois com um especialista."
+      topContent={
+        <div className="mini-progress">
+          <div className="mini-progress-label">
+            <span>Diagnóstico avançado</span>
+            <span>Etapa 1 de 2</span>
+          </div>
+          <div className="mini-progress-track">
+            <div className="mini-progress-fill" style={{ width: "50%" }} />
+          </div>
+        </div>
+      }
     >
       <div className="grid gap-0 md:grid-cols-2 md:gap-x-4">
         {fields.slice(0, 6).map(([key, label]) => (
