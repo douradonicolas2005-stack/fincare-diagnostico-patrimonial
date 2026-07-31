@@ -35,6 +35,7 @@ export type Lead = {
   objetivo_financeiro: string
   consentimento_contato: boolean
   consentimento_data_hora: string
+  honeypot: string
 }
 
 export type Calculation = {

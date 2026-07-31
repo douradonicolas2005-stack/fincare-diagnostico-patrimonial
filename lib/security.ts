@@ -1,10 +1,21 @@
 import { z } from "zod"
 
+const BR_PHONE_REGEX = /^[1-9][1-9](?:9\d{8}|[2-5]\d{7})$/
+
+export function isValidPhoneBR(value: string) {
+  return BR_PHONE_REGEX.test(value.replace(/\D/g, ""))
+}
+
 export type LeadPayload = z.infer<typeof leadSchema>
 
 export const leadSchema = z.object({
   nome: z.string().trim().min(2).max(100),
-  telefone: z.string().trim().min(8).max(30),
+  telefone: z
+    .string()
+    .trim()
+    .min(8)
+    .max(30)
+    .refine(isValidPhoneBR, { message: "telefone inválido" }),
   email: z.string().trim().email().max(180),
   cidade: z.string().trim().max(100),
   estado: z.string().max(2),

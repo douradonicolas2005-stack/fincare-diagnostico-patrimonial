@@ -3,7 +3,7 @@
 import { sendFunnelEvent, sendLead } from "@/lib/api"
 import { allocationFromCategories, calculate } from "@/lib/calculator"
 import { trackMetaPixelEvent } from "@/lib/meta-pixel"
-import { leadSchema, type FunnelPayload, type LeadPayload } from "@/lib/security"
+import { isValidPhoneBR, leadSchema, type FunnelPayload, type LeadPayload } from "@/lib/security"
 import type { AdvancedState, Calculation, Lead, Step } from "@/lib/types"
 import { track } from "@vercel/analytics"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -69,7 +69,8 @@ const initialLead: Lead = {
   possui_gerente_banco: "",
   objetivo_financeiro: "",
   consentimento_contato: false,
-  consentimento_data_hora: ""
+  consentimento_data_hora: "",
+  honeypot: ""
 }
 const initialAdvanced: AdvancedState = {
   source: null,
@@ -188,7 +189,6 @@ export default function Simulator() {
       ),
       data: new Date().toISOString(),
       origem_lead: "calculadora-fincare-instagram",
-      honeypot: "",
       ...emptyUtm,
       ...utm
     })
@@ -324,12 +324,11 @@ export default function Simulator() {
   }
   const validateContact = () => {
     const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lead.email.trim())
-    const phoneDigits = lead.telefone.replace(/\D/g, "")
-    if (lead.nome.trim().length >= 2 && validEmail && phoneDigits.length >= 10) {
+    if (lead.nome.trim().length >= 2 && validEmail && isValidPhoneBR(lead.telefone)) {
       return goTo(6)
     }
     setDialogMessage(
-      "Preencha nome, e-mail e WhatsApp corretamente para continuar."
+      "Preencha nome, e-mail e um WhatsApp válido com DDD para continuar."
     )
   }
 
