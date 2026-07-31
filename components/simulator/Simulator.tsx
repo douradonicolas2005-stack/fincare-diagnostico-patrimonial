@@ -195,12 +195,14 @@ export default function Simulator() {
   const send = async (
     complete: "sim" | "nao",
     currentLead: Lead,
-    currentCalc: Calculation
+    currentCalc: Calculation,
+    metaEventId?: string
   ): Promise<boolean> => {
     setSending(true)
     setSendError(false)
     try {
-      const ok = await sendLead(buildPayload(complete, currentLead, currentCalc))
+      const payload = buildPayload(complete, currentLead, currentCalc)
+      const ok = await sendLead(metaEventId ? { ...payload, meta_event_id: metaEventId } : payload)
       setSendError(!ok)
       return ok
     } catch {
@@ -249,8 +251,12 @@ export default function Simulator() {
     // pra responder, e nao ha motivo pra travar a tela de carregamento
     // (que ja mostra o essencial) esperando por isso - goTo("result") ja
     // acontecia incondicionalmente mesmo quando o envio falhava.
-    send("nao", currentLead, currentCalc).then(ok => {
-      if (ok) trackMetaPixelEvent("Lead")
+    // metaEventId compartilhado entre o disparo do Pixel aqui e a Conversions
+    // API server-side (app/api/leads/route.ts) para o Meta deduplicar os dois
+    // como um único evento "Lead".
+    const metaEventId = crypto.randomUUID()
+    send("nao", currentLead, currentCalc, metaEventId).then(ok => {
+      if (ok) trackMetaPixelEvent("Lead", metaEventId)
     })
     goTo("result")
   }

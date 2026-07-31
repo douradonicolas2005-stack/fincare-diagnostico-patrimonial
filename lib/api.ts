@@ -9,7 +9,7 @@ async function post(path: string, body: unknown): Promise<boolean> {
   }
 }
 
-export async function sendLead(payload: LeadPayload): Promise<boolean> {
+export async function sendLead(payload: LeadPayload & { meta_event_id?: string }): Promise<boolean> {
   return post("/api/leads", payload)
 }
 
