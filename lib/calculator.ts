@@ -83,12 +83,15 @@ export function project(
   const trajectory = [patrimony]
   let months: number | null = initial >= target ? 0 : null
 
+  // Não interrompe ao bater a meta: a trajetória precisa continuar até
+  // maxYears mesmo depois do "Ponto de Virada", senão qualquer leitura de
+  // ano posterior (ex: "patrimônio projetado em 10 anos") fica truncada no
+  // ano em que a meta foi atingida, mostrando um valor bem menor que o real.
   for (let month = 1; month <= maxYears * 12; month++) {
     patrimony = patrimony * (1 + monthlyRate) + monthly
 
     if (month % 12 === 0) trajectory.push(patrimony)
     if (months === null && patrimony >= target) months = month
-    if (months !== null && month % 12 === 0) break
   }
 
   return {
