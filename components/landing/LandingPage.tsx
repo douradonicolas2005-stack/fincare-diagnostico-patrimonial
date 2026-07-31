@@ -8,6 +8,12 @@ export function LandingPage() {
 
   return (
     <main className="landing-page">
+      <svg className="landing-waves" viewBox="0 0 500 900" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,150 C100,100 150,200 250,150 C350,100 400,200 500,150" stroke="#9fc4c7" strokeWidth="2" fill="none" />
+        <path d="M0,300 C120,250 180,350 260,300 C340,250 420,350 500,300" stroke="#9fc4c7" strokeWidth="1.5" fill="none" />
+        <path d="M0,700 C100,650 150,750 250,700 C350,650 400,750 500,700" stroke="#9fc4c7" strokeWidth="2" fill="none" />
+        <path d="M0,820 C120,770 180,870 260,820 C340,770 420,870 500,820" stroke="#9fc4c7" strokeWidth="1.5" fill="none" />
+      </svg>
       <section className="landing-card">
         <img
           className="landing-logo"
@@ -85,9 +91,22 @@ export function LandingPage() {
         </div>
 
         <button type="button" className="landing-cta" onClick={startDiagnosis}>
-          Iniciar meu diagnóstico gratuito →
+          Ver meu Score em 1 minuto →
         </button>
         <div className="landing-foot">Sem compromisso · Leva menos de 1 minuto</div>
+
+        <div className="landing-trust">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"
+              stroke="#9fc4c7"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
+          </svg>
+          Conexão segura (HTTPS)
+        </div>
+
         <div className="landing-foot">
           <a href="/privacidade">Política de Privacidade</a>
         </div>

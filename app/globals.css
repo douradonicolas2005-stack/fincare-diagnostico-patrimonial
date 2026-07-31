@@ -46,8 +46,9 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
-.landing-page { display: flex; min-height: 100vh; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 0%, #012730, var(--verde-escuro) 65%); padding: 36px 20px; color: #f4f9fc; }
-.landing-card { width: 100%; max-width: 460px; text-align: center; }
+.landing-page { position: relative; overflow: hidden; display: flex; min-height: 100vh; align-items: center; justify-content: center; background: radial-gradient(circle at 50% 0%, #012730, var(--verde-escuro) 65%); padding: 36px 20px; color: #f4f9fc; }
+.landing-waves { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .18; pointer-events: none; }
+.landing-card { position: relative; z-index: 1; width: 100%; max-width: 460px; text-align: center; }
 .landing-logo { display: block; height: 34px; margin: 0 auto 16px; }
 .landing-card h1 { margin: 0 0 10px; font-family: var(--font-display); font-size: 27px; font-weight: 500; line-height: 1.25; }
 .landing-card h1 span { color: var(--gold-light); }
@@ -75,10 +76,11 @@ body {
 .landing-step-num { width: 34px; height: 34px; line-height: 34px; border-radius: 50%; background: var(--gold-light); color: #04252c; font-family: var(--font-mono); font-size: 14px; font-weight: 800; margin: 0 auto 8px; box-shadow: 0 0 0 4px #012730, 0 0 0 5px rgba(159,196,199,.3); }
 .landing-step-label { font-size: 11.5px; font-weight: 600; color: #f4f9fc; line-height: 1.3; }
 
-.landing-cta { display: block; width: 100%; border: 0; border-radius: 9px; background: var(--gold); padding: 16px 22px; color: #04252c; font-size: 15px; font-weight: 700; cursor: pointer; }
-.landing-cta:hover { background: var(--gold-light); }
+.landing-cta { display: block; width: 100%; border: 0; border-radius: 12px; background: var(--bg); padding: 18px 22px; color: var(--verde-escuro); font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+.landing-cta:hover { background: var(--surface-alt); }
 .landing-foot { margin-top: 14px; color: rgba(159,196,199,.7); font-family: var(--font-mono); font-size: 11px; }
 .landing-foot a { color: inherit; }
+.landing-trust { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; background: rgba(255,255,255,.06); border: 1px solid rgba(159,196,199,.2); border-radius: 20px; padding: 6px 12px; font-family: var(--font-mono); font-size: 11px; color: rgba(244,249,252,.75); }
 button,
 input,
 select {
