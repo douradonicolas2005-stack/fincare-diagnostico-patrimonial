@@ -6,10 +6,7 @@ export type Step =
   | "teaser"
   | "loading"
   | "result"
-  | "advanced"
   | "manual"
-  | "portfolio"
-  | "dashboard"
   | 5
   | 6
   | "final"

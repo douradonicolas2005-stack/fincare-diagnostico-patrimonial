@@ -7,8 +7,6 @@ import { Button } from "../ui/Button"
 type ResultStepProps = {
   calc: Calculation
   onAdvanced: () => void
-  onFinalize: () => void
-  sending: boolean
 }
 
 export function ResultStep({ calc, onAdvanced }: ResultStepProps) {
@@ -35,6 +33,7 @@ export function ResultStep({ calc, onAdvanced }: ResultStepProps) {
         <strong>{independenceAge} anos</strong>.
       </>
     )
+  const projectedPatrimony10 = calc.trajetoria[Math.min(10, calc.trajetoria.length - 1)]
   const insights = [
     calc.anos !== null &&
     calc.anosCenarioAporte !== null &&
@@ -61,7 +60,12 @@ export function ResultStep({ calc, onAdvanced }: ResultStepProps) {
         </b>{" "}
         — o efeito dos juros compostos se acumula ao longo das décadas.
       </>
-    ) : null
+    ) : null,
+    <>
+      Mantendo sua trajetória atual, em 10 anos seu patrimônio pode chegar a{" "}
+      <b className="blurred-value">{formatCurrency(projectedPatrimony10)}</b> —
+      veja a projeção completa ano a ano aprofundando seu diagnóstico.
+    </>
   ].filter(Boolean)
 
   return (
@@ -94,7 +98,7 @@ export function ResultStep({ calc, onAdvanced }: ResultStepProps) {
           <span className="l2">
             Patrimônio necessário
             <br />
-            <span className="text-[13px]">
+            <span className="text-[13px] blurred-value">
               {formatCurrency(calc.necessario)}
             </span>
           </span>
@@ -127,10 +131,7 @@ export function ResultStep({ calc, onAdvanced }: ResultStepProps) {
       </div>
 
       <div className="insights result-insights">
-        {(insights.length
-          ? insights
-          : [<>Sua trajetória já está bem ajustada às suas metas atuais.</>]
-        ).map((insight, index) => (
+        {insights.map((insight, index) => (
           <div className="insight-card" key={index}>
             <span className="ico">
               {index === 0 ? "↑" : index === 1 ? "◆" : "✓"}

@@ -1,5 +1,3 @@
-import type { Allocation, Calculation } from "@/lib/types"
-
 export type ManualValues = {
   imoveis: number
   aplicacoes: number
@@ -10,17 +8,8 @@ export type ManualValues = {
   emprestimos: number
 }
 
-export type DashboardSummary = {
+export type DiagnosticoSummary = {
   total: number
   liquid: number
   rv: number
-}
-
-export type DashboardProps = {
-  calc: Calculation
-  allocation: Allocation[]
-  summary: DashboardSummary
-  onBack: () => void
-  onFinalize: () => void
-  sending: boolean
 }

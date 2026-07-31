@@ -9,6 +9,8 @@ type ManualStepProps = {
   setValues: Dispatch<SetStateAction<ManualValues>>
   onBack: () => void
   onDone: () => void
+  onSkip: () => void
+  sending: boolean
 }
 const fields: Array<[keyof ManualValues, string]> = [
   ["imoveis", "Imóveis (valor de mercado)"],
@@ -23,15 +25,17 @@ export function ManualStep({
   values,
   setValues,
   onBack,
-  onDone
+  onDone,
+  onSkip,
+  sending
 }: ManualStepProps) {
   const update = (key: keyof ManualValues, value: string) =>
     setValues(current => ({ ...current, [key]: Number(value) || 0 }))
   return (
     <Wizard
-      eyebrow="Opção 1"
-      title="Complemente seu patrimônio atual."
-      sub="Preencha o que se aplicar. Campos em branco são considerados zero — você pode ajustar depois com um especialista."
+      eyebrow="Diagnóstico avançado Fincare"
+      title="Vamos deixar sua análise ainda mais precisa."
+      sub="Adicione imóveis, aplicações, previdência, empresas, caixa e dívidas para um cálculo de patrimônio líquido mais completo. Preencha o que se aplicar — campos em branco são considerados zero, você pode ajustar depois com um especialista."
     >
       <div className="grid gap-0 md:grid-cols-2 md:gap-x-4">
         {fields.slice(0, 6).map(([key, label]) => (
@@ -54,9 +58,14 @@ export function ManualStep({
         <Button variant="ghost" onClick={onBack}>
           Voltar
         </Button>
-        <Button className="btn-primary flex-1" onClick={onDone}>
-          Atualizar diagnóstico
+        <Button className="btn-primary flex-1" onClick={onDone} disabled={sending}>
+          {sending ? "Gerando..." : "Ver diagnóstico completo"}
         </Button>
+      </div>
+      <div className="skip-line">
+        <button type="button" onClick={onSkip} disabled={sending}>
+          Prefiro continuar apenas com o diagnóstico rápido
+        </button>
       </div>
     </Wizard>
   )

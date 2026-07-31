@@ -8,11 +8,8 @@ import type { AdvancedState, Calculation, Lead, Step } from "@/lib/types"
 import { track } from "@vercel/analytics"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { BrandHeader } from "../layout/BrandHeader"
-import { AdvancedStep } from "./steps/AdvancedStep"
 import { ContactStep } from "./steps/ContactStep"
-import { ComingSoonStep } from "./steps/ComingSoonStep"
-import { Dashboard } from "./steps/Dashboard"
-import { FinalReport } from "./steps/FinalReport"
+import { DiagnosticoExecutivo } from "./steps/DiagnosticoExecutivo"
 import { LoadingStep } from "./steps/LoadingStep"
 import { ManualStep } from "./steps/ManualStep"
 import { MoneyInput } from "./steps/MoneyInput"
@@ -90,9 +87,9 @@ const initialManual = {
 export default function Simulator() {
   const [step, setStep] = useState<Step>(1)
   const [values, setValues] = useState({
-    patrimonio: 1500000,
-    aporte: 15000,
-    renda: 30000,
+    patrimonio: 0,
+    aporte: 0,
+    renda: 0,
     idade: 42,
     rentabilidade: 6,
     retirada: 4
@@ -130,6 +127,13 @@ export default function Simulator() {
   const goTo = (next: Step) => {
     setStep(next)
     window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+  const goToPremises = () => {
+    if (values.renda <= 0) {
+      setDialogMessage("Informe a renda passiva mensal desejada para continuar.")
+      return
+    }
+    goTo(4)
   }
   const calculateCurrent = (currentLead: Lead) =>
     calculate(
@@ -326,7 +330,7 @@ export default function Simulator() {
         "Outras aplicações": manual.aplicacoes
       })
     })
-    goTo("dashboard")
+    finalize()
   }
   const validateContact = () => {
     const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lead.email.trim())
@@ -425,7 +429,7 @@ export default function Simulator() {
                 <Button variant="ghost" onClick={() => goTo(2)}>
                   Voltar
                 </Button>
-                <Button className="btn-primary flex-1" onClick={() => goTo(4)}>
+                <Button className="btn-primary flex-1" onClick={goToPremises}>
                   Continuar
                 </Button>
               </div>
@@ -483,54 +487,26 @@ export default function Simulator() {
           {step === "loading" && <LoadingStep />}
 
           {step === "result" && calc && (
-            <ResultStep
-              calc={calc}
-              onAdvanced={() => goTo("advanced")}
-              onFinalize={finalize}
-              sending={sending}
-            />
-          )}
-
-          {step === "advanced" && (
-            <AdvancedStep
-              onManual={() => goTo("manual")}
-              onPortfolio={() => goTo("portfolio")}
-              onQuick={finalize}
-            />
+            <ResultStep calc={calc} onAdvanced={() => goTo("manual")} />
           )}
 
           {step === "manual" && (
             <ManualStep
               values={manual}
               setValues={setManual}
-              onBack={() => goTo("advanced")}
+              onBack={() => goTo("result")}
               onDone={doneManual}
-            />
-          )}
-
-          {step === "portfolio" && (
-            <ComingSoonStep
-              title="Importar minha carteira"
-              sub="A leitura automática de PDF, Excel e CSV será habilitada em uma próxima versão."
-              onBack={() => goTo("advanced")}
-            />
-          )}
-
-          {step === "dashboard" && calc && summary && (
-            <Dashboard
-              calc={calc}
-              allocation={allocation}
-              summary={summary}
-              onBack={() => goTo("advanced")}
-              onFinalize={finalize}
+              onSkip={finalize}
               sending={sending}
             />
           )}
 
-          {step === "final" && calc && (
-            <FinalReport
+          {step === "final" && calc && summary && (
+            <DiagnosticoExecutivo
               calc={calc}
               advanced={advanced}
+              allocation={allocation}
+              summary={summary}
               sendError={sendError}
             />
           )}
