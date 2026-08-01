@@ -2398,18 +2398,36 @@
       // --------------------------------------------------------------
       // PARA ONDE OS DADOS DO FORMULÁRIO SÃO ENVIADOS
       // --------------------------------------------------------------
-      // A coleta do HTML legado permanece desativada. O fluxo de produção
-      // usa a API server-side do Next e suas variáveis de ambiente.
-      const WEBHOOK_URL = ""
+      // 1. Crie uma conta grátis em https://formspree.io
+      // 2. Crie um novo formulário — ele vai te dar um link parecido com:
+      //    https://formspree.io/f/xxxxxxxx
+      // 3. Cole esse link abaixo, no lugar de 'SEU-WEBHOOK-AQUI'
+      //
+      // A partir daí, toda vez que alguém desbloquear o relatório, você recebe
+      // um e-mail com os dados da pessoa, e também consegue ver/baixar tudo
+      // em CSV no painel do Formspree.
+      //
+      // (Se no futuro você adotar RD Station, ActiveCampaign, HubSpot ou uma
+      // planilha via Zapier/Make, essa mesma linha é a única coisa que muda —
+      // todo o resto do código continua funcionando exatamente igual.)
+      const WEBHOOK_URL = "https://formspree.io/f/xjgqndvn"
 
       // --------------------------------------------------------------
       // PLANILHA GOOGLE SHEETS (visão tabular dos leads, sem custo)
       // --------------------------------------------------------------
-      // O HTML legado não recebe URL nem token de integração. Para produção,
-      // configure GOOGLE_SHEETS_WEBHOOK_URL e GOOGLE_SHEETS_WEBHOOK_TOKEN no
-      // ambiente server-side do Next/Vercel.
-      const SHEETS_WEBHOOK_URL = ""
-      const SHEETS_WEBHOOK_TOKEN = ""
+      // 1. Siga o passo a passo em google-sheets-integration.gs (neste repositório)
+      //    para implantar o script como "App da Web" no Google Apps Script.
+      // 2. Cole aqui a URL gerada (termina em /exec), no lugar de 'COLE-AQUI-A-URL-DO-APPS-SCRIPT'.
+      const SHEETS_WEBHOOK_URL =
+        "https://script.google.com/macros/s/AKfycbwR38_BmoDnh6jqCX3m97oz4B04p9-Z9ax4ub5H-zcCMSm_LcrdWYEeQ8czK7vdRYjw/exec"
+
+      // Chave enviada junto no payload do Sheets e conferida no doPost() do
+      // Apps Script (ver WEBHOOK_TOKEN em google-sheets-integration.gs) - os dois
+      // valores precisam ser IGUAIS. Isso so filtra bots/scanners genericos
+      // batendo direto na URL do webhook, nao e sigilo real (qualquer um que
+      // abrir o codigo-fonte da pagina ve essa mesma chave). Se trocar o valor
+      // aqui, troque tambem no .gs e reimplante uma nova versao.
+      const SHEETS_WEBHOOK_TOKEN = "b50b0b80ca404100c3d58bf1b972755d"
 
       // Envio compartilhado para a planilha do Sheets — usado tanto pelo lead
       // parcial (submitLead(), antes de terminar a simulação) quanto pelo lead

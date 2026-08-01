@@ -194,12 +194,15 @@ var PALETA_CARDS = [
 // no fincare-diagnostico-patrimonial-inteligente.html).
 var WHATSAPP_NUMERO = "5511941819794"
 
-// Token privado para filtrar chamadas diretas na URL do webhook.
-// Configure em Apps Script: Project Settings > Script Properties
-//   WEBHOOK_TOKEN = <mesmo valor de GOOGLE_SHEETS_WEBHOOK_TOKEN na Vercel>
-// Nunca coloque esse valor no HTML ou em outro arquivo versionado.
-var WEBHOOK_TOKEN =
-  PropertiesService.getScriptProperties().getProperty("WEBHOOK_TOKEN") || ""
+// Chave simples pra filtrar chamadas diretas na URL do webhook (fora do
+// formulario do site). NAO e um segredo de verdade - qualquer pessoa que
+// abrir o codigo-fonte da pagina consegue ler essa mesma chave em
+// SHEETS_WEBHOOK_TOKEN, no HTML do simulador (os dois valores precisam ser
+// identicos). O objetivo aqui e barrar bots/scanners genericos que tentam
+// URLs de Apps Script no acaso, nao um usuario que inspeciona a pagina de
+// proposito. Se um dia precisar de seguranca de verdade, isso teria que
+// virar autenticacao por sessao/OAuth, nao uma chave fixa no cliente.
+var WEBHOOK_TOKEN = "b50b0b80ca404100c3d58bf1b972755d"
 
 // Logo Fincare (mesmo PNG do cabecalho do simulador, ver .brand-logo-img em
 // fincare-diagnostico-patrimonial-inteligente.html) - embutido em base64 para
