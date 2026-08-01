@@ -2,10 +2,10 @@
 
 import { sendFunnelEvent, sendLead } from "@/lib/api"
 import { allocationFromCategories, calculate } from "@/lib/calculator"
+import { trackAnalyticsEvent } from "@/lib/analytics"
 import { trackMetaPixelEvent } from "@/lib/meta-pixel"
 import { isValidPhoneBR, leadSchema, type FunnelPayload, type LeadPayload } from "@/lib/security"
 import type { AdvancedState, Calculation, Lead, Step } from "@/lib/types"
-import { track } from "@vercel/analytics"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { BrandHeader } from "../layout/BrandHeader"
 import { ContactStep } from "./steps/ContactStep"
@@ -116,7 +116,17 @@ export default function Simulator() {
     const etapa = etapaFunil[String(step)]
     if (!etapa || trackedSteps.current.has(etapa)) return
     trackedSteps.current.add(etapa)
-    track("funil_etapa", { etapa })
+    trackAnalyticsEvent("funil_etapa", {
+      etapa,
+      tela: String(step)
+    })
+    trackAnalyticsEvent("wizard_screen_view", {
+      tela: String(step),
+      nome:
+        typeof step === "number"
+          ? stepNames[step]
+          : String(step)
+    })
     sendFunnelEvent({ etapa, ...readUtmParams() })
   }, [step])
 
@@ -125,12 +135,21 @@ export default function Simulator() {
   const setLeadValue = (key: keyof Lead, value: string) =>
     setLead(current => ({ ...current, [key]: value }))
   const goTo = (next: Step) => {
+    trackAnalyticsEvent("wizard_step_action", {
+      origem: String(step),
+      destino: String(next)
+    })
     setStep(next)
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
   const goToPremises = () => {
     if (values.renda <= 0) {
       setDialogMessage("Informe a renda passiva mensal desejada para continuar.")
+      trackAnalyticsEvent("wizard_step_validation_error", {
+        tela: "3_renda",
+        campo: "renda",
+        motivo: "valor_invalido"
+      })
       return
     }
     goTo(4)
@@ -202,14 +221,25 @@ export default function Simulator() {
     currentCalc: Calculation,
     metaEventId?: string
   ): Promise<boolean> => {
+    trackAnalyticsEvent("wizard_lead_submit_attempt", {
+      diagnostico_completo: complete
+    })
     setSending(true)
     setSendError(false)
     try {
       const payload = buildPayload(complete, currentLead, currentCalc)
       const ok = await sendLead(metaEventId ? { ...payload, meta_event_id: metaEventId } : payload)
+      trackAnalyticsEvent("wizard_lead_submit_result", {
+        diagnostico_completo: complete,
+        success: ok
+      })
       setSendError(!ok)
       return ok
     } catch {
+      trackAnalyticsEvent("wizard_lead_submit_result", {
+        diagnostico_completo: complete,
+        success: false
+      })
       setSendError(true)
       setDialogMessage(
         "Confira seus dados de contato antes de gerar o diagnóstico."
@@ -220,6 +250,7 @@ export default function Simulator() {
     }
   }
   const submitLead = async () => {
+    trackAnalyticsEvent("wizard_contact_submit_attempt")
     if (sending) return
     if (
       !lead.faixa_patrimonio ||
@@ -229,10 +260,16 @@ export default function Simulator() {
       !lead.objetivo_financeiro
     ) {
       setDialogMessage("Preencha todos os campos para continuar.")
+      trackAnalyticsEvent("wizard_qualification_validation_error", {
+        motivo: "campos_obrigatorios"
+      })
       return
     }
     if (!consent) {
       setDialogMessage("É necessário autorizar o contato para continuar.")
+      trackAnalyticsEvent("wizard_qualification_validation_error", {
+        motivo: "consentimento_ausente"
+      })
       return
     }
     const currentLead = {
@@ -266,7 +303,8 @@ export default function Simulator() {
   }
   const finalize = async () => {
     if (sending) return
-    if (calc) send("sim", lead, calc)
+    trackAnalyticsEvent("wizard_finalize_attempt")
+    if (calc) void send("sim", lead, calc)
     goTo("final")
   }
   const allocation = useMemo(
@@ -310,6 +348,7 @@ export default function Simulator() {
       }
     : null
   const doneManual = () => {
+    trackAnalyticsEvent("wizard_manual_complete")
     const extraLiquido =
       manual.imoveis +
       manual.aplicacoes +
@@ -335,11 +374,13 @@ export default function Simulator() {
   const validateContact = () => {
     const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lead.email.trim())
     if (lead.nome.trim().length >= 2 && validEmail && isValidPhoneBR(lead.telefone)) {
+      trackAnalyticsEvent("wizard_contact_validated")
       return goTo(6)
     }
     setDialogMessage(
       "Preencha nome, e-mail e um WhatsApp válido com DDD para continuar."
     )
+    trackAnalyticsEvent("wizard_contact_validation_error")
   }
 
   return (
