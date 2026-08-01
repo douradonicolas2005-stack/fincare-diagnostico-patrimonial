@@ -1,4 +1,5 @@
 import Script from "next/script"
+import { Suspense } from "react"
 
 import { GoogleAnalyticsTracker } from "./GoogleAnalyticsTracker"
 
@@ -24,7 +25,9 @@ export function GoogleAnalytics() {
           gtag('config', '${measurementId}', { send_page_view: false });
         `}
       </Script>
-      <GoogleAnalyticsTracker measurementId={measurementId} />
+      <Suspense fallback={null}>
+        <GoogleAnalyticsTracker measurementId={measurementId} />
+      </Suspense>
     </>
   )
 }
