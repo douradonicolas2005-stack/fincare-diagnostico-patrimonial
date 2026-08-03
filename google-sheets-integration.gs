@@ -128,8 +128,14 @@ var ETAPAS_FUNIL = [
   { valor: "2_aporte", rotulo: "2. Aporte mensal" },
   { valor: "3_renda", rotulo: "3. Renda desejada" },
   { valor: "4_premissas", rotulo: "4. Premissas avancadas" },
-  { valor: "5_qualificacao", rotulo: "5. Qualificacao" },
-  { valor: "6_contato", rotulo: "6. Dados de contato" },
+  // Os "valor" abaixo sao os mesmos enviados pelo front-end (Simulator.tsx,
+  // etapaFunil) desde o inicio - trocar esses valores quebraria a serie
+  // historica ja gravada na aba Funil. O que estava errado era so o
+  // "rotulo": o passo 5 do simulador e a tela de nome/e-mail/WhatsApp
+  // (Dados de contato) e o passo 6 e o questionario de patrimonio/renda/
+  // objetivo (Qualificacao) - rotulos corrigidos para bater com a tela real.
+  { valor: "5_qualificacao", rotulo: "5. Dados de contato" },
+  { valor: "6_contato", rotulo: "6. Qualificacao" },
   { valor: "result", rotulo: "Resultado (diagnostico rapido)" },
   { valor: "final", rotulo: "Diagnostico completo (finalizou)" }
 ]
