@@ -307,6 +307,20 @@ export default function Simulator() {
     if (calc) void send("sim", lead, calc)
     goTo("final")
   }
+  // A maioria das pessoas para na tela de resultado e nunca ve a etapa
+  // "final" (so quem aprofunda o diagnostico) - entao o aviso de falha de
+  // envio precisa aparecer ja no resultado, nao so la na frente. O retry
+  // tambem limpa o honeypot: um gerenciador de senha preenchendo aquele
+  // campo escondido por engano e uma causa real de falha silenciosa que so
+  // se corrige assim, ja que a pessoa nao tem como editar esse campo.
+  const retrySend = async () => {
+    if (!calc || sending) return
+    const clearedLead = { ...lead, honeypot: "" }
+    setLead(clearedLead)
+    const metaEventId = crypto.randomUUID()
+    const ok = await send("nao", clearedLead, calc, metaEventId)
+    if (ok) trackMetaPixelEvent("Lead", metaEventId)
+  }
   const allocation = useMemo(
     () =>
       advanced.allocation ||
@@ -528,7 +542,13 @@ export default function Simulator() {
           {step === "loading" && <LoadingStep />}
 
           {step === "result" && calc && (
-            <ResultStep calc={calc} onAdvanced={() => goTo("manual")} />
+            <ResultStep
+              calc={calc}
+              onAdvanced={() => goTo("manual")}
+              sendError={sendError}
+              onRetry={retrySend}
+              retrying={sending}
+            />
           )}
 
           {step === "manual" && (

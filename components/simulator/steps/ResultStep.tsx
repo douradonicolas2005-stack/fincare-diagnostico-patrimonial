@@ -9,9 +9,18 @@ import { trackMetaPixelEvent } from "@/lib/meta-pixel"
 type ResultStepProps = {
   calc: Calculation
   onAdvanced: () => void
+  sendError?: boolean
+  onRetry?: () => void
+  retrying?: boolean
 }
 
-export function ResultStep({ calc, onAdvanced }: ResultStepProps) {
+export function ResultStep({
+  calc,
+  onAdvanced,
+  sendError,
+  onRetry,
+  retrying
+}: ResultStepProps) {
   const percentage = Math.max(
     0,
     Math.min(100, (calc.patrimonio0 / calc.necessario) * 100)
@@ -75,6 +84,28 @@ export function ResultStep({ calc, onAdvanced }: ResultStepProps) {
 
   return (
     <div>
+      {sendError && (
+        <div className="send-error-banner" role="alert">
+          <p>
+            <strong>Não conseguimos confirmar o recebimento dos seus dados.</strong>{" "}
+            Seu diagnóstico abaixo continua valendo, mas um especialista da
+            Fincare só consegue entrar em contato se o envio for concluído.
+          </p>
+          <div className="btn-row">
+            <Button variant="ghost" onClick={onRetry} disabled={retrying}>
+              {retrying ? "Tentando..." : "Tentar novamente"}
+            </Button>
+            <a
+              className="btn btn-gold flex-1"
+              href={`https://wa.me/5511941819794?text=${encodeURIComponent("Olá, tentei preencher o Diagnóstico Patrimonial da Fincare mas recebi um aviso de erro no envio.")}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Falar no WhatsApp
+            </a>
+          </div>
+        </div>
+      )}
       <section className="result-card">
         <div className="result-head">
           <div className="result-eyebrow">Seu diagnóstico patrimonial</div>
