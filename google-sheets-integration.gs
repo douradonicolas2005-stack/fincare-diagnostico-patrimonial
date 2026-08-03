@@ -931,26 +931,27 @@ function handleFunilEvent_(data) {
   }
   cache.put("rl_funil", String(chamadasRecentes + 1), 600)
 
-  var lock = LockService.getScriptLock()
-  lock.waitLock(30000)
-  try {
-    var sheet = getFunilSheet_()
-    var ultimaLinha = getUltimaLinhaComDados_(sheet)
-    if (ultimaLinha === 0) {
-      sheet.getRange(1, 1, 1, HEADERS_FUNIL.length).setValues([HEADERS_FUNIL])
-      formatarCabecalhoFunil_(sheet)
-      ultimaLinha = 1
-    }
-    var row = HEADERS_FUNIL.map(function (h) {
-      if (h === "data") return new Date()
-      var v = data[h]
-      return v === undefined || v === null ? "" : v
-    })
-    sheet.getRange(ultimaLinha + 1, 1, 1, row.length).setValues([row])
-    sheet.getRange(ultimaLinha + 1, 1).setNumberFormat("dd/mm/yyyy hh:mm:ss")
-  } finally {
-    lock.releaseLock()
+  // Sem LockService aqui de proposito: eventos de funil sao muito mais
+  // frequentes que leads (ate 8 por sessao) e nao tem exigencia de dedup por
+  // e-mail, entao nao precisam da mesma garantia de integridade da aba
+  // Leads. Antes, competir pelo lock global do script com a gravacao de
+  // leads causava fila e timeouts (LockService.waitLock(30000) estourando)
+  // que apareciam como ~50% de taxa de erro nas Execucoes do Apps Script -
+  // o proprio volume de eventos de funil estava derrubando a gravacao dos
+  // leads de verdade. appendRow() resolve a proxima linha internamente, sem
+  // precisar ler a coluna inteira (getUltimaLinhaComDados_) nem travar nada.
+  var sheet = getFunilSheet_()
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, HEADERS_FUNIL.length).setValues([HEADERS_FUNIL])
+    formatarCabecalhoFunil_(sheet)
   }
+  var row = HEADERS_FUNIL.map(function (h) {
+    if (h === "data") return new Date()
+    var v = data[h]
+    return v === undefined || v === null ? "" : v
+  })
+  sheet.appendRow(row)
+  sheet.getRange(sheet.getLastRow(), 1).setNumberFormat("dd/mm/yyyy hh:mm:ss")
 
   return ContentService.createTextOutput(
     JSON.stringify({ ok: true })
