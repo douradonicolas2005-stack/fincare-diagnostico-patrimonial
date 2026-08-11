@@ -3,6 +3,8 @@ import type { Calculation } from "@/lib/types"
 import { Gauge } from "../charts/Gauge"
 import { ProjectionChart } from "../charts/ProjectionChart"
 import { Button } from "../ui/Button"
+import { track } from "@vercel/analytics"
+import { trackMetaPixelEvent } from "@/lib/meta-pixel"
 
 type ResultStepProps = {
   calc: Calculation
@@ -187,7 +189,105 @@ export function ResultStep({ calc, onAdvanced }: ResultStepProps) {
             </span>
             <span className="val locked">00000000</span>
           </li>
+
         </ul>
+
+        <div style={{ padding: "0 20px" }}>
+          <a
+            href="/ebook-fundos-imobiliarios-independencia-financeira.pdf"
+            download
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => {
+              try {
+                track("ebook_download", { local: "resultado" })
+                trackMetaPixelEvent("EbookDownload")
+              } catch {}
+            }}
+            style={{
+              display: "flex",
+              gap: 14,
+              alignItems: "center",
+              textDecoration: "none",
+              background: "var(--gold-bg)",
+              border: "1px solid var(--verde-claro)",
+              borderRadius: 12,
+              padding: 14,
+              marginBottom: 14
+            }}
+          >
+            <span
+              style={{
+                flexShrink: 0,
+                width: 56,
+                height: 74,
+                borderRadius: 6,
+                overflow: "hidden",
+                boxShadow: "0 4px 12px rgba(0,59,73,.25)"
+              }}
+            >
+              <svg
+                viewBox="0 0 56 74"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ display: "block", width: "100%", height: "100%" }}
+              >
+                <rect width="56" height="74" fill="#003b49" />
+                <g fill="#9fc4c7">
+                  <rect x="10" y="30" width="9" height="20" />
+                  <rect x="21" y="24" width="7" height="26" />
+                  <rect x="30" y="34" width="8" height="16" />
+                  <rect x="40" y="28" width="7" height="22" />
+                </g>
+                <rect x="10" y="12" width="26" height="3" rx="1.5" fill="#fff" />
+                <rect x="10" y="18" width="18" height="2" rx="1" fill="#9fc4c7" />
+              </svg>
+            </span>
+            <span style={{ flex: 1 }}>
+              <span
+                style={{
+                  display: "block",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 9.5,
+                  letterSpacing: ".07em",
+                  textTransform: "uppercase",
+                  color: "var(--verde-medio)",
+                  fontWeight: 700
+                }}
+              >
+                🎁 Guia bônus incluso
+              </span>
+              <span
+                style={{
+                  display: "block",
+                  fontFamily: "var(--font-display)",
+                  fontSize: 14.5,
+                  color: "var(--verde-escuro)",
+                  fontWeight: 600,
+                  lineHeight: 1.25,
+                  margin: "2px 0 8px"
+                }}
+              >
+                Fundos Imobiliários &amp; Independência Financeira
+              </span>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 7,
+                  background: "var(--verde-escuro)",
+                  color: "#fff",
+                  fontFamily: "var(--font-body)",
+                  fontWeight: 700,
+                  fontSize: 12.5,
+                  padding: "8px 14px",
+                  borderRadius: 10
+                }}
+              >
+                📥 Baixar o guia (PDF)
+              </span>
+            </span>
+          </a>
+        </div>
 
         <div className="report-cta">
           <Button variant="gold" className="w-full" onClick={onAdvanced}>
