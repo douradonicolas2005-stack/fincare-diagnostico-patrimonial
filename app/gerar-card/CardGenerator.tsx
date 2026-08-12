@@ -61,16 +61,27 @@ export function CardGenerator() {
     return `${window.location.origin}/api/og/diagnostico?${params.toString()}`
   }, [values, variant])
 
+  // Link rastreável do CTA (para colar junto com a imagem no WhatsApp).
+  // Aponta para /api/card-click, que registra a variante e redireciona.
+  const trackUrl = useMemo(() => {
+    if (typeof window === "undefined") return ""
+    const p = new URLSearchParams()
+    p.set("v", variant)
+    return `${window.location.origin}/api/card-click?${p.toString()}`
+  }, [variant])
+
+  const [copiedCta, setCopiedCta] = useState(false)
+
   const hasData = Boolean(values.renda && values.patrimonio)
 
   const set = (key: string, v: string) =>
     setValues((prev) => ({ ...prev, [key]: v }))
 
-  const copy = async () => {
+  const copyText = async (text: string, setter: (v: boolean) => void) => {
     try {
-      await navigator.clipboard.writeText(url)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1800)
+      await navigator.clipboard.writeText(text)
+      setter(true)
+      setTimeout(() => setter(false), 1800)
     } catch {
       /* clipboard indisponível — usuário copia manualmente */
     }
@@ -194,24 +205,6 @@ export function CardGenerator() {
               ))}
 
             <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
-              <button
-                type="button"
-                onClick={copy}
-                disabled={!hasData}
-                style={{
-                  flex: 1,
-                  padding: "13px 16px",
-                  borderRadius: 10,
-                  border: "none",
-                  background: hasData ? VERDE_ESCURO : "#c3d3d3",
-                  color: "#fff",
-                  fontSize: 15,
-                  fontWeight: 700,
-                  cursor: hasData ? "pointer" : "not-allowed"
-                }}
-              >
-                {copied ? "✓ Copiado!" : "Copiar link"}
-              </button>
               <a
                 href={hasData ? url : undefined}
                 download="diagnostico-fincare.png"
@@ -220,31 +213,93 @@ export function CardGenerator() {
                   textAlign: "center",
                   padding: "13px 16px",
                   borderRadius: 10,
+                  border: "none",
+                  background: hasData ? VERDE_ESCURO : "#c3d3d3",
+                  color: "#fff",
+                  fontSize: 15,
+                  fontWeight: 700,
+                  textDecoration: "none",
+                  pointerEvents: hasData ? "auto" : "none"
+                }}
+              >
+                Baixar imagem
+              </a>
+              <button
+                type="button"
+                onClick={() => copyText(url, setCopied)}
+                disabled={!hasData}
+                style={{
+                  flex: 1,
+                  padding: "13px 16px",
+                  borderRadius: 10,
                   border: `1px solid ${VERDE_ESCURO}`,
                   background: "#fff",
                   color: VERDE_ESCURO,
                   fontSize: 15,
                   fontWeight: 700,
-                  textDecoration: "none",
-                  pointerEvents: hasData ? "auto" : "none",
+                  cursor: hasData ? "pointer" : "not-allowed",
                   opacity: hasData ? 1 : 0.5
                 }}
               >
-                Baixar imagem
-              </a>
+                {copied ? "✓ Copiado!" : "Copiar link da imagem"}
+              </button>
+            </div>
+
+            {/* Link rastreável do CTA — é o que mede o clique por variante */}
+            <div
+              style={{
+                marginTop: 10,
+                padding: "14px 16px",
+                borderRadius: 12,
+                background: "#eef4f3",
+                border: `1px solid ${VERDE_CLARO}`,
+                display: "flex",
+                flexDirection: "column",
+                gap: 8
+              }}
+            >
+              <div style={{ fontSize: 13, fontWeight: 700, color: VERDE_ESCURO }}>
+                Link rastreável do CTA — variante “{variant}”
+              </div>
+              <div style={{ fontSize: 12, color: "#5c7278", lineHeight: 1.4 }}>
+                Mande a <b>imagem</b> e cole <b>este link</b> logo abaixo dela no WhatsApp
+                (ex.: “ver o detalhamento completo: {trackUrl}”). É o clique neste link que
+                é contabilizado por variante.
+              </div>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <button
+                  type="button"
+                  onClick={() => copyText(trackUrl, setCopiedCta)}
+                  style={{
+                    padding: "10px 16px",
+                    borderRadius: 10,
+                    border: "none",
+                    background: VERDE_MEDIO,
+                    color: "#fff",
+                    fontSize: 14,
+                    fontWeight: 700,
+                    cursor: "pointer"
+                  }}
+                >
+                  {copiedCta ? "✓ Copiado!" : "Copiar link do CTA"}
+                </button>
+                <span style={{ fontSize: 12, color: "#5c7278", wordBreak: "break-all" }}>
+                  {trackUrl}
+                </span>
+              </div>
             </div>
 
             {hasData && (
               <div
                 style={{
-                  marginTop: 4,
+                  marginTop: 8,
                   fontSize: 12,
-                  color: "#5c7278",
+                  color: "#8494a0",
                   wordBreak: "break-all",
                   lineHeight: 1.4
                 }}
               >
-                {url}
+                Link da imagem: {url}
               </div>
             )}
           </div>
