@@ -8,14 +8,19 @@ export const runtime = "nodejs"
 // simulador (necessario = renda*12/retirada + project()) e renderiza um
 // teaser.
 //
-// Dupla função do cadeado:
-//  1. Funil — os números "premium" ficam para a conversa.
-//  2. Privacidade — nenhum valor absoluto em R$ do lead aparece, então
-//     reencaminhar o card não expõe o patrimônio dele a terceiros.
+// Duas variantes para teste de conversão (param `v`):
+//   - "completo" (default) — headline + medidor + insights de aceleração +
+//     três valores trancados.
+//   - "gancho" (v=gancho) — versão enxuta: só o gancho emocional (headline,
+//     medidor) + CTA forte. Sem insights, mais respiro.
+//
+// Dupla função do cadeado (em ambas): funil + privacidade — nenhum valor
+// absoluto em R$ do lead aparece, então reencaminhar o card não expõe o
+// patrimônio dele.
 //
 // Exemplo:
-//   /api/og/diagnostico?nome=Carlos&idade=45&patrimonio=500000&aporte=3000&renda=15000
-//   params opcionais: rent (default 6, em %), ret (default 4, em %)
+//   /api/og/diagnostico?nome=Carlos&idade=45&patrimonio=500000&aporte=3000&renda=15000&v=gancho
+//   params opcionais: rent (default 6, em %), ret (default 4, em %), v
 
 const VERDE_ESCURO = "#003b49"
 const VERDE_ESCURO_2 = "#012730"
@@ -43,6 +48,9 @@ export function GET(req: Request) {
   const renda = Math.max(0, num(searchParams.get("renda"), 0))
   const rent = num(searchParams.get("rent"), 6) / 100
   const retirada = num(searchParams.get("ret"), 4) / 100
+  const isGancho = ["gancho", "b"].includes(
+    (searchParams.get("v") || "").toLowerCase()
+  )
 
   const necessario = renda > 0 && retirada > 0 ? (renda * 12) / retirada : 0
   const base =
@@ -137,22 +145,58 @@ export function GET(req: Request) {
         </div>
 
         {/* Título */}
-        <div style={{ display: "flex", flexDirection: "column", marginTop: "26px", gap: "10px" }}>
-          <div style={{ display: "flex", fontSize: "56px", fontWeight: 800, lineHeight: 1.05 }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginTop: isGancho ? "48px" : "26px",
+            gap: isGancho ? "16px" : "10px"
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              fontSize: isGancho ? "78px" : "56px",
+              fontWeight: 800,
+              lineHeight: 1.03
+            }}
+          >
             {title}
           </div>
-          <div style={{ display: "flex", fontSize: "28px", color: "#b9cdc9", lineHeight: 1.3 }}>
+          <div
+            style={{
+              display: "flex",
+              fontSize: isGancho ? "32px" : "28px",
+              color: "#b9cdc9",
+              lineHeight: 1.3
+            }}
+          >
             {subtitle}
           </div>
         </div>
 
         {/* Medidor da meta */}
-        <div style={{ display: "flex", flexDirection: "column", marginTop: "26px", gap: "12px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginTop: isGancho ? "56px" : "26px",
+            gap: "12px"
+          }}
+        >
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
             <div style={{ display: "flex", fontSize: "27px", color: "#cfe0dc" }}>
               da meta já atingida
             </div>
-            <div style={{ display: "flex", fontSize: "70px", fontWeight: 800, color: VERDE_CLARO, lineHeight: 1 }}>
+            <div
+              style={{
+                display: "flex",
+                fontSize: isGancho ? "88px" : "70px",
+                fontWeight: 800,
+                color: VERDE_CLARO,
+                lineHeight: 1
+              }}
+            >
               {Math.round(percentage)}%
             </div>
           </div>
@@ -160,8 +204,8 @@ export function GET(req: Request) {
             style={{
               display: "flex",
               width: "100%",
-              height: "28px",
-              borderRadius: "14px",
+              height: isGancho ? "32px" : "28px",
+              borderRadius: "16px",
               background: "rgba(255,255,255,0.12)"
             }}
           >
@@ -169,80 +213,100 @@ export function GET(req: Request) {
               style={{
                 display: "flex",
                 width: `${Math.max(2, percentage)}%`,
-                height: "28px",
-                borderRadius: "14px",
+                height: isGancho ? "32px" : "28px",
+                borderRadius: "16px",
                 background: `linear-gradient(90deg, ${VERDE_MEDIO}, ${VERDE_CLARO})`
               }}
             />
           </div>
         </div>
 
-        {/* Insights de aceleração (sem expor R$) */}
-        <div style={{ display: "flex", flexDirection: "column", marginTop: "24px", gap: "12px" }}>
-          {insights.slice(0, 2).map((it, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "16px",
-                background: "rgba(255,255,255,0.06)",
-                border: "1px solid rgba(159,196,199,0.30)",
-                borderRadius: "16px",
-                padding: "16px 22px"
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "24px",
-                  background: VERDE_MEDIO,
-                  color: "#fff",
-                  fontSize: "28px",
-                  fontWeight: 800
-                }}
-              >
-                {it.ico}
-              </div>
-              <div style={{ display: "flex", flex: 1, fontSize: "26px", color: "#dce8e5", lineHeight: 1.3 }}>
-                {it.text}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Valores trancados (privacidade + funil) */}
-        <div style={{ display: "flex", flexDirection: "column", marginTop: "24px", gap: "12px" }}>
-          <div style={{ display: "flex", gap: "18px" }}>
-            {lockedItems.map((label, i) => (
+        {/* Insights de aceleração — só na variante completa */}
+        {!isGancho && (
+          <div style={{ display: "flex", flexDirection: "column", marginTop: "24px", gap: "12px" }}>
+            {insights.slice(0, 2).map((it, i) => (
               <div
                 key={i}
                 style={{
                   display: "flex",
-                  flexDirection: "column",
-                  flex: 1,
                   alignItems: "center",
-                  gap: "10px",
-                  background: "rgba(255,255,255,0.05)",
+                  gap: "16px",
+                  background: "rgba(255,255,255,0.06)",
                   border: "1px solid rgba(159,196,199,0.30)",
                   borderRadius: "16px",
-                  padding: "18px 14px"
+                  padding: "16px 22px"
                 }}
               >
-                <div style={{ display: "flex", fontSize: "40px" }}>🔒</div>
-                <div style={{ display: "flex", fontSize: "21px", color: "#a9c2be", textAlign: "center", lineHeight: 1.25 }}>
-                  {label}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                    width: "48px",
+                    height: "48px",
+                    borderRadius: "24px",
+                    background: VERDE_MEDIO,
+                    color: "#fff",
+                    fontSize: "28px",
+                    fontWeight: 800
+                  }}
+                >
+                  {it.ico}
+                </div>
+                <div style={{ display: "flex", flex: 1, fontSize: "26px", color: "#dce8e5", lineHeight: 1.3 }}>
+                  {it.text}
                 </div>
               </div>
             ))}
           </div>
-          <div style={{ display: "flex", fontSize: "20px", color: "#8fb0ac" }}>
-            🔒 Valores em R$ ocultos — protegem seus dados caso o card seja compartilhado.
+        )}
+
+        {/* Valores trancados (privacidade + funil) */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginTop: isGancho ? "56px" : "24px",
+            gap: "12px"
+          }}
+        >
+          {!isGancho && (
+            <div style={{ display: "flex", gap: "18px" }}>
+              {lockedItems.map((label, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    flex: 1,
+                    alignItems: "center",
+                    gap: "10px",
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(159,196,199,0.30)",
+                    borderRadius: "16px",
+                    padding: "18px 14px"
+                  }}
+                >
+                  <div style={{ display: "flex", fontSize: "40px" }}>🔒</div>
+                  <div style={{ display: "flex", fontSize: "21px", color: "#a9c2be", textAlign: "center", lineHeight: 1.25 }}>
+                    {label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          <div
+            style={{
+              display: "flex",
+              fontSize: isGancho ? "24px" : "20px",
+              color: isGancho ? "#cfe0dc" : "#8fb0ac",
+              lineHeight: 1.35
+            }}
+          >
+            🔒 {isGancho
+              ? "Patrimônio necessário e projeção completa ficam para a conversa. Nenhum valor em R$ aparece aqui — seus dados ficam protegidos se você compartilhar."
+              : "Valores em R$ ocultos — protegem seus dados caso o card seja compartilhado."}
           </div>
         </div>
 
@@ -251,17 +315,17 @@ export function GET(req: Request) {
           style={{
             display: "flex",
             flexDirection: "column",
-            marginTop: "24px",
+            marginTop: isGancho ? "56px" : "24px",
             background: VERDE_CLARO,
             borderRadius: "20px",
-            padding: "22px 34px",
+            padding: isGancho ? "28px 36px" : "22px 34px",
             gap: "4px"
           }}
         >
-          <div style={{ display: "flex", fontSize: "31px", fontWeight: 800, color: "#04252c" }}>
+          <div style={{ display: "flex", fontSize: isGancho ? "36px" : "31px", fontWeight: 800, color: "#04252c" }}>
             Quer o detalhamento completo?
           </div>
-          <div style={{ display: "flex", fontSize: "25px", color: "#0b3b3b", lineHeight: 1.3 }}>
+          <div style={{ display: "flex", fontSize: isGancho ? "27px" : "25px", color: "#0b3b3b", lineHeight: 1.3 }}>
             Patrimônio necessário, projeção ano a ano e o que acelera sua meta — numa conversa de 15 min, sem compromisso.
           </div>
         </div>
@@ -270,7 +334,7 @@ export function GET(req: Request) {
         <div
           style={{
             display: "flex",
-            marginTop: "22px",
+            marginTop: isGancho ? "44px" : "22px",
             fontSize: "20px",
             color: "#8fb0ac",
             lineHeight: 1.35

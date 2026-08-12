@@ -44,6 +44,11 @@ export function CardGenerator() {
     const sp = new URLSearchParams(window.location.search)
     return Boolean(sp.get("rent") || sp.get("ret"))
   })
+  const [variant, setVariant] = useState<"completo" | "gancho">(() => {
+    if (typeof window === "undefined") return "completo"
+    const v = new URLSearchParams(window.location.search).get("v")
+    return v === "gancho" || v === "b" ? "gancho" : "completo"
+  })
 
   const url = useMemo(() => {
     if (typeof window === "undefined") return ""
@@ -52,8 +57,9 @@ export function CardGenerator() {
       const v = (values[f.key] || "").trim()
       if (v) params.set(f.key, v)
     }
+    if (variant === "gancho") params.set("v", "gancho")
     return `${window.location.origin}/api/og/diagnostico?${params.toString()}`
-  }, [values])
+  }, [values, variant])
 
   const hasData = Boolean(values.renda && values.patrimonio)
 
@@ -96,10 +102,47 @@ export function CardGenerator() {
           FINCARE — USO INTERNO
         </div>
         <h1 style={{ margin: "0 0 4px", fontSize: 28 }}>Gerar card de diagnóstico</h1>
-        <p style={{ margin: "0 0 24px", color: "#5c7278", fontSize: 15 }}>
+        <p style={{ margin: "0 0 20px", color: "#5c7278", fontSize: 15 }}>
           Preencha os dados que a pessoa te passar no WhatsApp. A prévia atualiza sozinha —
           copie o link ou baixe a imagem e mande na conversa.
         </p>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+          <span style={{ fontSize: 14, fontWeight: 600 }}>Modelo do card:</span>
+          <div
+            style={{
+              display: "inline-flex",
+              border: `1px solid ${VERDE_CLARO}`,
+              borderRadius: 999,
+              overflow: "hidden"
+            }}
+          >
+            {(["completo", "gancho"] as const).map((v) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setVariant(v)}
+                style={{
+                  padding: "8px 18px",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  textTransform: "capitalize",
+                  background: variant === v ? VERDE_ESCURO : "#fff",
+                  color: variant === v ? "#fff" : VERDE_ESCURO
+                }}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
+          <span style={{ fontSize: 12, color: "#5c7278" }}>
+            {variant === "completo"
+              ? "com insights de aceleração"
+              : "só o gancho — mais enxuto p/ testar conversão"}
+          </span>
+        </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32, alignItems: "start" }}>
           {/* Formulário */}
