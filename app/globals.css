@@ -375,3 +375,21 @@ select {
     transform: translateY(0);
   }
 }
+
+/* Link interno (uso do assessor) para gerar o card de WhatsApp a partir do
+   resultado. Discreto de propósito — não é um CTA para o prospect. */
+.internal-card-link {
+  display: block;
+  text-align: center;
+  margin: 14px auto 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  opacity: 0.55;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+.internal-card-link:hover {
+  opacity: 1;
+  color: var(--verde-medio);
+  text-decoration: underline;
+}

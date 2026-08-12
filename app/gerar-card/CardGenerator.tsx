@@ -28,9 +28,22 @@ const ADVANCED: Field[] = [
 ]
 
 export function CardGenerator() {
-  const [values, setValues] = useState<Record<string, string>>({})
+  const [values, setValues] = useState<Record<string, string>>(() => {
+    if (typeof window === "undefined") return {}
+    const sp = new URLSearchParams(window.location.search)
+    const init: Record<string, string> = {}
+    for (const f of [...FIELDS, ...ADVANCED]) {
+      const v = sp.get(f.key)
+      if (v) init[f.key] = v
+    }
+    return init
+  })
   const [copied, setCopied] = useState(false)
-  const [showAdvanced, setShowAdvanced] = useState(false)
+  const [showAdvanced, setShowAdvanced] = useState(() => {
+    if (typeof window === "undefined") return false
+    const sp = new URLSearchParams(window.location.search)
+    return Boolean(sp.get("rent") || sp.get("ret"))
+  })
 
   const url = useMemo(() => {
     if (typeof window === "undefined") return ""

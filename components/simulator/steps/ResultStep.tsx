@@ -45,6 +45,14 @@ export function ResultStep({
       </>
     )
   const projectedPatrimony10 = calc.trajetoria[Math.min(10, calc.trajetoria.length - 1)]
+  const cardHref = `/gerar-card?${new URLSearchParams({
+    idade: String(Math.round(calc.idade)),
+    patrimonio: String(Math.round(calc.patrimonio0)),
+    aporte: String(Math.round(calc.aporte)),
+    renda: String(Math.round(calc.renda)),
+    rent: String(Number((calc.rent * 100).toFixed(2))),
+    ret: String(Number((calc.retirada * 100).toFixed(2)))
+  }).toString()}`
   const insights = [
     calc.anos !== null &&
     calc.anosCenarioAporte !== null &&
@@ -333,6 +341,15 @@ export function ResultStep({
         <br />
         Resultados calculados a partir das premissas informadas por você.
       </div>
+
+      <a
+        href={cardHref}
+        target="_blank"
+        rel="noreferrer"
+        className="internal-card-link"
+      >
+        ⚙︎ Gerar card para WhatsApp (interno)
+      </a>
     </div>
   )
 }
