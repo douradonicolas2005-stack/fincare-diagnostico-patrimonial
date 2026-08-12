@@ -335,21 +335,22 @@ export function ResultStep({
         </div>
       </div>
 
-      <div className="authority-strip">
-        Ferramenta desenvolvida pela Fincare Investimentos, baseada em
-        metodologias utilizadas em planejamento patrimonial.
-        <br />
-        Resultados calculados a partir das premissas informadas por você.
-      </div>
-
       <a
         href={cardHref}
         target="_blank"
         rel="noreferrer"
         className="internal-card-link"
       >
-        ⚙︎ Gerar card para WhatsApp (interno)
+        📲 Gerar card para WhatsApp
+        <span className="internal-card-link-tag">interno</span>
       </a>
+
+      <div className="authority-strip">
+        Ferramenta desenvolvida pela Fincare Investimentos, baseada em
+        metodologias utilizadas em planejamento patrimonial.
+        <br />
+        Resultados calculados a partir das premissas informadas por você.
+      </div>
     </div>
   )
 }
