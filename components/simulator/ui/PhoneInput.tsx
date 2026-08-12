@@ -12,7 +12,15 @@ type PhoneInputProps = {
 }
 
 function onlyDigits(value: string) {
-  return value.replace(/\D/g, "").slice(0, 11)
+  let digits = value.replace(/\D/g, "")
+  // Autopreenchimento do sistema às vezes inclui o código do país (+55).
+  // Um número brasileiro sozinho nunca passa de 11 dígitos, então nesse
+  // caso o "55" extra é o DDI, não parte do DDD/número — removê-lo antes
+  // de cortar evita que os 2 últimos dígitos reais sejam descartados.
+  if (digits.length > 11 && digits.startsWith("55")) {
+    digits = digits.slice(2)
+  }
+  return digits.slice(0, 11)
 }
 
 function formatPhone(value: string) {

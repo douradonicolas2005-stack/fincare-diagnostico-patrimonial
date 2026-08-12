@@ -855,6 +855,9 @@ function enviarEmailDiagnostico_(data) {
     '<p><a href="https://wa.me/' +
     WHATSAPP_NUMERO +
     '" style="background:#2B7E7E;color:#fff;padding:10px 18px;border-radius:6px;text-decoration:none;">Falar com um especialista no WhatsApp</a></p>' +
+    '<p style="font-size:13px;color:#5C7278;border-top:1px solid #D9E4E4;padding-top:14px;margin-top:20px;">' +
+    "<strong>De bonus:</strong> preparamos um guia rapido sobre como usar Fundos Imobiliarios para construir uma renda passiva que acompanhe a inflacao. " +
+    '<a href="https://fincarescorepatrimonial.com.br/ebook-fundos-imobiliarios-independencia-financeira.pdf" style="color:#2B7E7E;font-weight:bold;">Baixar o guia em PDF</a>.</p>' +
     construirCartaoVisita_() +
     "</div>"
 

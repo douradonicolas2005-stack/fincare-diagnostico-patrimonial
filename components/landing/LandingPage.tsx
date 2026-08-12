@@ -98,31 +98,34 @@ export function LandingPage() {
         <button type="button" className="landing-cta" onClick={startDiagnosis}>
           Ver meu Score em 1 minuto →
         </button>
-        <div className="landing-foot">Sem compromisso · Leva menos de 1 minuto</div>
 
-        <div className="landing-trust">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"
-              stroke="#9fc4c7"
-              strokeWidth="2"
-              strokeLinejoin="round"
-            />
-          </svg>
-          Conexão segura (HTTPS)
-        </div>
+        <div className="landing-bottom">
+          <div className="landing-foot">Sem compromisso · Leva menos de 1 minuto</div>
 
-        <div className="landing-foot">
-          <a
-            href="/privacidade"
-            onClick={() =>
-              trackAnalyticsEvent("landing_privacy_click", {
-                action: "open_privacy"
-              })
-            }
-          >
-            Política de Privacidade
-          </a>
+          <div className="landing-trust">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"
+                stroke="#9fc4c7"
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Conexão segura (HTTPS)
+          </div>
+
+          <div className="landing-foot">
+            <a
+              href="/privacidade"
+              onClick={() =>
+                trackAnalyticsEvent("landing_privacy_click", {
+                  action: "open_privacy"
+                })
+              }
+            >
+              Política de Privacidade
+            </a>
+          </div>
         </div>
       </section>
     </main>

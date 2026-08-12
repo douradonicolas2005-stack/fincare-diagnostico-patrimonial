@@ -44,6 +44,8 @@ export function ScoreTeaserStep({
             Quero ver meu diagnóstico completo →
           </Button>
         </div>
+
+        <p className="bonus-hint">🎁 + guia bônus sobre Fundos Imobiliários</p>
       </div>
     </Wizard>
   )

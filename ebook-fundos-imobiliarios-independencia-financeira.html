@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Fundos Imobiliários e Independência Financeira | Fincare Investimentos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde-escuro: #003b49; --verde-medio: #2b7e7e; --verde-claro: #9fc4c7;
+    --verde-claro-bg: #eaf2f1; --text: #0b2a32; --text-muted: #5c7278;
+    --line: #d9e4e4; --font-display: "Fraunces", serif; --font-body: "Manrope", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #ccdada; font-family: var(--font-body); color: var(--text); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page {
+    max-width: 680px; margin: 24px auto; background: #fff; border-radius: 4px;
+    box-shadow: 0 8px 30px rgba(0,59,73,.18); overflow: hidden; min-height: 480px;
+  }
+  .page.dark { background: var(--verde-escuro); color: #f4f9fc; }
+  @media print {
+    body { background: #fff; }
+    .page { box-shadow: none; margin: 0; max-width: none; page-break-after: always; border-radius: 0; }
+  }
+
+  /* capa / contracapa */
+  .cover { text-align: center; padding: 90px 50px; }
+  .cover .logo-mark { font-family: var(--font-display); font-size: 28px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 26px; }
+  .cover .kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--verde-claro); margin-bottom: 18px; }
+  .cover h1 { font-family: var(--font-display); font-size: 32px; font-weight: 600; line-height: 1.25; margin: 0 0 14px; }
+  .cover p.sub { color: #cfe4e3; font-size: 14.5px; max-width: 42ch; margin: 0 auto; line-height: 1.6; }
+  .cover .slogan { margin-top: 56px; font-family: var(--font-display); font-style: italic; font-weight: 500; color: #d8ecec; font-size: 27px; line-height: 1.4; }
+  .cover .slogan::before { content: ""; display: block; width: 48px; height: 2px; background: var(--verde-medio); margin: 0 auto 22px; }
+
+  .back { padding: 70px 50px; }
+  .back .slogan { font-family: var(--font-display); font-style: italic; font-weight: 500; color: #d8ecec; font-size: 22px; max-width: 34ch; line-height: 1.5; margin-bottom: 40px; }
+  .back .contact { font-size: 13px; line-height: 2; color: #eaf2f1; }
+  .back .contact b { color: #fff; }
+
+  /* miolo */
+  .content-page { padding: 44px 48px; flex: 1 1 auto; }
+  .badge { display: inline-block; background: var(--verde-claro-bg); color: var(--verde-medio); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; padding: 4px 12px; border-radius: 20px; font-weight: 700; margin-bottom: 14px; }
+  .content-page h2 { font-family: var(--font-display); font-size: 23px; color: var(--verde-escuro); margin: 0 0 10px; }
+  .content-page p.lead { font-size: 14px; color: var(--text-muted); line-height: 1.65; max-width: 54ch; }
+  .divider { border: none; border-top: 2px solid var(--verde-medio); width: 40px; margin: 20px 0 26px; }
+
+  .profile-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .profile-icon { flex-shrink: 0; width: 52px; height: 52px; border-radius: 50%; background: var(--verde-claro-bg); display: flex; align-items: center; justify-content: center; }
+  .profile-header h2 { margin: 0; }
+  .profile-tag { font-family: var(--font-mono); font-size: 11px; color: var(--verde-medio); text-transform: uppercase; letter-spacing: .05em; }
+
+  .info-row { display: flex; gap: 14px; margin-bottom: 20px; }
+  .info-row .icon { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--verde-claro-bg); display: flex; align-items: center; justify-content: center; }
+  .info-row .info-content b { display: block; font-size: 14px; color: var(--verde-escuro); margin-bottom: 3px; }
+  .info-row .info-content p { margin: 0; font-size: 13px; color: var(--text); line-height: 1.55; }
+
+  .alloc-title { font-size: 12.5px; font-weight: 700; color: var(--verde-escuro); margin: 22px 0 10px; text-transform: uppercase; letter-spacing: .04em; }
+  .alloc-bar-wrap { display: flex; height: 26px; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .alloc-legend { display: flex; flex-wrap: wrap; gap: 10px 18px; }
+  .alloc-legend .item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text); }
+  .alloc-legend .sw { width: 9px; height: 9px; border-radius: 2px; }
+
+  .page-footer { display: flex; justify-content: space-between; padding: 14px 48px; border-top: 1px solid var(--line); font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+  .disclaimer { font-size: 10px; color: #9aabab; line-height: 1.5; padding: 0 48px 24px; }
+
+  .mini-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 22px; }
+  .mini-card { background: var(--verde-claro-bg); border-radius: 10px; padding: 16px; }
+  .mini-card b { display: block; font-size: 12.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--verde-medio); margin-bottom: 6px; }
+  .mini-card p { margin: 0; font-size: 12.5px; color: var(--text); line-height: 1.5; }
+
+  .process-step { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .process-step:last-of-type { border-bottom: none; }
+  .process-step .num { flex-shrink: 0; font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--verde-claro); width: 36px; }
+  .process-step .step-content b { display: block; font-size: 14px; color: var(--verde-escuro); margin-bottom: 3px; }
+  .process-step .step-content p { margin: 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.55; }
+
+  .scenario-card { border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+  .scenario-card .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .scenario-card .top b { font-size: 14px; color: var(--verde-escuro); }
+  .scenario-card .result { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .04em; padding: 3px 10px; border-radius: 20px; font-weight: 700; }
+  .result.ruim { background: #fbe9e9; color: #b23b3b; }
+  .result.ok { background: #eaf2f1; color: var(--verde-medio); }
+  .result.bom { background: #dff1e4; color: #2f8a4f; }
+  .scenario-card p { margin: 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.55; }
+
+  /* --- refresh de arte: logo da marca --- */
+  :root { --logo: url("data:image/png;base64,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"); }
+  .page.dark { background: radial-gradient(circle at 50% -8%, #0a4a5a, var(--verde-escuro) 62%); position: relative; }
+  .page.dark::after { content: ""; position: absolute; right: -64px; bottom: -64px; width: 230px; height: 230px; border: 1.5px solid rgba(159,196,199,.13); border-radius: 24px; transform: rotate(24deg); pointer-events: none; }
+  .brand-logo { background: var(--logo) center/contain no-repeat; }
+  .cover .brand-logo--cover { width: 184px; height: 49px; margin: 0 auto 30px; }
+  .back .brand-logo--back { width: 156px; height: 42px; margin: 0 0 34px; }
+  .footer-logo { width: 78px; height: 21px; background: var(--logo) left center/contain no-repeat; filter: brightness(0); opacity: .5; }
+
+  /* --- capa/contracapa em pagina inteira --- */
+  .page.cover-page, .page.back-page { max-width: none; width: 100%; margin: 0; border-radius: 0; box-shadow: none; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .cover-page .cover { padding: 56px 50px; }
+  .back-page .back { width: 100%; max-width: 470px; padding: 56px 50px; }
+  @media print { @page { size: A4; margin: 0; } .page:not(.dark) { min-height: 100vh; } .page.cover-page, .page.back-page { height: 100vh; min-height: 0; } }
+
+  /* --- fundo das paginas de desenvolvimento --- */
+  .page:not(.dark) { position: relative; background: linear-gradient(180deg, #edf4f5 0%, #ffffff 30%); display: flex; flex-direction: column; min-height: 962px; }
+  .page:not(.dark)::before { content: ""; position: absolute; top: 60px; right: -74px; width: 200px; height: 200px; border: 1.4px solid rgba(43,126,126,.10); border-radius: 26px; transform: rotate(18deg); z-index: 0; pointer-events: none; }
+  .page:not(.dark)::after { content: ""; position: absolute; left: -70px; bottom: -70px; width: 170px; height: 170px; border-radius: 50%; background: radial-gradient(circle, rgba(159,196,199,.16), transparent 70%); z-index: 0; pointer-events: none; }
+  .content-page, .page-footer, .disclaimer { position: relative; z-index: 1; }
+
+  /* --- sumario (redesenhado) + ilustracoes --- */
+  .toc-head { display: flex; gap: 20px; align-items: flex-start; }
+  .toc-head-text { flex: 1; }
+  .toc-head-text h2 { margin-top: 4px; }
+  .toc-head-art { flex-shrink: 0; width: 104px; }
+  .toc-head-art svg { width: 100%; height: auto; display: block; }
+  .toc { margin-top: 16px; }
+  .toc-group { display: inline-block; background: var(--verde-escuro); color: #eaf2f1; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .09em; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; margin: 16px 0 2px; }
+  .toc-group.first { margin-top: 4px; }
+  .toc-item { display: flex; align-items: flex-start; gap: 16px; }
+  .toc-folio { font-family: var(--font-display); font-size: 23px; font-weight: 600; color: var(--verde-claro); width: 32px; flex-shrink: 0; line-height: 1.35; text-align: right; }
+  .toc-body { flex: 1; border-bottom: 1px solid var(--line); padding: 5px 0 12px; }
+  .toc-item:last-child .toc-body { border-bottom: none; }
+  .toc-title { display: block; font-family: var(--font-display); font-size: 15px; font-weight: 500; color: var(--verde-escuro); }
+  .toc-sub { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .cover-skyline { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; line-height: 0; opacity: .5; pointer-events: none; }
+  .cover-skyline svg { width: 100%; height: auto; display: block; }
+  .asset-trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 22px 0 4px; }
+  .asset { background: var(--verde-claro-bg); border-radius: 12px; padding: 15px 8px; text-align: center; }
+  .asset-ico { width: 38px; height: 38px; margin: 0 auto 8px; }
+  .asset-ico svg { width: 100%; height: 100%; display: block; }
+  .asset span { font-size: 11px; font-weight: 600; color: var(--verde-escuro); line-height: 1.3; }
+  /* --- callout da apresentacao --- */
+  .callout { background: var(--verde-escuro); color: #dbe9ea; border-radius: 14px; padding: 20px 22px; margin-top: 22px; }
+  .callout .callout-title { display: block; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--verde-claro); margin-bottom: 12px; }
+  .callout ul { margin: 0; padding-left: 18px; }
+  .callout li { font-size: 12.7px; line-height: 1.7; margin-bottom: 4px; }
+  .callout li b { color: #fff; }
+
+  /* --- preencher a folha A4 (escala + distribuicao vertical) --- */
+  .content-page { padding: 60px 58px; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+  .badge { font-size: 11px; letter-spacing: .07em; padding: 6px 15px; margin-bottom: 4px; }
+  .content-page h2 { font-size: 30px; line-height: 1.2; margin: 6px 0; }
+  .content-page p.lead { font-size: 16px; line-height: 1.9; margin: 10px 0 0; max-width: none; }
+  .divider { width: 48px; margin: 22px 0; }
+  .info-row { margin-bottom: 4px; gap: 18px; align-items: flex-start; }
+  .info-row .icon { width: 40px; height: 40px; }
+  .info-row .info-content b { font-size: 15px; margin-bottom: 5px; }
+  .info-row .info-content p { font-size: 14.5px; line-height: 1.7; }
+  .profile-header { margin-bottom: 8px; gap: 18px; }
+  .profile-icon { width: 60px; height: 60px; }
+  .profile-tag { font-size: 12px; }
+  .process-step { padding: 20px 0; }
+  .process-step .num { font-size: 31px; width: 44px; }
+  .process-step .step-content b { font-size: 15px; }
+  .process-step .step-content p { font-size: 14px; line-height: 1.65; }
+  .mini-card-grid { gap: 16px; margin-top: 8px; }
+  .mini-card { padding: 20px; }
+  .mini-card b { font-size: 13px; margin-bottom: 8px; }
+  .mini-card p { font-size: 13px; line-height: 1.6; }
+  .scenario-card { padding: 18px 22px; margin-bottom: 14px; }
+  .scenario-card .top b { font-size: 15px; }
+  .scenario-card p { font-size: 14px; line-height: 1.65; }
+  .asset-trio { gap: 14px; margin: 20px 0; }
+  .asset { padding: 24px 12px; }
+  .asset-ico { width: 46px; height: 46px; }
+  .asset span { font-size: 12px; }
+  .callout { margin-top: 8px; padding: 24px 26px; }
+  .callout li { font-size: 13.5px; line-height: 1.85; margin-bottom: 6px; }
+  .disclaimer { font-size: 11px; line-height: 1.6; padding: 16px 58px 4px; }
+  .page-footer { padding: 18px 58px; }
+</style>
+</head>
+<body>
+
+<!-- CAPA -->
+<div class="page dark cover-page">
+  <div class="cover">
+    <div class="brand-logo brand-logo--cover" role="img" aria-label="Fincare"></div>
+    <span class="kicker">Educação Financeira · Fincare Investimentos</span>
+    <h1>Dá pra viver de aluguel sem ter um imóvel?</h1>
+    <p class="sub">O que 10 anos de dados sobre Fundos Imobiliários revelam sobre construir uma renda que dure — e acompanhe a inflação.</p>
+    <div class="slogan">"Não é só sobre investir, é cuidar."</div>
+  </div>
+  <div class="cover-skyline"><svg viewBox="0 0 680 120" width="100%" preserveAspectRatio="xMidYMax meet" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="0.0" y="66" width="35.8" height="54" fill="#9fc4c7"/><rect x="5.0" y="75" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="26.8" y="75" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="5.0" y="87" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="26.8" y="87" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="5.0" y="99" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="26.8" y="99" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="5.0" y="111" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="26.8" y="111" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="37.8" y="32" width="35.8" height="88" fill="#9fc4c7"/><rect x="42.8" y="41" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="64.6" y="41" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="42.8" y="53" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="64.6" y="53" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="42.8" y="65" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="64.6" y="65" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="42.8" y="77" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="64.6" y="77" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="42.8" y="89" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="64.6" y="89" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="42.8" y="101" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="64.6" y="101" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="42.8" y="113" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="64.6" y="113" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="75.6" y="78" width="35.8" height="42" fill="#9fc4c7"/><rect x="80.6" y="87" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="102.3" y="87" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="80.6" y="99" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="102.3" y="99" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="80.6" y="111" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="102.3" y="111" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="113.3" y="10" width="35.8" height="110" fill="#9fc4c7"/><rect x="118.3" y="19" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="140.1" y="19" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="118.3" y="31" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="140.1" y="31" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="118.3" y="43" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="140.1" y="43" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="118.3" y="55" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="140.1" y="55" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="118.3" y="67" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="140.1" y="67" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="118.3" y="79" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="140.1" y="79" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="118.3" y="91" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="140.1" y="91" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="118.3" y="103" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="140.1" y="103" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="151.1" y="54" width="35.8" height="66" fill="#9fc4c7"/><rect x="156.1" y="63" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="177.9" y="63" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="156.1" y="75" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="177.9" y="75" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="156.1" y="87" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="177.9" y="87" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="156.1" y="99" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="177.9" y="99" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="156.1" y="111" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="177.9" y="111" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="188.9" y="70" width="35.8" height="50" fill="#9fc4c7"/><rect x="193.9" y="79" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="215.7" y="79" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="193.9" y="91" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="215.7" y="91" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="193.9" y="103" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="215.7" y="103" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="226.7" y="24" width="35.8" height="96" fill="#9fc4c7"/><rect x="231.7" y="33" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="253.4" y="33" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="231.7" y="45" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="253.4" y="45" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="231.7" y="57" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="253.4" y="57" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="231.7" y="69" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="253.4" y="69" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="231.7" y="81" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="253.4" y="81" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="231.7" y="93" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="253.4" y="93" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="231.7" y="105" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="253.4" y="105" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="264.4" y="60" width="35.8" height="60" fill="#9fc4c7"/><rect x="269.4" y="69" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="291.2" y="69" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="269.4" y="81" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="291.2" y="81" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="269.4" y="93" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="291.2" y="93" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="269.4" y="105" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="291.2" y="105" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="302.2" y="40" width="35.8" height="80" fill="#9fc4c7"/><rect x="307.2" y="49" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="329.0" y="49" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="307.2" y="61" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="329.0" y="61" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="307.2" y="73" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="329.0" y="73" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="307.2" y="85" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="329.0" y="85" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="307.2" y="97" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="329.0" y="97" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="307.2" y="109" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="329.0" y="109" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="340.0" y="82" width="35.8" height="38" fill="#9fc4c7"/><rect x="345.0" y="91" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="366.8" y="91" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="345.0" y="103" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="366.8" y="103" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="377.8" y="48" width="35.8" height="72" fill="#9fc4c7"/><rect x="382.8" y="57" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="404.6" y="57" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="382.8" y="69" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="404.6" y="69" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="382.8" y="81" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="404.6" y="81" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="382.8" y="93" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="404.6" y="93" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="382.8" y="105" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="404.6" y="105" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="415.6" y="16" width="35.8" height="104" fill="#9fc4c7"/><rect x="420.6" y="25" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="442.3" y="25" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="420.6" y="37" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="442.3" y="37" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="420.6" y="49" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="442.3" y="49" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="420.6" y="61" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="442.3" y="61" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="420.6" y="73" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="442.3" y="73" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="420.6" y="85" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="442.3" y="85" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="420.6" y="97" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="442.3" y="97" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="420.6" y="109" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="442.3" y="109" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="453.3" y="68" width="35.8" height="52" fill="#9fc4c7"/><rect x="458.3" y="77" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="480.1" y="77" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="458.3" y="89" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="480.1" y="89" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="458.3" y="101" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="480.1" y="101" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="458.3" y="113" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="480.1" y="113" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="491.1" y="36" width="35.8" height="84" fill="#9fc4c7"/><rect x="496.1" y="45" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="517.9" y="45" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="496.1" y="57" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="517.9" y="57" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="496.1" y="69" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="517.9" y="69" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="496.1" y="81" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="517.9" y="81" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="496.1" y="93" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="517.9" y="93" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="496.1" y="105" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="517.9" y="105" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="528.9" y="74" width="35.8" height="46" fill="#9fc4c7"/><rect x="533.9" y="83" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="555.7" y="83" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="533.9" y="95" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="555.7" y="95" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="533.9" y="107" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="555.7" y="107" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="566.7" y="28" width="35.8" height="92" fill="#9fc4c7"/><rect x="571.7" y="37" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="593.4" y="37" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="571.7" y="49" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="593.4" y="49" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="571.7" y="61" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="593.4" y="61" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="571.7" y="73" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="593.4" y="73" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="571.7" y="85" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="593.4" y="85" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="571.7" y="97" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="593.4" y="97" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="571.7" y="109" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="593.4" y="109" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="604.4" y="62" width="35.8" height="58" fill="#9fc4c7"/><rect x="609.4" y="71" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="631.2" y="71" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="609.4" y="83" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="631.2" y="83" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="609.4" y="95" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="631.2" y="95" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="609.4" y="107" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="631.2" y="107" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="642.2" y="20" width="35.8" height="100" fill="#9fc4c7"/><rect x="647.2" y="29" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="669.0" y="29" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="647.2" y="41" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="669.0" y="41" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="647.2" y="53" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="669.0" y="53" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="647.2" y="65" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="669.0" y="65" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="647.2" y="77" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="669.0" y="77" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="647.2" y="89" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="669.0" y="89" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="647.2" y="101" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="669.0" y="101" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="647.2" y="113" width="4" height="5" fill="#003b49" opacity="0.45"/><rect x="669.0" y="113" width="4" height="5" fill="#003b49" opacity="0.45"/></svg></div>
+</div>
+
+<!-- SUMÁRIO -->
+<div class="page">
+  <div class="content-page">
+    <span class="badge">Sumário</span>
+    <div class="toc-head">
+      <div class="toc-head-text">
+        <h2>O que você vai encontrar</h2>
+        <p class="lead">Um caminho curto e direto: primeiro o que 10 anos de dados revelam sobre viver de renda com fundos imobiliários; depois, como a Fincare pode ajudar a aplicar isso ao seu momento de vida.</p>
+      </div>
+      <div class="toc-head-art"><svg viewBox="0 0 104 104" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="102" height="102" rx="20" fill="#eaf2f1"/><rect x="54" y="40" width="26" height="44" rx="3" fill="#003b49"/><rect x="60" y="48" width="6" height="6" rx="1" fill="#9fc4c7"/><rect x="69" y="48" width="6" height="6" rx="1" fill="#9fc4c7"/><rect x="60" y="60" width="6" height="6" rx="1" fill="#9fc4c7"/><rect x="69" y="60" width="6" height="6" rx="1" fill="#9fc4c7"/><rect x="60" y="72" width="6" height="6" rx="1" fill="#9fc4c7"/><rect x="69" y="72" width="6" height="6" rx="1" fill="#9fc4c7"/><rect x="24" y="30" width="30" height="54" rx="3" fill="#2b7e7e"/><rect x="30" y="38" width="7" height="7" rx="1.5" fill="#eaf2f1"/><rect x="41" y="38" width="7" height="7" rx="1.5" fill="#eaf2f1"/><rect x="30" y="51" width="7" height="7" rx="1.5" fill="#eaf2f1"/><rect x="41" y="51" width="7" height="7" rx="1.5" fill="#eaf2f1"/><rect x="30" y="64" width="7" height="7" rx="1.5" fill="#eaf2f1"/><rect x="41" y="64" width="7" height="7" rx="1.5" fill="#eaf2f1"/><circle cx="30" cy="22" r="6" fill="#9fc4c7"/><circle cx="44" cy="17" r="6" fill="#2b7e7e"/><circle cx="58" cy="24" r="6" fill="#003b49"/></svg></div>
+    </div>
+    <div class="toc">
+      <div class="toc-group first">O estudo dos 10 anos</div>
+      <div class="toc-item"><span class="toc-folio">01</span><span class="toc-body"><span class="toc-title">O que é, afinal, um Fundo Imobiliário</span><span class="toc-sub">O conceito, sem jargão</span></span></div>
+      <div class="toc-item"><span class="toc-folio">02</span><span class="toc-body"><span class="toc-title">10 anos, 9 fundos, uma pergunta simples</span><span class="toc-sub">Como o estudo foi montado</span></span></div>
+      <div class="toc-item"><span class="toc-folio">03</span><span class="toc-body"><span class="toc-title">Só gastar a renda não é suficiente</span><span class="toc-sub">Descoberta 1 de 3</span></span></div>
+      <div class="toc-item"><span class="toc-folio">04</span><span class="toc-body"><span class="toc-title">O segredo está em guardar uma parte</span><span class="toc-sub">Descoberta 2 de 3</span></span></div>
+      <div class="toc-item"><span class="toc-folio">05</span><span class="toc-body"><span class="toc-title">Não coloque tudo numa cesta só</span><span class="toc-sub">Descoberta 3 de 3</span></span></div>
+      <div class="toc-item"><span class="toc-folio">06</span><span class="toc-body"><span class="toc-title">O mercado imobiliário anda em ciclos</span><span class="toc-sub">Contexto para o longo prazo</span></span></div>
+      <div class="toc-item"><span class="toc-folio">07</span><span class="toc-body"><span class="toc-title">5 lições para levar com você</span><span class="toc-sub">Resumo prático</span></span></div>
+      <div class="toc-group">Sobre a Fincare</div>
+      <div class="toc-item"><span class="toc-folio">08</span><span class="toc-body"><span class="toc-title">Somos a Fincare Investimentos</span><span class="toc-sub">Quem cuida do seu patrimônio</span></span></div>
+      <div class="toc-item"><span class="toc-folio">09</span><span class="toc-body"><span class="toc-title">Uma jornada, não uma venda única</span><span class="toc-sub">Como trabalhamos</span></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- APRESENTAÇÃO -->
+<div class="page">
+  <div class="content-page">
+    <span class="badge">Apresentação</span>
+    <h2>Antes de começar</h2>
+    <p class="lead">Quase todo mundo já sonhou em chegar a um ponto na vida em que o dinheiro trabalha por você — em que dá para viver, ou ao menos complementar a renda, sem depender apenas do salário. Os fundos imobiliários aparecem muito nessa conversa, mas quase sempre cercados de promessas fáceis e de pouca informação de verdade.</p>
+    <p class="lead">Este material foi feito para o caminho oposto: em vez de promessas, dados. Resumimos, em linguagem simples, um estudo que acompanhou uma carteira real de fundos imobiliários por 10 anos para responder a uma pergunta honesta — essa renda é confiável o suficiente para se viver dela ao longo do tempo, mesmo com a inflação corroendo o poder de compra ano após ano?</p>
+    <div class="callout">
+      <span class="callout-title">O que você vai encontrar</span>
+      <ul>
+        <li><b>O que é um fundo imobiliário</b>, explicado sem jargão.</li>
+        <li><b>O que 10 anos de dados revelaram</b> sobre viver de renda.</li>
+        <li><b>As 3 descobertas</b> que separam quem mantém o poder de compra de quem o perde.</li>
+        <li><b>5 lições práticas</b> para aplicar no seu próprio planejamento.</li>
+      </ul>
+    </div>
+    <p class="lead" style="margin-top:22px;">Este não é um manual de recomendações — é um convite a pensar com clareza sobre o longo prazo. Se, ao final, você quiser entender como tudo isso se aplica ao seu momento, é só conversar com a gente. Afinal, <b style="color:var(--verde-escuro);">não é só sobre investir, é cuidar.</b></p>
+  </div>
+</div>
+
+<!-- INTRODUÇÃO -->
+<div class="page">
+  <div class="content-page">
+    <span class="badge">Conceito</span>
+    <h2>O que é, afinal, um Fundo Imobiliário</h2>
+    <p class="lead">Imagine comprar uma salinha de um shopping ou de um prédio comercial junto com milhares de outras pessoas. Cada uma entra com uma parte do dinheiro, e juntas são donas do imóvel. Todo mês, o aluguel pago pelas lojas e empresas que ocupam esse espaço é dividido entre todos os "sócios", proporcionalmente ao que cada um investiu.</p>
+    <hr class="divider" />
+    <p class="lead">É basicamente isso que é um Fundo de Investimento Imobiliário (FII): um fundo que reúne o dinheiro de várias pessoas para comprar imóveis — shoppings, galpões logísticos, prédios de escritório — e distribui a renda dos aluguéis todo mês, sem você precisar comprar um imóvel inteiro, cuidar de inquilino ou se preocupar com reforma. E, hoje, quem investe como pessoa física não paga Imposto de Renda sobre essa renda mensal.</p>
+    <div class="asset-trio">
+      <div class="asset"><div class="asset-ico"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 17h24v17H8z" stroke="#2b7e7e" stroke-width="2" stroke-linejoin="round"/><path d="M7 17l3-8h20l3 8" stroke="#2b7e7e" stroke-width="2" stroke-linejoin="round"/><rect x="17" y="24" width="6" height="10" fill="#2b7e7e"/></svg></div><span>Shoppings</span></div>
+      <div class="asset"><div class="asset-ico"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 34V17l14-8 14 8v17z" stroke="#2b7e7e" stroke-width="2" stroke-linejoin="round"/><path d="M16 34V25h8v9" stroke="#2b7e7e" stroke-width="2" stroke-linejoin="round"/></svg></div><span>Galpões logísticos</span></div>
+      <div class="asset"><div class="asset-ico"><svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="11" y="6" width="18" height="28" rx="1.5" stroke="#2b7e7e" stroke-width="2"/><path d="M16 13h2M22 13h2M16 19h2M22 19h2M16 25h2M22 25h2" stroke="#2b7e7e" stroke-width="2" stroke-linecap="round"/></svg></div><span>Escritórios</span></div>
+    </div>
+    <p class="lead">Mas a pergunta que muita gente faz é: <b>essa renda é confiável o suficiente para viver dela</b> — hoje, daqui a 10 anos, daqui a 20? Um estudo acompanhou uma carteira real de fundos imobiliários por 10 anos para tentar responder exatamente isso. É esse estudo que resumimos aqui, em linguagem simples.</p>
+  </div>
+  <div class="disclaimer">Material educacional baseado no artigo "O Uso dos Fundos Imobiliários para a Independência Financeira", de Rodrigo Costa Medeiros. Não constitui recomendação de investimento.</div>
+  <div class="page-footer"><span class="footer-logo" role="img" aria-label="Fincare Investimentos"></span><span>01</span></div>
+</div>
+
+<!-- O ESTUDO -->
+<div class="page">
+  <div class="content-page">
+    <span class="badge">O experimento</span>
+    <h2>10 anos, 9 fundos, uma pergunta simples</h2>
+    <p class="lead">Entre dezembro de 2010 e dezembro de 2019, um pesquisador simulou uma carteira com 9 fundos imobiliários diferentes — escolhidos por critérios objetivos, como ter mais de um imóvel, mais de um inquilino e não depender de um único setor da economia.</p>
+    <hr class="divider" />
+    <div class="info-row">
+      <div class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 8v4l3 3M12 22a10 10 0 100-20 10 10 0 000 20z" stroke="#2b7e7e" stroke-width="1.6"/></svg></div>
+      <div class="info-content"><b>A pergunta central</b><p>O dinheiro recebido todo mês em aluguéis foi suficiente, ao longo de uma década, para cobrir o custo de vida de uma pessoa <i>e</i> acompanhar a inflação (medida pelo IPCA, o índice oficial de preços do Brasil)?</p></div>
+    </div>
+    <div class="info-row">
+      <div class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 3v18M4 8h4m-4 4h4m-4 4h4M20 3H12v18h8V3z" stroke="#2b7e7e" stroke-width="1.6"/></svg></div>
+      <div class="info-content"><b>Como foi testado</b><p>O pesquisador comparou três formas de usar a renda recebida: gastar 100% dela, guardar 15% para comprar mais cotas todo mês, ou guardar 30%. Isso mostra o efeito de "reinvestir uma parte" no resultado final.</p></div>
+    </div>
+    <p class="lead" style="margin-top:6px;"><b style="color:var(--verde-escuro);">Por que isso importa:</b> não basta receber renda — é preciso que essa renda não perca valor de compra com o tempo. R$ 1.000 hoje não compram a mesma coisa que R$ 1.000 daqui a 10 anos, por causa da inflação.</p>
+  </div>
+  <div class="page-footer"><span class="footer-logo" role="img" aria-label="Fincare Investimentos"></span><span>02</span></div>
+</div>
+
+<!-- RESULTADO: SÓ RECEBER NÃO BASTA -->
+<div class="page">
+  <div class="content-page">
+    <span class="profile-tag">Descoberta 1 de 3</span>
+    <div class="profile-header">
+      <div class="profile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L2.1 18.04A2 2 0 003.9 21h16.2a2 2 0 001.8-2.96L13.71 3.86a2 2 0 00-3.42 0z" stroke="#c9962a" stroke-width="1.8"/></svg></div>
+      <h2>Só gastar a renda não é suficiente</h2>
+    </div>
+    <p class="lead">Os fundos pagaram todo mês, sem falhar — isso o estudo confirmou. Mas quando toda a renda foi usada para viver, sem guardar nada para comprar mais cotas, o resultado foi negativo: ao final dos 10 anos, faltaram <b>R$ 35.542,83</b> para que o patrimônio tivesse, de fato, acompanhado a inflação do período.</p>
+    <hr class="divider" />
+    <div class="scenario-card">
+      <div class="top"><b>Cenário: gastar 100% da renda</b><span class="result ruim">Não funcionou</span></div>
+      <p>A renda mensal foi regular, mas sem reinvestir nada, o poder de compra da carteira foi corroído aos poucos pela inflação. Na prática, o investidor foi ficando "mais pobre" mesmo recebendo dinheiro todo mês.</p>
+    </div>
+    <p class="lead">Pense assim: se você recebe aluguel, mas nunca reinveste nada dele para comprar mais imóveis (ou mais cotas de fundos), sua "capacidade de gerar renda" fica parada no tempo — enquanto os preços de tudo ao redor sobem.</p>
+  </div>
+  <div class="page-footer"><span class="footer-logo" role="img" aria-label="Fincare Investimentos"></span><span>03</span></div>
+</div>
+
+<!-- RESULTADO: GUARDAR UMA PARTE -->
+<div class="page">
+  <div class="content-page">
+    <span class="profile-tag">Descoberta 2 de 3</span>
+    <div class="profile-header">
+      <div class="profile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2C8 6 6 9 6 13a6 6 0 0012 0c0-4-2-7-6-11z" stroke="#2b7e7e" stroke-width="1.8"/></svg></div>
+      <h2>O segredo está em guardar uma parte</h2>
+    </div>
+    <p class="lead">Quando parte da renda foi reinvestida — ou seja, usada para comprar mais cotas de fundos em vez de ser gasta — o resultado mudou completamente. É como plantar parte da colheita em vez de comer tudo: a "plantação" (a carteira) cresce, e passa a gerar mais renda no mês seguinte.</p>
+    <hr class="divider" />
+    <div class="scenario-card">
+      <div class="top"><b>Reinvestindo 15% da renda</b><span class="result ok">Funcionou</span></div>
+      <p>O patrimônio ficou próximo da inflação ao longo da década, superando-a em metade do período. Ou seja: viável, mas apertado — o mínimo necessário para não perder poder de compra.</p>
+    </div>
+    <div class="scenario-card">
+      <div class="top"><b>Reinvestindo 30% da renda</b><span class="result bom">Funcionou melhor</span></div>
+      <p>O patrimônio superou a inflação em 70% do período, criando uma "gordura" extra que ajudou a atravessar os anos mais difíceis sem perder valor.</p>
+    </div>
+    <p class="lead" style="margin-top:4px;"><b style="color:var(--verde-escuro);">Tradução prática:</b> se você quer viver da renda dos seus investimentos por muitos anos, gastar 100% do que a carteira paga é arriscado. Guardar entre 15% e 30% para reinvestir aumenta muito a chance de a renda durar — e ainda crescer.</p>
+  </div>
+  <div class="page-footer"><span class="footer-logo" role="img" aria-label="Fincare Investimentos"></span><span>04</span></div>
+</div>
+
+<!-- DIVERSIFICAÇÃO -->
+<div class="page">
+  <div class="content-page">
+    <span class="profile-tag">Descoberta 3 de 3</span>
+    <div class="profile-header">
+      <div class="profile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M10 20V4M16 20v-7M22 20v-3" stroke="#2b7e7e" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <h2>Não coloque tudo numa cesta só</h2>
+    </div>
+    <p class="lead">Na carteira estudada, um único fundo chegou a representar 20% de tudo o que estava investido. Esse fundo, em um momento de crise, caiu quase pela metade do valor. Quem estivesse muito concentrado nele teria sofrido um baque forte no patrimônio.</p>
+    <hr class="divider" />
+    <div class="info-row">
+      <div class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L2.1 18.04A2 2 0 003.9 21h16.2a2 2 0 001.8-2.96L13.71 3.86a2 2 0 00-3.42 0z" stroke="#c9962a" stroke-width="1.6"/></svg></div>
+      <div class="info-content"><b>A lição</b><p>Quanto mais concentrado em poucos fundos (ou poucos setores), maior o risco de um evento isolado — a saída de um grande inquilino, um problema num único imóvel — afetar boa parte da sua renda de uma vez.</p></div>
+    </div>
+    <div class="info-row">
+      <div class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#2b7e7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="info-content"><b>A boa notícia</b><p>Em 2010, existiam poucos fundos imobiliários disponíveis para diversificar. Hoje, existem dezenas de opções, cobrindo shoppings, galpões logísticos, escritórios, hospitais, agências bancárias e outros segmentos — o que torna muito mais fácil montar uma carteira diversificada.</p></div>
+    </div>
+    <p class="lead">Comparar um FII a um imóvel comprado sozinho ajuda a entender a vantagem: se você tem um único imóvel alugado e o inquilino sai, sua renda cai a zero até alugar de novo. Numa carteira diversificada de fundos, com centenas de imóveis e milhares de inquilinos por trás, a saída de um único inquilino afeta uma fatia bem menor da sua renda total.</p>
+  </div>
+  <div class="page-footer"><span class="footer-logo" role="img" aria-label="Fincare Investimentos"></span><span>05</span></div>
+</div>
+
+<!-- CICLOS -->
+<div class="page">
+  <div class="content-page">
+    <span class="badge">Contexto importante</span>
+    <h2>O mercado imobiliário anda em ciclos</h2>
+    <p class="lead">Assim como a maré sobe e desce, o mercado de imóveis passa por fases que se repetem ao longo dos anos — geralmente durando de 7 a 8 anos cada ciclo completo:</p>
+    <hr class="divider" />
+    <div class="process-step">
+      <div class="num">1</div>
+      <div class="step-content"><b>Crescimento</b><p>Preços de imóveis e aluguéis sobem, novos empreendimentos surgem.</p></div>
+    </div>
+    <div class="process-step">
+      <div class="num">2</div>
+      <div class="step-content"><b>Desaceleração</b><p>A oferta de imóveis cresce mais que a procura, e os preços param de subir tão rápido.</p></div>
+    </div>
+    <div class="process-step">
+      <div class="num">3</div>
+      <div class="step-content"><b>Retração</b><p>Preços e aluguéis caem, imóveis ficam mais baratos.</p></div>
+    </div>
+    <div class="process-step">
+      <div class="num">4</div>
+      <div class="step-content"><b>Recuperação</b><p>O mercado se reorganiza e se prepara para um novo ciclo de crescimento.</p></div>
+    </div>
+    <p class="lead" style="margin-top:18px;">O estudo teve a sorte de começar em 2010, bem no início de uma fase de crescimento — o que ajudou os resultados dos primeiros anos. Ninguém consegue escolher com certeza em que fase do ciclo está entrando ao investir. Por isso, pensar em longo prazo e manter os pés no chão sobre os altos e baixos do caminho é parte do jogo — e não um sinal de que algo deu errado.</p>
+  </div>
+  <div class="page-footer"><span class="footer-logo" role="img" aria-label="Fincare Investimentos"></span><span>06</span></div>
+</div>
+
+<!-- RESUMO PRÁTICO -->
+<div class="page">
+  <div class="content-page">
+    <span class="badge">Resumo prático</span>
+    <h2>5 lições para levar com você</h2>
+    <hr class="divider" />
+    <div class="mini-card-grid">
+      <div class="mini-card"><b>1. A renda é confiável</b><p>Os fundos pagaram todo mês, de forma consistente, ao longo dos 10 anos estudados.</p></div>
+      <div class="mini-card"><b>2. Mas gastar tudo é arriscado</b><p>Sem reinvestir nada, a renda perde poder de compra com o tempo, por causa da inflação.</p></div>
+      <div class="mini-card"><b>3. Guarde uma fatia</b><p>Reinvestir entre 15% e 30% da renda recebida foi o que fez a diferença entre perder e ganhar poder de compra.</p></div>
+      <div class="mini-card"><b>4. Diversifique de verdade</b><p>Espalhar entre vários fundos e setores reduz o impacto de um problema isolado na sua renda.</p></div>
+    </div>
+    <div class="mini-card" style="margin-top:14px;"><b>5. Ajuste sua régua de gastos</b><p>Uma forma prática de aplicar isso no dia a dia: ao planejar viver da sua carteira, considere gastar entre 70% e 85% da renda do primeiro ano, guardando o restante para reinvestir. Esse hábito cria a folga necessária para a renda acompanhar a inflação nos anos seguintes.</p></div>
+    <p class="lead" style="margin-top:20px;">Nenhum investimento é garantia de resultado — inclusive fundos imobiliários envolvem riscos, oscilam de preço e podem passar por períodos de queda. O que o estudo mostra é que, com reinvestimento constante e diversificação, essa classe de investimento tem potencial para sustentar uma renda de longo prazo. A melhor forma de saber se ela faz sentido para o seu momento é conversar com quem entende do seu contexto completo.</p>
+  </div>
+  <div class="disclaimer">Este material tem caráter educacional e não constitui oferta, recomendação de investimento específica ou garantia de rentabilidade. Fundos imobiliários envolvem riscos, inclusive de perda de capital. Rentabilidade passada não garante resultados futuros.</div>
+  <div class="page-footer"><span class="footer-logo" role="img" aria-label="Fincare Investimentos"></span><span>07</span></div>
+</div>
+
+<!-- INSTITUCIONAL: QUEM SOMOS -->
+<div class="page">
+  <div class="content-page">
+    <span class="badge">Sobre a Fincare</span>
+    <h2>Somos a Fincare Investimentos</h2>
+    <p class="lead">Assessoria de investimentos e banking para você, sua família e o seu negócio. Trazemos experiência e visão abrangente sobre o seu patrimônio para que você tenha a segurança das melhores escolhas em produtos financeiros voltados ao seu propósito e visão de futuro — estejam eles no curto, médio ou longo prazo.</p>
+    <div class="mini-card-grid">
+      <div class="mini-card">
+        <b>Missão</b>
+        <p>Cuidar da vida financeira e patrimonial de nossos clientes, apresentando soluções alinhadas com seu momento de vida e objetivos, a fim de proporcionar liberdade, tranquilidade, segurança financeira, rentabilidade e continuidade do patrimônio.</p>
+      </div>
+      <div class="mini-card">
+        <b>Visão</b>
+        <p>Ser referência em cuidar dos investimentos e do patrimônio dos nossos clientes.</p>
+      </div>
+    </div>
+    <p class="lead" style="margin-top:22px;">Um time formado por profissionais que entendem de investimentos e planejamento patrimonial, com foco em resultado e comprometimento — guiado por respeito, ética, transparência e responsabilidade em cada decisão.</p>
+  </div>
+  <div class="disclaimer">Este material tem caráter educacional e não constitui oferta, recomendação de investimento específica ou garantia de rentabilidade.</div>
+  <div class="page-footer"><span class="footer-logo" role="img" aria-label="Fincare Investimentos"></span><span>08</span></div>
+</div>
+
+<!-- INSTITUCIONAL: COMO FAZEMOS -->
+<div class="page">
+  <div class="content-page">
+    <span class="badge">Como fazemos</span>
+    <h2>Uma jornada, não uma venda única</h2>
+    <p class="lead">Cuidar é ser completo: atendimento e soluções personalizadas a você, sua família e sua empresa, com foco no momento atual e nos objetivos almejados.</p>
+    <hr class="divider" />
+    <div class="process-step">
+      <div class="num">1</div>
+      <div class="step-content"><b>Escuta</b><p>Entendendo o momento de vida, conquistas almejadas, projetos e perfil.</p></div>
+    </div>
+    <div class="process-step">
+      <div class="num">2</div>
+      <div class="step-content"><b>Estudo e Diagnóstico</b><p>Avaliação e análise macroeconômica. O momento atual e a melhor estratégia e solução para alcançar seus objetivos pessoais e/ou empresariais.</p></div>
+    </div>
+    <div class="process-step">
+      <div class="num">3</div>
+      <div class="step-content"><b>Iniciando a Jornada</b><p>Apresentação das melhores soluções e oportunidades, acesso a portfólio de produtos e plano de ação detalhado e dirigido aos objetivos almejados.</p></div>
+    </div>
+    <div class="process-step">
+      <div class="num">4</div>
+      <div class="step-content"><b>Proximidade e Cuidado</b><p>Acompanhamento da evolução patrimonial, do mercado e das oportunidades disponíveis. Revisões e ajustes constantes, sempre com vistas na conquista do objetivo final.</p></div>
+    </div>
+    <p class="lead" style="margin-top:22px; font-style:italic; color:var(--verde-medio); font-weight:600;">Fincare, não é só sobre investir, é cuidar!</p>
+  </div>
+  <div class="disclaimer">Este material tem caráter educacional e não constitui oferta, recomendação de investimento específica ou garantia de rentabilidade.</div>
+  <div class="page-footer"><span class="footer-logo" role="img" aria-label="Fincare Investimentos"></span><span>09</span></div>
+</div>
+
+<!-- CONTRACAPA -->
+<div class="page dark back-page">
+  <div class="back">
+    <div class="brand-logo brand-logo--back" role="img" aria-label="Fincare"></div>
+    <div class="slogan">"Estamos à disposição para contribuir no alcance dos seus sonhos e objetivos."</div>
+    <div class="contact">
+      <div><b>Telefone:</b> +55 11 4230.0912</div>
+      <div><b>Campinas:</b> Rua Maria Monteiro, 830, Sala 64 - Cambui | SP</div>
+      <div><b>Jundiaí:</b> Rua Barão de Teffé, 1000, Sala 42 - Jardim Ana Maria | SP</div>
+      <div style="margin-top:10px;"><b>Site:</b> fincareinvestimentos.com.br</div>
+    </div>
+    <div class="slogan" style="margin-top:40px;">"Não é só sobre investir, é cuidar."</div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -434,6 +434,16 @@ export default function Simulator() {
               title="Para começar, quanto você já possui investido hoje?"
               sub="Considere o total investido em renda fixa, renda variável, fundos e previdência — sem incluir imóveis de uso próprio."
             >
+              <div className="bonus-banner">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M20 12v9H4v-9M2 7h20v5H2V7zM12 22V7M12 7c-1.5-3-6-3-6 0 1.5 1 6 0 6 0zm0 0c1.5-3 6-3 6 0-1.5 1-6 0-6 0z" stroke="var(--verde-medio)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <div className="bonus-text">
+                  <b>Bônus ao final da simulação</b>
+                  Você recebe de graça, por e-mail, o guia "Como usar Fundos
+                  Imobiliários para construir renda passiva".
+                </div>
+              </div>
               <MoneyInput
                 label="Patrimônio investido atualmente"
                 value={values.patrimonio}
