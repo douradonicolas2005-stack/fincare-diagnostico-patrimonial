@@ -99,6 +99,7 @@ export default function Simulator() {
   const [calc, setCalc] = useState<Calculation | null>(null)
   const [manual, setManual] = useState(initialManual)
   const [utm, setUtm] = useState(emptyUtm)
+  const [ref, setRef] = useState("")
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState(false)
   const [consent, setConsent] = useState(false)
@@ -107,6 +108,9 @@ export default function Simulator() {
 
   useEffect(() => {
     setUtm(readUtmParams())
+    // ?ref= = quem indicou (canal de indicação rastreável). Capturado no mount
+    // junto do UTM; entra só no lead (não no evento de funil).
+    setRef(new URLSearchParams(window.location.search).get("ref") || "")
   }, [])
 
   // Funil de etapas do simulador (Vercel Analytics + aba "Funil" no Sheets).
@@ -212,6 +216,7 @@ export default function Simulator() {
       ),
       data: new Date().toISOString(),
       origem_lead: "calculadora-fincare-instagram",
+      ref: ref || undefined,
       ...emptyUtm,
       ...utm
     })

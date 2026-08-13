@@ -375,3 +375,43 @@ select {
     transform: translateY(0);
   }
 }
+
+/* Botão interno (uso do assessor) para gerar o card de WhatsApp a partir do
+   resultado. Visível e claramente clicável, mas com estilo distinto do CTA
+   dourado do prospect (contorno, não preenchido em dourado). */
+.internal-card-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin: 18px auto 8px;
+  padding: 14px 18px;
+  border: 1.5px solid var(--verde-medio);
+  border-radius: 12px;
+  background: var(--verde-claro-bg);
+  color: var(--verde-escuro);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.internal-card-link:hover {
+  background: var(--verde-medio);
+  color: #fff;
+}
+.internal-card-link-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--verde-medio);
+  color: #fff;
+}
+.internal-card-link:hover .internal-card-link-tag {
+  background: #fff;
+  color: var(--verde-medio);
+}

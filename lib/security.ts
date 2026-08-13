@@ -57,6 +57,7 @@ export const leadSchema = z.object({
   diagnostico_avancado_alocacao_por_classe: z.string().max(3000).optional(),
   data: z.string().datetime(),
   origem_lead: z.string().max(80),
+  ref: z.string().trim().max(120).optional(),
   utm_campaign: z.string().max(150),
   utm_source: z.string().max(150),
   utm_medium: z.string().max(150),

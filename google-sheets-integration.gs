@@ -67,7 +67,8 @@ var COLS = {
   estado: 31,
   consentimento_contato: 32,
   consentimento_data_hora: 33,
-  diagnostico_completo: 34
+  diagnostico_completo: 34,
+  ref: 35
 }
 
 var HEADERS = [
@@ -104,7 +105,8 @@ var HEADERS = [
   "estado",
   "consentimento_contato",
   "consentimento_data_hora",
-  "diagnostico_completo"
+  "diagnostico_completo",
+  "ref"
 ]
 
 // ================================================================
@@ -177,9 +179,12 @@ var FORMATO_SCORE = "0" + ASPAS + "%" + ASPAS
 var FORMATO_AVG_ANOS = "0.0" + ASPAS + " anos" + ASPAS
 var FORMATO_IDADE = "0" + ASPAS + " anos" + ASPAS
 
-// Colunas auxiliares calculadas, logo depois da ultima coluna de dados (AH).
-var COL_DATA_REAL = COLS.diagnostico_completo + 1 // 35 = AI
-var COL_LEAD_VALIDO = COLS.diagnostico_completo + 2 // 36 = AJ
+// Colunas auxiliares calculadas, logo depois da ultima coluna de dados.
+// Relativas a HEADERS.length (nao a uma coluna fixa) para acompanharem
+// automaticamente qualquer coluna nova adicionada ao fim - ex.: "ref"
+// (AI=35) empurrou data_real/lead_valido para AJ/AK sem colisao.
+var COL_DATA_REAL = HEADERS.length + 1
+var COL_LEAD_VALIDO = HEADERS.length + 2
 
 var PALETA_CARDS = [
   "#2A9D8F",
@@ -1940,7 +1945,7 @@ function construirComoUsar_(ss) {
   var linhas = [
     [
       "Como o webhook alimenta",
-      "O simulador do site grava um lead novo por linha na aba Leads, sempre nas colunas A ate AH (34 colunas), incluindo AD (perfil_investidor), AE (estado), AF (consentimento_contato), AG (consentimento_data_hora) e AH (diagnostico_completo). O script nunca escreve nas colunas AI (data_real) e AJ (lead_valido) - essas sao calculadas automaticamente pela planilha."
+      "O simulador do site grava um lead novo por linha na aba Leads, sempre nas colunas A ate AI (35 colunas), incluindo AD (perfil_investidor), AE (estado), AF (consentimento_contato), AG (consentimento_data_hora), AH (diagnostico_completo) e AI (ref, quem indicou via ?ref= na URL). O script nunca escreve nas colunas AJ (data_real) e AK (lead_valido) - essas sao calculadas automaticamente pela planilha."
     ],
     [
       "Perfil de investidor (coluna AD)",
@@ -1959,8 +1964,8 @@ function construirComoUsar_(ss) {
       '"nao" = lead parcial: a pessoa autorizou contato e preencheu os dados basicos mas fechou a pagina antes de ver o resultado (score/perfil ainda nao existem para essa linha). "sim" = lead completo: chegou ate o final e recebeu o diagnostico por e-mail. Quem completa aparece duas vezes na aba (uma linha parcial e uma completa) - use esta coluna pra filtrar quem vale a pena reimpactar por nao ter terminado.'
     ],
     [
-      "Colunas auxiliares (AI e AJ)",
-      "AI (data_real) converte o texto de data/hora da coluna A numa data de verdade, formatada dd/mm/aaaa. AJ (lead_valido) marca 1 quando o lead tem e-mail preenchido (coluna D), vazio quando nao tem. Sao formulas ARRAYFORMULA unicas na linha 2 que se expandem sozinhas conforme novas linhas chegam."
+      "Colunas auxiliares (AJ e AK)",
+      "AJ (data_real) converte o texto de data/hora da coluna A numa data de verdade, formatada dd/mm/aaaa. AK (lead_valido) marca 1 quando o lead tem e-mail preenchido (coluna D), vazio quando nao tem. Sao formulas ARRAYFORMULA unicas na linha 2 que se expandem sozinhas conforme novas linhas chegam."
     ],
     [
       "O que e lead valido",
