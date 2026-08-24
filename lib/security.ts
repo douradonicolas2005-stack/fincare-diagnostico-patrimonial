@@ -46,6 +46,9 @@ export const leadSchema = z.object({
     .nullable()
     .optional(),
   score_patrimonial: z.number().min(0).max(100).optional(),
+  taxa_atual: z.number().min(0).max(1).optional(),
+  fit_score: z.number().min(0).max(100).optional(),
+  fit_tier: z.enum(["A", "B", "C"]).optional(),
   perfil_investidor: z.string().max(40).optional(),
   perfil_investidor_descricao: z.string().max(500).optional(),
   perfil_investidor_alocacao: z.string().max(2000).optional(),

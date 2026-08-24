@@ -1,4 +1,5 @@
 import { leadSchema } from "@/lib/security"
+import { computeFit } from "@/lib/fit"
 import { forwardLead } from "@/lib/server/integrations"
 import { clientIp, readJson, RequestSizeError } from "@/lib/server/http"
 import { enviarEventoLeadMetaCapi } from "@/lib/server/meta-capi"
@@ -15,7 +16,8 @@ export async function POST(request: NextRequest) {
     const parsed = leadSchema.safeParse(body)
     if (!parsed.success || parsed.data.honeypot) return NextResponse.json({ ok: false, error: "dados inválidos" }, { status: 400 })
     if (!rateLimit(`email:${parsed.data.email.toLowerCase()}`)) return NextResponse.json({ ok: false, error: "limite de envios atingido" }, { status: 429 })
-    const ok = await forwardLead(parsed.data)
+    const enriched = { ...parsed.data, ...computeFit(parsed.data) }
+    const ok = await forwardLead(enriched)
     const metaEventId = typeof body.meta_event_id === "string" ? body.meta_event_id : undefined
     if (ok && metaEventId) {
       await enviarEventoLeadMetaCapi({

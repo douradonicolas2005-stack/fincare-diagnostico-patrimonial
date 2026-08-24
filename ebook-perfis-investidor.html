@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>Guia dos Perfis de Investidor | Fincare Investimentos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde-escuro: #003b49; --verde-medio: #2b7e7e; --verde-claro: #9fc4c7;
+    --verde-claro-bg: #eaf2f1; --text: #0b2a32; --text-muted: #5c7278;
+    --line: #d9e4e4; --font-display: "Fraunces", serif; --font-body: "Manrope", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #ccdada; font-family: var(--font-body); color: var(--text); }
+  .page {
+    max-width: 680px; margin: 24px auto; background: #fff; border-radius: 4px;
+    box-shadow: 0 8px 30px rgba(0,59,73,.18); overflow: hidden; min-height: 480px;
+  }
+  .page.dark { background: var(--verde-escuro); color: #f4f9fc; }
+  @media print {
+    body { background: #fff; }
+    .page { box-shadow: none; margin: 0; max-width: none; page-break-after: always; border-radius: 0; }
+  }
+
+  /* capa / contracapa */
+  .cover { text-align: center; padding: 90px 50px; }
+  .cover .logo-mark { font-family: var(--font-display); font-size: 28px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 26px; }
+  .cover .kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--verde-claro); margin-bottom: 18px; }
+  .cover h1 { font-family: var(--font-display); font-size: 34px; font-weight: 600; line-height: 1.25; margin: 0 0 14px; }
+  .cover p.sub { color: #cfe4e3; font-size: 14.5px; max-width: 40ch; margin: 0 auto; line-height: 1.6; }
+  .cover .slogan { margin-top: 60px; font-style: italic; color: var(--verde-claro); font-size: 13px; }
+
+  .back { padding: 70px 50px; }
+  .back .slogan { font-style: italic; color: var(--verde-claro); font-size: 14px; max-width: 34ch; line-height: 1.5; margin-bottom: 40px; }
+  .back .contact { font-size: 13px; line-height: 2; color: #eaf2f1; }
+  .back .contact b { color: #fff; }
+
+  /* miolo */
+  .content-page { padding: 44px 48px; }
+  .badge { display: inline-block; background: var(--verde-claro-bg); color: var(--verde-medio); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; padding: 4px 12px; border-radius: 20px; font-weight: 700; margin-bottom: 14px; }
+  .content-page h2 { font-family: var(--font-display); font-size: 24px; color: var(--verde-escuro); margin: 0 0 10px; }
+  .content-page p.lead { font-size: 14px; color: var(--text-muted); line-height: 1.65; max-width: 52ch; }
+  .divider { border: none; border-top: 2px solid var(--verde-medio); width: 40px; margin: 20px 0 26px; }
+
+  .profile-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .profile-icon { flex-shrink: 0; width: 52px; height: 52px; border-radius: 50%; background: var(--verde-claro-bg); display: flex; align-items: center; justify-content: center; }
+  .profile-header h2 { margin: 0; }
+  .profile-tag { font-family: var(--font-mono); font-size: 11px; color: var(--verde-medio); text-transform: uppercase; letter-spacing: .05em; }
+
+  .info-row { display: flex; gap: 14px; margin-bottom: 20px; }
+  .info-row .icon { flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--verde-claro-bg); display: flex; align-items: center; justify-content: center; }
+  .info-row .info-content b { display: block; font-size: 14px; color: var(--verde-escuro); margin-bottom: 3px; }
+  .info-row .info-content p { margin: 0; font-size: 13px; color: var(--text); line-height: 1.55; }
+
+  .alloc-title { font-size: 12.5px; font-weight: 700; color: var(--verde-escuro); margin: 22px 0 10px; text-transform: uppercase; letter-spacing: .04em; }
+  .alloc-bar-wrap { display: flex; height: 26px; border-radius: 6px; overflow: hidden; margin-bottom: 12px; }
+  .alloc-legend { display: flex; flex-wrap: wrap; gap: 10px 18px; }
+  .alloc-legend .item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text); }
+  .alloc-legend .sw { width: 9px; height: 9px; border-radius: 2px; }
+
+  .page-footer { display: flex; justify-content: space-between; padding: 14px 48px; border-top: 1px solid var(--line); font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+  .disclaimer { font-size: 10px; color: #9aabab; line-height: 1.5; padding: 0 48px 24px; }
+
+  .mini-card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 22px; }
+  .mini-card { background: var(--verde-claro-bg); border-radius: 10px; padding: 16px; }
+  .mini-card b { display: block; font-size: 12.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--verde-medio); margin-bottom: 6px; }
+  .mini-card p { margin: 0; font-size: 12.5px; color: var(--text); line-height: 1.5; }
+
+  .process-step { display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--line); }
+  .process-step:last-of-type { border-bottom: none; }
+  .process-step .num { flex-shrink: 0; font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--verde-claro); width: 36px; }
+  .process-step .step-content b { display: block; font-size: 14px; color: var(--verde-escuro); margin-bottom: 3px; }
+  .process-step .step-content p { margin: 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.55; }
+</style>
+</head>
+<body>
+
+<!-- CAPA -->
+<div class="page dark">
+  <div class="cover">
+    <div class="logo-mark">fincare</div>
+    <span class="kicker">Fincare Investimentos</span>
+    <h1>Guia dos Perfis de Investidor</h1>
+    <p class="sub">Entenda o que está por trás do seu perfil — e o que fazer com essa informação a partir de agora.</p>
+    <div class="slogan">"Não é só sobre investir, é cuidar."</div>
+  </div>
+</div>
+
+<!-- INTRODUÇÃO -->
+<div class="page">
+  <div class="content-page">
+    <span class="badge">Introdução</span>
+    <h2>Por que seu perfil de investidor importa</h2>
+    <p class="lead">Perfil de investidor não é um rótulo definitivo — é uma bússola. A própria regulação do mercado brasileiro (Resolução CVM nº 30/2021) exige que toda recomendação de investimento leve em conta três fatores: sua tolerância a oscilações, sua capacidade financeira de assumir risco, e seu conhecimento e experiência como investidor. É exatamente esse tripé que o seu diagnóstico usou para calcular o perfil que você recebeu.</p>
+    <hr class="divider" />
+    <p class="lead">O problema não é ter um perfil conservador, moderado ou dinâmico — é não saber qual é o seu, e por isso manter uma carteira desalinhada com quem você é hoje. Nas próximas páginas, você encontra o seu perfil, o que ele significa na prática, o erro mais comum de quem tem esse mesmo perfil (com base em finanças comportamentais), e um próximo passo concreto.</p>
+  </div>
+  <div class="disclaimer">Classificação estimada com base em capacidade financeira, tolerância a oscilações e conhecimento/experiência declarados na simulação. O enquadramento oficial do seu perfil deve ser validado com um assessor da Fincare Investimentos.</div>
+</div>
+
+<!-- PERFIL: ULTRACONSERVADOR -->
+<div class="page">
+  <div class="content-page">
+    <span class="profile-tag">Perfil 1 de 4</span>
+    <div class="profile-header">
+      <div class="profile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" stroke="#2b7e7e" stroke-width="1.8"/></svg></div>
+      <h2>Ultraconservador</h2>
+    </div>
+    <p class="lead">Baixíssima tolerância a oscilações. Prioriza estabilidade e previsibilidade, com carteira concentrada em Renda Fixa.</p>
+    <hr class="divider" />
+    <div class="info-row">
+      <div class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L2.1 18.04A2 2 0 003.9 21h16.2a2 2 0 001.8-2.96L13.71 3.86a2 2 0 00-3.42 0z" stroke="#c9962a" stroke-width="1.6"/></svg></div>
+      <div class="info-content"><b>Erro comum desse perfil</b><p>A <i>aversão à perda</i> — vieses comportamentais bem documentados mostram que a dor de perder pesa cerca do dobro do prazer de ganhar — leva a buscar "segurança" concentrando tudo num único banco ou produto, por comodismo. Dentro da Renda Fixa também existe risco de crédito: cada instituição tem cobertura do FGC limitada a R$ 250 mil por CPF.</p></div>
+    </div>
+    <div class="info-row">
+      <div class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#2b7e7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="info-content"><b>Próximo passo sugerido</b><p>Diversificar entre emissores e produtos diferentes dentro da própria Renda Fixa (Tesouro Direto, CDBs de bancos distintos, LCI/LCA), em vez de concentrar tudo numa única instituição — mantendo o mesmo perfil de segurança, com menos risco de crédito.</p></div>
+    </div>
+    <div class="alloc-title">Alocação recomendada de referência</div>
+    <div class="alloc-bar-wrap"><div style="width:100%;background:#003B49"></div></div>
+    <div class="alloc-legend"><span class="item"><span class="sw" style="background:#003B49"></span>Renda Fixa — 100%</span></div>
+  </div>
+  <div class="page-footer"><span>Fincare Investimentos</span><span>01</span></div>
+</div>
+
+<!-- PERFIL: CONSERVADOR -->
+<div class="page">
+  <div class="content-page">
+    <span class="profile-tag">Perfil 2 de 4</span>
+    <div class="profile-header">
+      <div class="profile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M10 20V4M16 20v-7M22 20v-3" stroke="#2b7e7e" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+      <h2>Conservador</h2>
+    </div>
+    <p class="lead">Baixa aceitação a oscilações, com espaço para diversificar além da Renda Fixa, somando Multimercado, Renda Variável Local e ativos internacionais.</p>
+    <hr class="divider" />
+    <div class="info-row">
+      <div class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L2.1 18.04A2 2 0 003.9 21h16.2a2 2 0 001.8-2.96L13.71 3.86a2 2 0 00-3.42 0z" stroke="#c9962a" stroke-width="1.6"/></svg></div>
+      <div class="info-content"><b>Erro comum desse perfil</b><p>Diversificar "de nome": acumular vários fundos de Renda Fixa ou Multimercado parecidos entre si, achando que tem uma carteira diversificada — quando, na prática, todos reagem aos mesmos fatores de risco (juros, crédito).</p></div>
+    </div>
+    <div class="info-row">
+      <div class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#2b7e7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="info-content"><b>Próximo passo sugerido</b><p>Verificar se a fatia em Multimercado, Renda Variável Local e Internacional realmente reage de forma diferente da Renda Fixa em cenários de mercado distintos — diversificação de verdade é sobre fontes de risco diferentes, não número de produtos.</p></div>
+    </div>
+    <div class="alloc-title">Alocação recomendada de referência</div>
+    <div class="alloc-bar-wrap">
+      <div style="width:77%;background:#003B49"></div><div style="width:8%;background:#2B7E7E"></div><div style="width:5%;background:#4a9494"></div><div style="width:6%;background:#9FC4C7"></div><div style="width:4%;background:#5C7278"></div>
+    </div>
+    <div class="alloc-legend">
+      <span class="item"><span class="sw" style="background:#003B49"></span>Renda Fixa — 77%</span>
+      <span class="item"><span class="sw" style="background:#2B7E7E"></span>Multimercado — 8%</span>
+      <span class="item"><span class="sw" style="background:#4a9494"></span>Renda Variável Local — 5%</span>
+      <span class="item"><span class="sw" style="background:#9FC4C7"></span>Internacional — 6%</span>
+      <span class="item"><span class="sw" style="background:#5C7278"></span>Alternativos — 4%</span>
+    </div>
+  </div>
+  <div class="page-footer"><span>Fincare Investimentos</span><span>02</span></div>
+</div>
+
+<!-- PERFIL: MODERADO -->
+<div class="page">
+  <div class="content-page">
+    <span class="profile-tag">Perfil 3 de 4</span>
+    <div class="profile-header">
+      <div class="profile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 17l6-6 4 4 8-8M21 7v6h-6" stroke="#2b7e7e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h2>Moderado</h2>
+    </div>
+    <p class="lead">Aceita oscilações em prol de maior potencial de retorno. Fundos Multimercado ganham peso relevante, com visão de longo prazo.</p>
+    <hr class="divider" />
+    <div class="info-row">
+      <div class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L2.1 18.04A2 2 0 003.9 21h16.2a2 2 0 001.8-2.96L13.71 3.86a2 2 0 00-3.42 0z" stroke="#c9962a" stroke-width="1.6"/></svg></div>
+      <div class="info-content"><b>Erro comum desse perfil</b><p>A <i>contabilidade mental</i> — tratar cada investimento como uma "caixinha" separada, sem uma tese unificada. Confundir "moderado" com "um pouco de tudo" costuma vir daí: pulverizar em vários produtos parecidos em vez de diversificar com propósito.</p></div>
+    </div>
+    <div class="info-row">
+      <div class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#2b7e7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="info-content"><b>Próximo passo sugerido</b><p>Definir metas claras por classe de ativo — por exemplo, quanto da fatia em Multimercado busca descorrelação, e quanto em Internacional busca proteção cambial — em vez de diversificar só por diversificar.</p></div>
+    </div>
+    <div class="alloc-title">Alocação recomendada de referência</div>
+    <div class="alloc-bar-wrap">
+      <div style="width:54%;background:#003B49"></div><div style="width:16%;background:#2B7E7E"></div><div style="width:10%;background:#4a9494"></div><div style="width:13%;background:#9FC4C7"></div><div style="width:7%;background:#5C7278"></div>
+    </div>
+    <div class="alloc-legend">
+      <span class="item"><span class="sw" style="background:#003B49"></span>Renda Fixa — 54%</span>
+      <span class="item"><span class="sw" style="background:#2B7E7E"></span>Multimercado — 16%</span>
+      <span class="item"><span class="sw" style="background:#4a9494"></span>Renda Variável Local — 10%</span>
+      <span class="item"><span class="sw" style="background:#9FC4C7"></span>Internacional — 13%</span>
+      <span class="item"><span class="sw" style="background:#5C7278"></span>Alternativos — 7%</span>
+    </div>
+  </div>
+  <div class="page-footer"><span>Fincare Investimentos</span><span>03</span></div>
+</div>
+
+<!-- PERFIL: DINÂMICO -->
+<div class="page">
+  <div class="content-page">
+    <span class="profile-tag">Perfil 4 de 4</span>
+    <div class="profile-header">
+      <div class="profile-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 17l6-8 4 5 8-11" stroke="#2b7e7e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h2>Dinâmico</h2>
+    </div>
+    <p class="lead">Aceita oscilações significativas em busca de maiores retornos, com maior exposição a Renda Variável, Fundos Imobiliários e Internacional. Foco em longo prazo.</p>
+    <hr class="divider" />
+    <div class="info-row">
+      <div class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01M10.29 3.86L2.1 18.04A2 2 0 003.9 21h16.2a2 2 0 001.8-2.96L13.71 3.86a2 2 0 00-3.42 0z" stroke="#c9962a" stroke-width="1.6"/></svg></div>
+      <div class="info-content"><b>Erro comum desse perfil</b><p><i>Efeito manada</i> e <i>viés de confirmação</i>: perseguir o ativo "da moda" porque todo mundo está comprando, e depois só buscar notícias que confirmem que a escolha foi certa, ignorando sinais de risco. Por aceitar mais oscilação, o perfil dinâmico é o mais exposto a entrar no topo e vender no fundo por impulso.</p></div>
+    </div>
+    <div class="info-row">
+      <div class="icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#2b7e7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="info-content"><b>Próximo passo sugerido</b><p>Definir critérios de entrada e saída antes de investir — não durante a euforia ou o pânico do mercado — e manter reserva de liquidez suficiente pra nunca precisar vender ativos de risco no pior momento por necessidade de caixa.</p></div>
+    </div>
+    <div class="alloc-title">Alocação recomendada de referência</div>
+    <div class="alloc-bar-wrap">
+      <div style="width:36%;background:#003B49"></div><div style="width:16%;background:#2B7E7E"></div><div style="width:17%;background:#4a9494"></div><div style="width:21%;background:#9FC4C7"></div><div style="width:10%;background:#5C7278"></div>
+    </div>
+    <div class="alloc-legend">
+      <span class="item"><span class="sw" style="background:#003B49"></span>Renda Fixa — 36%</span>
+      <span class="item"><span class="sw" style="background:#2B7E7E"></span>Multimercado — 16%</span>
+      <span class="item"><span class="sw" style="background:#4a9494"></span>Renda Variável Local — 17%</span>
+      <span class="item"><span class="sw" style="background:#9FC4C7"></span>Internacional — 21%</span>
+      <span class="item"><span class="sw" style="background:#5C7278"></span>Alternativos — 10%</span>
+    </div>
+  </div>
+  <div class="page-footer"><span>Fincare Investimentos</span><span>04</span></div>
+</div>
+
+<!-- INSTITUCIONAL: QUEM SOMOS -->
+<div class="page">
+  <div class="content-page">
+    <span class="badge">Sobre a Fincare</span>
+    <h2>Somos a Fincare Investimentos</h2>
+    <p class="lead">Assessoria de investimentos e banking para você, sua família e o seu negócio. Trazemos experiência e visão abrangente sobre o seu patrimônio para que você tenha a segurança das melhores escolhas em produtos financeiros voltados ao seu propósito e visão de futuro — estejam eles no curto, médio ou longo prazo.</p>
+    <div class="mini-card-grid">
+      <div class="mini-card">
+        <b>Missão</b>
+        <p>Cuidar da vida financeira e patrimonial de nossos clientes, apresentando soluções alinhadas com seu momento de vida e objetivos, a fim de proporcionar liberdade, tranquilidade, segurança financeira, rentabilidade e continuidade do patrimônio.</p>
+      </div>
+      <div class="mini-card">
+        <b>Visão</b>
+        <p>Ser referência em cuidar dos investimentos e do patrimônio dos nossos clientes.</p>
+      </div>
+    </div>
+    <p class="lead" style="margin-top:22px;">Um time formado por profissionais que entendem de investimentos e planejamento patrimonial, com foco em resultado e comprometimento — guiado por respeito, ética, transparência e responsabilidade em cada decisão.</p>
+  </div>
+  <div class="disclaimer">Este material tem caráter educacional e não constitui oferta, recomendação de investimento específica ou garantia de rentabilidade.</div>
+</div>
+
+<!-- INSTITUCIONAL: COMO FAZEMOS -->
+<div class="page">
+  <div class="content-page">
+    <span class="badge">Como fazemos</span>
+    <h2>Uma jornada, não uma venda única</h2>
+    <p class="lead">Cuidar é ser completo: atendimento e soluções personalizadas a você, sua família e sua empresa, com foco no momento atual e nos objetivos almejados.</p>
+    <hr class="divider" />
+    <div class="process-step">
+      <div class="num">1</div>
+      <div class="step-content"><b>Escuta</b><p>Entendendo o momento de vida, conquistas almejadas, projetos e perfil.</p></div>
+    </div>
+    <div class="process-step">
+      <div class="num">2</div>
+      <div class="step-content"><b>Estudo e Diagnóstico</b><p>Avaliação e análise macroeconômica. O momento atual e a melhor estratégia e solução para alcançar seus objetivos pessoais e/ou empresariais.</p></div>
+    </div>
+    <div class="process-step">
+      <div class="num">3</div>
+      <div class="step-content"><b>Iniciando a Jornada</b><p>Apresentação das melhores soluções e oportunidades, acesso a portfólio de produtos e plano de ação detalhado e dirigido aos objetivos almejados.</p></div>
+    </div>
+    <div class="process-step">
+      <div class="num">4</div>
+      <div class="step-content"><b>Proximidade e Cuidado</b><p>Acompanhamento da evolução patrimonial, do mercado e das oportunidades disponíveis. Revisões e ajustes constantes, sempre com vistas na conquista do objetivo final.</p></div>
+    </div>
+    <p class="lead" style="margin-top:22px; font-style:italic; color:var(--verde-medio); font-weight:600;">Fincare, não é só sobre investir, é cuidar!</p>
+  </div>
+  <div class="disclaimer">Este material tem caráter educacional e não constitui oferta, recomendação de investimento específica ou garantia de rentabilidade.</div>
+</div>
+
+<!-- CONTRACAPA -->
+<div class="page dark">
+  <div class="back">
+    <div class="slogan">"Estamos à disposição para contribuir no alcance dos seus sonhos e objetivos."</div>
+    <div class="contact">
+      <div><b>Telefone:</b> +55 11 4230.0912</div>
+      <div><b>Campinas:</b> Rua Maria Monteiro, 830, Sala 64 - Cambui | SP</div>
+      <div><b>Jundiaí:</b> Rua Barão de Teffé, 1000, Sala 42 - Jardim Ana Maria | SP</div>
+      <div style="margin-top:10px;"><b>Site:</b> fincareinvestimentos.com.br</div>
+    </div>
+    <div class="slogan" style="margin-top:40px;">"Não é só sobre investir, é cuidar."</div>
+  </div>
+</div>
+
+</body>
+</html>

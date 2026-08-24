@@ -2,12 +2,14 @@
 
 import { sendFunnelEvent, sendLead } from "@/lib/api"
 import { allocationFromCategories, calculate } from "@/lib/calculator"
+import { feeBandPorLabel } from "@/lib/fees"
 import { trackAnalyticsEvent } from "@/lib/analytics"
 import { trackMetaPixelEvent } from "@/lib/meta-pixel"
 import { isValidPhoneBR, leadSchema, type FunnelPayload, type LeadPayload } from "@/lib/security"
-import type { AdvancedState, Calculation, Lead, Step } from "@/lib/types"
+import type { AdvancedState, Calculation, InvestmentAllocation, Lead, Step } from "@/lib/types"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { BrandHeader } from "../layout/BrandHeader"
+import { AllocationStep } from "./steps/AllocationStep"
 import { ContactStep } from "./steps/ContactStep"
 import { DiagnosticoExecutivo } from "./steps/DiagnosticoExecutivo"
 import { LoadingStep } from "./steps/LoadingStep"
@@ -72,7 +74,8 @@ const initialLead: Lead = {
 const initialAdvanced: AdvancedState = {
   source: null,
   extraLiquido: 0,
-  allocation: null
+  allocation: null,
+  carteiraClasses: null
 }
 const initialManual = {
   imoveis: 0,
@@ -82,6 +85,13 @@ const initialManual = {
   caixa: 0,
   financiamentos: 0,
   emprestimos: 0
+}
+const initialCarteira: InvestmentAllocation = {
+  "Renda Fixa": 0,
+  Multimercado: 0,
+  "Renda Variável Local": 0,
+  Internacional: 0,
+  Alternativos: 0
 }
 
 export default function Simulator() {
@@ -98,6 +108,8 @@ export default function Simulator() {
   const [advanced, setAdvanced] = useState<AdvancedState>(initialAdvanced)
   const [calc, setCalc] = useState<Calculation | null>(null)
   const [manual, setManual] = useState(initialManual)
+  const [carteira, setCarteira] = useState<InvestmentAllocation>(initialCarteira)
+  const [taxaBand, setTaxaBand] = useState("")
   const [utm, setUtm] = useState(emptyUtm)
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState(false)
@@ -192,9 +204,15 @@ export default function Simulator() {
       diagnostico_avancado_fonte:
         advanced.source || "nenhuma (apenas diagnostico rapido)",
       diagnostico_avancado_patrimonio_liquido_adicional: advanced.extraLiquido,
-      diagnostico_avancado_alocacao_por_classe: advanced.allocation
-        ? JSON.stringify(advanced.allocation)
-        : "",
+      // Prioriza a carteira por classe de risco (captura da Etapa 2) — e o
+      // dado que o nome do campo descreve. Cai pra composicao patrimonial
+      // antiga so quando a alocacao por classe nao foi informada.
+      diagnostico_avancado_alocacao_por_classe: advanced.carteiraClasses
+        ? JSON.stringify(advanced.carteiraClasses)
+        : advanced.allocation
+          ? JSON.stringify(advanced.allocation)
+          : "",
+      taxa_atual: feeBandPorLabel(taxaBand)?.taxa,
       score_patrimonial: Math.round(
         Math.max(
           0,
@@ -381,8 +399,14 @@ export default function Simulator() {
         "Participação em empresas": manual.empresas,
         "Caixa / liquidez": manual.caixa,
         "Outras aplicações": manual.aplicacoes
-      })
+      }),
+      carteiraClasses: null
     })
+    goTo("alocacao")
+  }
+  const submitAllocation = () => {
+    trackAnalyticsEvent("wizard_allocation_complete")
+    setAdvanced(current => ({ ...current, carteiraClasses: carteira }))
     finalize()
   }
   const validateContact = () => {
@@ -572,12 +596,27 @@ export default function Simulator() {
             />
           )}
 
+          {step === "alocacao" && (
+            <AllocationStep
+              values={carteira}
+              setValues={setCarteira}
+              taxaBand={taxaBand}
+              setTaxaBand={setTaxaBand}
+              onBack={() => goTo("manual")}
+              onDone={submitAllocation}
+              onSkip={finalize}
+              sending={sending}
+            />
+          )}
+
           {step === "final" && calc && summary && (
             <DiagnosticoExecutivo
               calc={calc}
               advanced={advanced}
               allocation={allocation}
               summary={summary}
+              carteiraClasses={advanced.carteiraClasses}
+              taxaBand={taxaBand}
               sendError={sendError}
             />
           )}

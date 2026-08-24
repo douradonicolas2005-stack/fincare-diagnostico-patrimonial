@@ -415,3 +415,41 @@ select {
   background: #fff;
   color: var(--verde-medio);
 }
+
+/* Investment Checkup: comparativo "sua alocacao x referencia do perfil" */
+.allocation-compare-legend {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.allocation-compare-row {
+  margin-bottom: 12px;
+}
+.allocation-compare-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 5px;
+}
+.allocation-compare-values {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+.allocation-compare-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.allocation-compare-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--surface-alt);
+}
+.allocation-compare-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.3s ease;
+}

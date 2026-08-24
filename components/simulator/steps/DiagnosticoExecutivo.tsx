@@ -1,15 +1,23 @@
 import { formatCurrency } from "@/lib/calculator"
-import type { AdvancedState, Allocation, Calculation } from "@/lib/types"
+import type { AdvancedState, Allocation, Calculation, InvestmentAllocation } from "@/lib/types"
 import type { DiagnosticoSummary } from "../simulator.types"
 import { AllocationDonut } from "../charts/AllocationDonut"
 import { ExecutiveChart } from "../charts/ExecutiveChart"
 import { ExecutiveMetric } from "./ExecutiveMetric"
+import { CheckupScorecard } from "./CheckupScorecard"
+import { AllocationCompare } from "./AllocationCompare"
+import { FeeAnalyzer } from "./FeeAnalyzer"
+import { computeCheckup } from "@/lib/checkup"
+import { compareToIdeal, totalCarteira } from "@/lib/allocation"
+import { computeFeeImpact, feeBandPorLabel } from "@/lib/fees"
 
 type DiagnosticoExecutivoProps = {
   calc: Calculation
   advanced: AdvancedState
   allocation: Allocation[]
   summary: DiagnosticoSummary
+  carteiraClasses: InvestmentAllocation | null
+  taxaBand: string
   sendError: boolean
 }
 
@@ -23,9 +31,23 @@ export function DiagnosticoExecutivo({
   advanced,
   allocation,
   summary,
+  carteiraClasses,
+  taxaBand,
   sendError
 }: DiagnosticoExecutivoProps) {
   const profile = calc.perfilInvestidor!
+  const investido = carteiraClasses ? totalCarteira(carteiraClasses) : 0
+  const feeBand = feeBandPorLabel(taxaBand)
+  const feeImpact =
+    feeBand && investido > 0
+      ? computeFeeImpact({
+          investido,
+          taxaAtual: feeBand.taxa,
+          estimado: feeBand.estimado,
+          anos: calc.anos ?? 20,
+          rentabilidadeBruta: calc.rent
+        })
+      : null
   const independenceAge = calc.anos === null ? null : calc.idade + calc.anos
   const score = Math.round(
     Math.max(0, Math.min(100, (calc.patrimonio0 / calc.necessario) * 100))
@@ -106,6 +128,11 @@ export function DiagnosticoExecutivo({
         </div>
       </div>
 
+      <div className="dashboard-section-title">Checkup da sua carteira</div>
+      <CheckupScorecard
+        checkup={computeCheckup({ allocation, liquidezPct: summary.liquid })}
+      />
+
       <div className="dashboard-section-title">Distribuição por classe de ativos</div>
       <div className="allocation-wrap">
         <AllocationDonut allocation={allocation} />
@@ -119,6 +146,26 @@ export function DiagnosticoExecutivo({
           ))}
         </div>
       </div>
+
+      {carteiraClasses && totalCarteira(carteiraClasses) > 0 && (
+        <>
+          <div className="dashboard-section-title">
+            Sua alocação × referência do seu perfil
+          </div>
+          <AllocationCompare
+            rows={compareToIdeal(carteiraClasses, profile.alocacao)}
+          />
+        </>
+      )}
+
+      {feeImpact && (
+        <>
+          <div className="dashboard-section-title">
+            O impacto das taxas no seu patrimônio
+          </div>
+          <FeeAnalyzer impact={feeImpact} />
+        </>
+      )}
 
       <div className="dashboard-section-title">Liquidez da carteira</div>
       <div className="liquidity-bar">

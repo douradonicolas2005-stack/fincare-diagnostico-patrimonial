@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ficha de Descoberta e Diagnóstico de Carteira — Fincare</title>
+<style>
+  :root{
+    --teal-dark:#003b49;
+    --teal:#2b7e7e;
+    --teal-mid:#246a6a;
+    --teal-light:#9fc4c7;
+    --bg:#f4f9fc;
+    --line:#d9e4e4;
+    --ink:#0b2a32;
+    --muted:#5c7278;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:"Segoe UI",Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    background:var(--bg);
+    margin:0;
+    padding:0;
+  }
+  .page{
+    max-width:880px;
+    margin:0 auto;
+    padding:32px 40px 60px;
+    background:#fff;
+  }
+  header.brand{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:3px solid var(--teal-dark);
+    padding-bottom:16px;
+    margin-bottom:20px;
+  }
+  header.brand img{height:42px;}
+  header.brand .title{
+    text-align:right;
+  }
+  header.brand h1{
+    font-size:19px;
+    margin:0;
+    color:var(--teal-dark);
+    letter-spacing:.2px;
+  }
+  header.brand p{
+    margin:2px 0 0;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .meta-row{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:10px;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:12px 16px;
+    margin-bottom:26px;
+    font-size:12px;
+  }
+  .meta-row label{
+    display:block;
+    color:var(--muted);
+    font-weight:600;
+    margin-bottom:3px;
+    text-transform:uppercase;
+    font-size:10px;
+    letter-spacing:.4px;
+  }
+  .meta-row .fill{
+    border-bottom:1px solid var(--teal-light);
+    height:16px;
+  }
+  section{margin-bottom:26px;}
+  .sec-head{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .sec-num{
+    background:var(--teal-dark);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  .sec-head h2{
+    font-size:15px;
+    margin:0;
+    color:var(--teal-dark);
+  }
+  .sec-sub{
+    font-size:11.5px;
+    color:var(--muted);
+    margin:2px 0 12px 32px;
+  }
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px 20px;}
+  .field label{
+    display:block;
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--teal-mid);
+    margin-bottom:4px;
+  }
+  .field .fill{
+    border-bottom:1px solid var(--line);
+    height:18px;
+  }
+  .field .fill.tall{height:36px;}
+  .box{
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:14px 16px;
+  }
+  .options{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 16px;
+    font-size:12.5px;
+  }
+  .opt{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    white-space:nowrap;
+  }
+  .opt .box-mark{
+    width:13px;height:13px;
+    border:1.4px solid var(--teal-mid);
+    border-radius:3px;
+    flex-shrink:0;
+  }
+  .opt.circle .box-mark{border-radius:50%;}
+  table.alloc{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+  }
+  table.alloc th{
+    text-align:left;
+    color:var(--teal-mid);
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+    border-bottom:1px solid var(--line);
+    padding:4px 6px;
+  }
+  table.alloc td{
+    border-bottom:1px solid var(--line);
+    padding:6px 6px;
+  }
+  table.alloc td.pct{width:70px;}
+  .pct-fill{
+    border-bottom:1px solid var(--teal-light);
+    display:inline-block;
+    width:50px;
+  }
+  .pain-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px 20px;
+    font-size:12.5px;
+  }
+  .goal-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+  }
+  .goal-table th{
+    text-align:left;
+    font-size:10.5px;
+    text-transform:uppercase;
+    color:var(--teal-mid);
+    border-bottom:1px solid var(--line);
+    padding:5px 6px;
+  }
+  .goal-table td{
+    border-bottom:1px solid var(--line);
+    padding:9px 6px;
+    vertical-align:top;
+  }
+  .goal-table td.check{width:26px;text-align:center;}
+  .advisor-box{
+    background:var(--bg);
+    border:1px dashed var(--teal-light);
+    border-radius:8px;
+    padding:16px 18px;
+  }
+  .advisor-box h2{color:var(--teal-dark);font-size:14.5px;margin:0 0 4px;}
+  .advisor-box .note{font-size:11px;color:var(--muted);margin-bottom:12px;}
+  .disclaimer{
+    margin-top:30px;
+    padding-top:14px;
+    border-top:1px solid var(--line);
+    font-size:10.5px;
+    color:var(--muted);
+    line-height:1.5;
+  }
+  .lines .fill{margin-bottom:10px;}
+  @media print{
+    body{background:#fff;}
+    .page{padding:0;max-width:none;}
+    section{page-break-inside:avoid;}
+  }
+  .print-btn{
+    position:fixed;
+    top:18px;
+    right:18px;
+    background:var(--teal-dark);
+    color:#fff;
+    border:none;
+    padding:10px 16px;
+    border-radius:6px;
+    font-size:13px;
+    cursor:pointer;
+  }
+  @media print{.print-btn{display:none;}}
+</style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">Imprimir / Salvar em PDF</button>
+
+<div class="page">
+
+  <header class="brand">
+    <img src="logo-fincare.png" alt="Fincare">
+    <div class="title">
+      <h1>Ficha de Descoberta e Diagnóstico de Carteira</h1>
+      <p>Uso interno do assessor — reunião de diagnóstico com prospect</p>
+    </div>
+  </header>
+
+  <div class="meta-row">
+    <div><label>Assessor responsável</label><div class="fill"></div></div>
+    <div><label>Data da reunião</label><div class="fill"></div></div>
+    <div><label>Canal de origem do lead</label><div class="fill"></div></div>
+  </div>
+
+  <!-- 1. Dados cadastrais -->
+  <section>
+    <div class="sec-head"><span class="sec-num">1</span><h2>Dados do prospect</h2></div>
+    <div class="grid3">
+      <div class="field"><label>Nome completo</label><div class="fill"></div></div>
+      <div class="field"><label>Idade</label><div class="fill"></div></div>
+      <div class="field"><label>Profissão</label><div class="fill"></div></div>
+      <div class="field"><label>Cidade / UF</label><div class="fill"></div></div>
+      <div class="field"><label>Estado civil</label><div class="fill"></div></div>
+      <div class="field"><label>Dependentes</label><div class="fill"></div></div>
+      <div class="field"><label>Telefone / WhatsApp</label><div class="fill"></div></div>
+      <div class="field"><label>E-mail</label><div class="fill"></div></div>
+      <div class="field"><label>Como conheceu a Fincare</label><div class="fill"></div></div>
+    </div>
+    <div class="sec-sub" style="margin-top:12px;">Já possui assessor, gerente de banco ou consultor hoje?</div>
+    <div class="options">
+      <span class="opt"><span class="box-mark"></span> Não, autogerido</span>
+      <span class="opt"><span class="box-mark"></span> Gerente de banco</span>
+      <span class="opt"><span class="box-mark"></span> Assessor/corretora</span>
+      <span class="opt"><span class="box-mark"></span> Outro:</span>
+      <span class="fill" style="width:180px;display:inline-block;"></span>
+    </div>
+  </section>
+
+  <!-- 2. Perfil de investidor -->
+  <section>
+    <div class="sec-head"><span class="sec-num">2</span><h2>Perfil de investidor</h2></div>
+    <div class="sec-sub">Respostas rápidas para orientar a suitability — não substitui a Análise de Perfil do Investidor (API) formal exigida pela compliance.</div>
+
+    <div class="box" style="margin-bottom:10px;">
+      <label style="font-size:11.5px;font-weight:600;color:var(--teal-mid);">Objetivo principal ao investir</label>
+      <div class="options" style="margin-top:6px;">
+        <span class="opt"><span class="box-mark"></span> Preservar patrimônio</span>
+        <span class="opt"><span class="box-mark"></span> Crescer patrimônio</span>
+        <span class="opt"><span class="box-mark"></span> Gerar renda passiva</span>
+        <span class="opt"><span class="box-mark"></span> Aposentadoria</span>
+        <span class="opt"><span class="box-mark"></span> Sucessão/herança</span>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="box">
+        <label style="font-size:11.5px;font-weight:600;color:var(--teal-mid);">Horizonte de investimento</label>
+        <div class="options" style="margin-top:6px;">
+          <span class="opt"><span class="box-mark"></span> Curto (&lt; 2 anos)</span>
+          <span class="opt"><span class="box-mark"></span> Médio (2–5 anos)</span>
+          <span class="opt"><span class="box-mark"></span> Longo (&gt; 5 anos)</span>
+        </div>
+      </div>
+      <div class="box">
+        <label style="font-size:11.5px;font-weight:600;color:var(--teal-mid);">Experiência com investimentos</label>
+        <div class="options" style="margin-top:6px;">
+          <span class="opt"><span class="box-mark"></span> Nenhuma / poupança</span>
+          <span class="opt"><span class="box-mark"></span> Básica (CDB, Tesouro)</span>
+          <span class="opt"><span class="box-mark"></span> Intermediária (fundos, ações)</span>
+          <span class="opt"><span class="box-mark"></span> Avançada (multimercado, internacional)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="box" style="margin-top:10px;">
+      <label style="font-size:11.5px;font-weight:600;color:var(--teal-mid);">Se a carteira caísse 20% em um mês, o que faria?</label>
+      <div class="options" style="margin-top:6px;">
+        <span class="opt"><span class="box-mark"></span> Resgataria tudo</span>
+        <span class="opt"><span class="box-mark"></span> Resgataria parte</span>
+        <span class="opt"><span class="box-mark"></span> Manteria a posição</span>
+        <span class="opt"><span class="box-mark"></span> Aportaria mais</span>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:10px;">
+      <div class="field"><label>% do patrimônio disposto a investir/migrar</label><div class="fill"></div></div>
+      <div class="field"><label>Necessidade de liquidez (quanto e quando)</label><div class="fill"></div></div>
+    </div>
+
+    <div class="box" style="margin-top:10px;">
+      <label style="font-size:11.5px;font-weight:600;color:var(--teal-mid);">Classificação resultante (assessor)</label>
+      <div class="options" style="margin-top:6px;">
+        <span class="opt circle"><span class="box-mark"></span> Conservador</span>
+        <span class="opt circle"><span class="box-mark"></span> Moderado</span>
+        <span class="opt circle"><span class="box-mark"></span> Arrojado</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Situação patrimonial atual -->
+  <section>
+    <div class="sec-head"><span class="sec-num">3</span><h2>Situação patrimonial e carteira atual</h2></div>
+    <div class="grid3">
+      <div class="field"><label>Patrimônio financeiro total (faixa)</label><div class="fill"></div></div>
+      <div class="field"><label>Renda mensal (pessoal/família)</label><div class="fill"></div></div>
+      <div class="field"><label>Aporte mensal disponível</label><div class="fill"></div></div>
+      <div class="field" style="grid-column:1/-1;"><label>Instituições onde investe hoje (bancos/corretoras)</label><div class="fill"></div></div>
+    </div>
+
+    <div style="margin-top:14px;">
+      <label style="font-size:11.5px;font-weight:600;color:var(--teal-mid);display:block;margin-bottom:6px;">Composição estimada da carteira atual</label>
+      <table class="alloc">
+        <tr><th>Classe</th><th>%</th><th>Classe</th><th>%</th></tr>
+        <tr><td>Renda fixa (CDB, Tesouro, LCI/LCA)</td><td class="pct"><span class="pct-fill"></span></td><td>Fundos de investimento</td><td class="pct"><span class="pct-fill"></span></td></tr>
+        <tr><td>Ações / Bolsa</td><td class="pct"><span class="pct-fill"></span></td><td>FIIs</td><td class="pct"><span class="pct-fill"></span></td></tr>
+        <tr><td>Previdência (PGBL/VGBL)</td><td class="pct"><span class="pct-fill"></span></td><td>Internacional / offshore</td><td class="pct"><span class="pct-fill"></span></td></tr>
+        <tr><td>Imóveis (renda/patrimônio)</td><td class="pct"><span class="pct-fill"></span></td><td>Poupança / conta corrente</td><td class="pct"><span class="pct-fill"></span></td></tr>
+        <tr><td>Cripto</td><td class="pct"><span class="pct-fill"></span></td><td>Outros: ______________</td><td class="pct"><span class="pct-fill"></span></td></tr>
+      </table>
+    </div>
+
+    <div class="grid2" style="margin-top:14px;">
+      <div class="field"><label>Sabe informar as taxas que paga hoje?</label>
+        <div class="options" style="margin-top:4px;">
+          <span class="opt"><span class="box-mark"></span> Sim</span>
+          <span class="opt"><span class="box-mark"></span> Não</span>
+        </div>
+      </div>
+      <div class="field"><label>Quem administra/decide hoje</label><div class="fill"></div></div>
+    </div>
+  </section>
+
+  <!-- 4. Dores -->
+  <section>
+    <div class="sec-head"><span class="sec-num">4</span><h2>Dores e frustrações com a carteira atual</h2></div>
+    <div class="sec-sub">Marque tudo que o prospect relatar espontaneamente ou confirmar quando perguntado.</div>
+    <div class="pain-grid">
+      <span class="opt"><span class="box-mark"></span> Rentabilidade abaixo do esperado</span>
+      <span class="opt"><span class="box-mark"></span> Falta de transparência nas taxas</span>
+      <span class="opt"><span class="box-mark"></span> Falta de diversificação</span>
+      <span class="opt"><span class="box-mark"></span> Pouco acompanhamento / atendimento fraco</span>
+      <span class="opt"><span class="box-mark"></span> Não entende os produtos que possui</span>
+      <span class="opt"><span class="box-mark"></span> Medo de perder dinheiro</span>
+      <span class="opt"><span class="box-mark"></span> Não sabe se está no caminho certo</span>
+      <span class="opt"><span class="box-mark"></span> Excesso de produtos do próprio banco</span>
+      <span class="opt"><span class="box-mark"></span> Questões sucessórias/tributárias em aberto</span>
+      <span class="opt"><span class="box-mark"></span> Sem proteção (seguro de vida/invalidez)</span>
+    </div>
+    <div class="field" style="margin-top:12px;"><label>Outras dores relatadas (nas palavras do prospect)</label><div class="fill tall"></div></div>
+  </section>
+
+  <!-- 5. Objetivos -->
+  <section>
+    <div class="sec-head"><span class="sec-num">5</span><h2>Objetivos e metas financeiras</h2></div>
+    <table class="goal-table">
+      <tr><th class="check"></th><th>Objetivo</th><th>Prazo</th><th>Valor necessário</th></tr>
+      <tr><td class="check"><span class="box-mark" style="display:inline-block;"></span></td><td>Independência financeira / aposentadoria</td><td></td><td></td></tr>
+      <tr><td class="check"><span class="box-mark" style="display:inline-block;"></span></td><td>Compra de imóvel</td><td></td><td></td></tr>
+      <tr><td class="check"><span class="box-mark" style="display:inline-block;"></span></td><td>Educação dos filhos</td><td></td><td></td></tr>
+      <tr><td class="check"><span class="box-mark" style="display:inline-block;"></span></td><td>Proteção da família (seguro)</td><td></td><td></td></tr>
+      <tr><td class="check"><span class="box-mark" style="display:inline-block;"></span></td><td>Sucessão patrimonial</td><td></td><td></td></tr>
+      <tr><td class="check"><span class="box-mark" style="display:inline-block;"></span></td><td>Outro: ___________________</td><td></td><td></td></tr>
+    </table>
+  </section>
+
+  <!-- 6. Diagnóstico do assessor -->
+  <section class="advisor-box">
+    <h2>Diagnóstico preliminar do assessor</h2>
+    <p class="note">Preencher após a reunião, antes de montar a proposta.</p>
+    <div class="grid2">
+      <div class="field"><label>Perfil identificado</label><div class="fill"></div></div>
+      <div class="field"><label>Temperatura do prospect</label>
+        <div class="options" style="margin-top:4px;">
+          <span class="opt"><span class="box-mark"></span> Quente</span>
+          <span class="opt"><span class="box-mark"></span> Morno</span>
+          <span class="opt"><span class="box-mark"></span> Frio</span>
+        </div>
+      </div>
+    </div>
+    <div class="field" style="margin-top:10px;"><label>Principais gaps encontrados na carteira atual</label><div class="fill tall"></div></div>
+    <div class="field" style="margin-top:10px;"><label>Oportunidades / produtos e estratégias a propor</label><div class="fill tall"></div></div>
+    <div class="grid2" style="margin-top:10px;">
+      <div class="field"><label>Próximo passo</label><div class="fill"></div></div>
+      <div class="field"><label>Data de retorno agendada</label><div class="fill"></div></div>
+    </div>
+  </section>
+
+  <div class="disclaimer">
+    Este formulário é uma ferramenta de descoberta comercial para orientar a reunião do assessor e não substitui a Análise de Perfil do Investidor (API) formal, os termos de adesão e demais documentos exigidos pela regulação CVM/ANBIMA aplicável à atividade de consultoria e distribuição de investimentos. Dados patrimoniais e pessoais aqui registrados devem seguir a política interna de tratamento de dados e a LGPD.
+  </div>
+
+</div>
+
+</body>
+</html>

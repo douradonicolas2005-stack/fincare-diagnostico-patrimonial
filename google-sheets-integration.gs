@@ -67,7 +67,10 @@ var COLS = {
   estado: 31,
   consentimento_contato: 32,
   consentimento_data_hora: 33,
-  diagnostico_completo: 34
+  diagnostico_completo: 34,
+  fit_score: 35,
+  fit_tier: 36,
+  taxa_atual: 37
 }
 
 var HEADERS = [
@@ -104,7 +107,10 @@ var HEADERS = [
   "estado",
   "consentimento_contato",
   "consentimento_data_hora",
-  "diagnostico_completo"
+  "diagnostico_completo",
+  "fit_score",
+  "fit_tier",
+  "taxa_atual"
 ]
 
 // ================================================================
@@ -177,9 +183,12 @@ var FORMATO_SCORE = "0" + ASPAS + "%" + ASPAS
 var FORMATO_AVG_ANOS = "0.0" + ASPAS + " anos" + ASPAS
 var FORMATO_IDADE = "0" + ASPAS + " anos" + ASPAS
 
-// Colunas auxiliares calculadas, logo depois da ultima coluna de dados (AH).
-var COL_DATA_REAL = COLS.diagnostico_completo + 1 // 35 = AI
-var COL_LEAD_VALIDO = COLS.diagnostico_completo + 2 // 36 = AJ
+// Colunas auxiliares calculadas, logo depois da ultima coluna de dados.
+// Ancoradas em HEADERS.length (nao numa coluna fixa) pra se deslocarem
+// sozinhas quando novas colunas de dados sao acrescentadas ao fim - hoje,
+// com fit_score/fit_tier, ficam em 37 (AK) e 38 (AL).
+var COL_DATA_REAL = HEADERS.length + 1
+var COL_LEAD_VALIDO = HEADERS.length + 2
 
 var PALETA_CARDS = [
   "#2A9D8F",
@@ -998,12 +1007,14 @@ function formatarLinha_(sheet, row) {
 
   sheet.getRange(row, COLS.data).setNumberFormat("dd/mm/yyyy hh:mm")
   sheet.getRange(row, COLS.score_patrimonial).setNumberFormat(FORMATO_SCORE)
+  sheet.getRange(row, COLS.fit_score).setNumberFormat("0")
+  sheet.getRange(row, COLS.taxa_atual).setNumberFormat("0.00%")
 }
 
 function aplicarFormatacaoCondicionalScore_(sheet) {
   var lastRow = Math.max(2, getUltimaLinhaComDados_(sheet))
-  var range = sheet.getRange(2, COLS.score_patrimonial, lastRow - 1, 1)
-  var rule = SpreadsheetApp.newConditionalFormatRule()
+  var rangeScore = sheet.getRange(2, COLS.score_patrimonial, lastRow - 1, 1)
+  var regraScore = SpreadsheetApp.newConditionalFormatRule()
     .setGradientMaxpointWithValue(
       "#2B7E7E",
       SpreadsheetApp.InterpolationType.NUMBER,
@@ -1019,9 +1030,27 @@ function aplicarFormatacaoCondicionalScore_(sheet) {
       SpreadsheetApp.InterpolationType.NUMBER,
       "0"
     )
-    .setRanges([range])
+    .setRanges([rangeScore])
     .build()
-  sheet.setConditionalFormatRules([rule])
+
+  // Destaque do fit_tier: A (melhor encaixe com o cliente ideal) em verde,
+  // B em ambar. C fica sem cor. So pra bater o olho e priorizar a ligacao.
+  var rangeTier = sheet.getRange(2, COLS.fit_tier, lastRow - 1, 1)
+  var regraTierA = SpreadsheetApp.newConditionalFormatRule()
+    .whenTextEqualTo("A")
+    .setBackground("#B7E1CD")
+    .setBold(true)
+    .setRanges([rangeTier])
+    .build()
+  var regraTierB = SpreadsheetApp.newConditionalFormatRule()
+    .whenTextEqualTo("B")
+    .setBackground("#FCE8B2")
+    .setRanges([rangeTier])
+    .build()
+
+  // setConditionalFormatRules substitui TODAS as regras da aba - por isso as
+  // tres vao juntas numa unica chamada, senao uma zeraria a outra.
+  sheet.setConditionalFormatRules([regraScore, regraTierA, regraTierB])
 }
 
 // Reformata o cabecalho e todas as linhas ja existentes (util para dados
