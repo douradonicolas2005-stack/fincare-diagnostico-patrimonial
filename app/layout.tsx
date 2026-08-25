@@ -8,26 +8,69 @@ import "./globals.css"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://fincarescorepatrimonial.com.br"),
-  title: "Simulador Fincare | Score Patrimonial",
+  title: {
+    default:
+      "Simulador de Independência Financeira | Score Patrimonial Gratuito",
+    template: "%s | Fincare Investimentos"
+  },
   description:
-    "Simule sua trajetória patrimonial e descubra caminhos para alcançar seus objetivos.",
+    "Descubra em 1 minuto quanto falta para sua independência financeira. Simulador gratuito com score patrimonial, projeção de aposentadoria e plano personalizado em PDF.",
+  keywords: [
+    "independência financeira",
+    "calculadora aposentadoria",
+    "score patrimonial",
+    "simulador investimentos",
+    "renda passiva",
+    "quanto falta para me aposentar",
+    "planejamento patrimonial",
+    "calculadora de aposentadoria por idade",
+    "quanto preciso para me aposentar",
+    "Fincare Investimentos"
+  ],
+  authors: [{ name: "Fincare Investimentos" }],
+  creator: "Fincare Investimentos",
+  publisher: "Fincare Investimentos",
+  formatDetection: { telephone: false },
   icons: { icon: "/favicon.ico" },
   openGraph: {
-    title: "Simulador Fincare | Score Patrimonial",
+    title:
+      "Simulador de Independência Financeira | Score Patrimonial Gratuito",
     description:
-      "Diagnóstico patrimonial gratuito, com metodologia de Wealth Management, da Fincare Investimentos.",
+      "Descubra em 1 minuto quanto falta para sua independência financeira. Simulador gratuito com score patrimonial, projeção de aposentadoria e plano personalizado em PDF.",
     url: "https://fincarescorepatrimonial.com.br",
     siteName: "Fincare Investimentos",
-    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Simulador de Score Patrimonial Fincare"
+      }
+    ],
     locale: "pt_BR",
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
-    title: "Simulador Fincare | Score Patrimonial",
+    title:
+      "Simulador de Independência Financeira | Score Patrimonial Gratuito",
     description:
-      "Diagnóstico patrimonial gratuito, com metodologia de Wealth Management, da Fincare Investimentos.",
+      "Descubra em 1 minuto quanto falta para sua independência financeira. Simulador gratuito com score patrimonial e plano em PDF.",
     images: ["/og-image.png"]
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1
+    }
+  },
+  alternates: {
+    canonical: "https://fincarescorepatrimonial.com.br"
   }
 }
 
