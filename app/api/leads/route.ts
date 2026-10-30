@@ -68,7 +68,8 @@ async function handlePartial(
     )
 
   // Parciais nao disparam Conversions API: o evento "Lead" do Meta continua
-  // sendo enviado uma unica vez, no envio completo (abaixo).
+  // sendo enviado uma unica vez, no envio completo (abaixo). Tambem nao vao
+  // para o Formspree - so para a planilha (ver forwardLead).
   const ok = await forwardLead(partial)
 
   return NextResponse.json(

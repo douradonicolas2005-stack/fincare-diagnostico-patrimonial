@@ -30,10 +30,16 @@ function configured(name: string): string | undefined {
   return process.env[name]
 }
 
+// Envio progressivo: o parcial vai SO para a planilha. O Formspree gratuito
+// tem cota de 50 submissoes por mes e cada lead gera ate 6 parciais - mandar
+// os dois lados esgotaria a cota com menos de 10 leads. A planilha ja e o
+// destino "de trabalho" (onde o time olha os leads); o Formspree continua
+// recebendo apenas o envio completo, como notificacao.
 export async function forwardLead(
   payload: LeadPayload | PartialLeadPayload
 ): Promise<boolean> {
-  const formspreeUrl = configured("FORMSPREE_ENDPOINT")
+  const parcial = "parcial" in payload && payload.parcial === true
+  const formspreeUrl = parcial ? undefined : configured("FORMSPREE_ENDPOINT")
   const sheetsUrl = configured("GOOGLE_SHEETS_WEBHOOK_URL")
   const token = configured("GOOGLE_SHEETS_WEBHOOK_TOKEN")
 
