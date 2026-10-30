@@ -1,11 +1,11 @@
 "use client"
 
-import { sendFunnelEvent, sendLead } from "@/lib/api"
+import { sendFunnelEvent, sendLead, sendPartialLead } from "@/lib/api"
 import { allocationFromCategories, calculate } from "@/lib/calculator"
 import { feeBandPorLabel } from "@/lib/fees"
 import { trackAnalyticsEvent } from "@/lib/analytics"
 import { trackMetaPixelEvent } from "@/lib/meta-pixel"
-import { isValidPhoneBR, leadSchema, type FunnelPayload, type LeadPayload } from "@/lib/security"
+import { isValidPhoneBR, leadSchema, type FunnelPayload, type LeadPayload, type PartialLeadPayload } from "@/lib/security"
 import type { AdvancedState, Calculation, InvestmentAllocation, Lead, Step } from "@/lib/types"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { BrandHeader } from "../layout/BrandHeader"
@@ -54,6 +54,66 @@ const etapaFunil: Record<string, FunnelPayload["etapa"]> = {
   "6": "6_contato",
   result: "result",
   final: "final"
+}
+// Envio progressivo: identifica a MESMA linha da planilha entre as telas.
+// Fica em sessionStorage porque o objetivo e compor UMA sessao de simulacao;
+// se a pessoa voltar em outro dia, o e-mail (quando existir) reencontra a
+// linha no Apps Script.
+const LEAD_ID_KEY = "fincare:lead_id:v1"
+const criarLeadId = () => {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID()
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+    const r = (Math.random() * 16) | 0
+    return (c === "x" ? r : (r & 0x3) | 0x8).toString(16)
+  })
+}
+const lerLeadId = () => {
+  if (typeof window === "undefined") return criarLeadId()
+  try {
+    const salvo = window.sessionStorage.getItem(LEAD_ID_KEY)
+    if (
+      salvo &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(salvo)
+    )
+      return salvo
+    const novo = criarLeadId()
+    window.sessionStorage.setItem(LEAD_ID_KEY, novo)
+    return novo
+  } catch {
+    return criarLeadId()
+  }
+}
+// Ordem das telas - so enviamos parcial quando a pessoa AVANCA. Voltar para
+// rever uma tela nao gera envio novo (e nao reescreve nada na planilha).
+const stepOrder: Record<string, number> = {
+  "1": 1,
+  "2": 2,
+  "3": 3,
+  "4": 4,
+  teaser: 5,
+  "5": 6,
+  "6": 7,
+  loading: 8,
+  result: 9,
+  manual: 10,
+  alocacao: 11,
+  final: 12
+}
+// Etapa enviada ao SAIR de cada tela (a tela que acabou de ser concluida).
+// A tela 6 nao entra aqui: ela termina no envio completo (submitLead).
+const etapaAoSair: Record<string, PartialLeadPayload["etapa"]> = {
+  "1": "1_patrimonio",
+  "2": "2_aporte",
+  "3": "3_renda",
+  "4": "4_premissas",
+  "5": "5_contato"
+}
+const etapaOrdem: Record<PartialLeadPayload["etapa"], number> = {
+  "1_patrimonio": 1,
+  "2_aporte": 2,
+  "3_renda": 3,
+  "4_premissas": 4,
+  "5_contato": 5
 }
 const initialLead: Lead = {
   nome: "",
@@ -146,7 +206,68 @@ export default function Simulator() {
     setValues(current => ({ ...current, [key]: Number(value) || 0 }))
   const setLeadValue = (key: keyof Lead, value: string) =>
     setLead(current => ({ ...current, [key]: value }))
+  const leadIdRef = useRef<string>("")
+  const obterLeadId = () => {
+    if (!leadIdRef.current) leadIdRef.current = lerLeadId()
+    return leadIdRef.current
+  }
+  // Monta o "pedaco" correspondente a etapa concluida. So inclui os campos
+  // que ja foram perguntados ate ali - mandar um aporte_mensal: 0 na tela 1
+  // gravaria um zero que ninguem informou.
+  const buildPartialPayload = (
+    etapa: PartialLeadPayload["etapa"]
+  ): PartialLeadPayload => {
+    const ate = etapaOrdem[etapa]
+    const agora = new Date().toISOString()
+    const payload: PartialLeadPayload = {
+      parcial: true,
+      lead_id: obterLeadId(),
+      etapa,
+      diagnostico_completo: "nao",
+      data: agora,
+      atualizado_em: agora,
+      origem_lead: "calculadora-fincare-instagram",
+      ...utm
+    }
+    if (ate >= 1) payload.patrimonio_atual = values.patrimonio
+    if (ate >= 2) payload.aporte_mensal = values.aporte
+    if (ate >= 3) payload.renda_desejada = values.renda
+    if (ate >= 4) {
+      payload.idade_atual = values.idade
+      payload.rentabilidade_esperada = values.rentabilidade / 100
+      payload.taxa_retirada = values.retirada / 100
+    }
+    if (ate >= 5) {
+      const nome = lead.nome.trim()
+      const email = lead.email.trim()
+      const telefone = lead.telefone.trim()
+      if (nome) payload.nome = nome
+      if (email) payload.email = email
+      if (telefone) payload.telefone = telefone
+      if (lead.cidade.trim()) payload.cidade = lead.cidade.trim()
+      if (lead.estado.trim()) payload.estado = lead.estado.trim()
+    }
+    if (lead.honeypot) payload.honeypot = lead.honeypot
+    return payload
+  }
+  // Silencioso por design: o envio progressivo nao pode travar a navegacao
+  // nem mostrar erro para quem so esta preenchendo o formulario.
+  const sendPartial = (etapa: PartialLeadPayload["etapa"]) => {
+    try {
+      const payload = buildPartialPayload(etapa)
+      trackAnalyticsEvent("wizard_partial_submit", { etapa })
+      sendPartialLead(payload)
+    } catch {
+      // sem feedback: o envio completo continua sendo o caminho critico
+    }
+  }
   const goTo = (next: Step) => {
+    const ordemAtual = stepOrder[String(step)] ?? 0
+    const ordemProxima = stepOrder[String(next)] ?? 0
+    if (ordemProxima > ordemAtual) {
+      const etapa = etapaAoSair[String(step)]
+      if (etapa) sendPartial(etapa)
+    }
     trackAnalyticsEvent("wizard_step_action", {
       origem: String(step),
       destino: String(next)
@@ -185,6 +306,7 @@ export default function Simulator() {
   ): LeadPayload =>
     leadSchema.parse({
       ...currentLead,
+      lead_id: obterLeadId(),
       consentimento_contato: true,
       consentimento_data_hora:
         currentLead.consentimento_data_hora || new Date().toISOString(),

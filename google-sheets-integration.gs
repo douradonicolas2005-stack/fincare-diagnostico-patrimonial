@@ -70,7 +70,9 @@ var COLS = {
   diagnostico_completo: 34,
   fit_score: 35,
   fit_tier: 36,
-  taxa_atual: 37
+  taxa_atual: 37,
+  lead_id: 38,
+  atualizado_em: 39
 }
 
 var HEADERS = [
@@ -110,7 +112,9 @@ var HEADERS = [
   "diagnostico_completo",
   "fit_score",
   "fit_tier",
-  "taxa_atual"
+  "taxa_atual",
+  "lead_id",
+  "atualizado_em"
 ]
 
 // ================================================================
@@ -186,7 +190,7 @@ var FORMATO_IDADE = "0" + ASPAS + " anos" + ASPAS
 // Colunas auxiliares calculadas, logo depois da ultima coluna de dados.
 // Ancoradas em HEADERS.length (nao numa coluna fixa) pra se deslocarem
 // sozinhas quando novas colunas de dados sao acrescentadas ao fim - hoje,
-// com fit_score/fit_tier, ficam em 37 (AK) e 38 (AL).
+// com lead_id/atualizado_em (38/39), ficam em 40 (AN) e 41 (AO).
 var COL_DATA_REAL = HEADERS.length + 1
 var COL_LEAD_VALIDO = HEADERS.length + 2
 
@@ -269,6 +273,92 @@ function encontrarLinhaPorEmail_(sheet, email, ultimaLinha) {
   return 0
 }
 
+// Procura a linha pelo lead_id (UUID gerado no navegador e mantido durante a
+// sessao de simulacao). E a chave do envio progressivo: as telas 1-4 ainda
+// nao tem e-mail, entao sem esse id nao haveria como compor a mesma linha.
+function encontrarLinhaPorLeadId_(sheet, leadId, ultimaLinha) {
+  if (ultimaLinha < 2) return 0
+  var alvo = String(leadId || "")
+    .toLowerCase()
+    .trim()
+  if (!alvo) return 0
+  var ids = sheet.getRange(2, COLS.lead_id, ultimaLinha - 1, 1).getValues()
+  for (var i = ids.length - 1; i >= 0; i--) {
+    if (String(ids[i][0] || "").toLowerCase().trim() === alvo) return i + 2
+  }
+  return 0
+}
+
+// Um campo "vazio" no payload nao deve apagar o que ja foi gravado antes.
+// O envio progressivo manda so o que a pessoa ja respondeu, entao o merge
+// preenche apenas as colunas ainda em branco.
+function campoVazio_(valor) {
+  return valor === undefined || valor === null || valor === ""
+}
+
+// Garante que a planilha ja tenha as colunas do envio progressivo. Roda a
+// cada chamada (e nao so quando a aba esta vazia) porque lead_id/atualizado_em
+// foram acrescentados numa planilha que ja estava em uso. A checagem e
+// deliberadamente estreita - so olha as duas colunas novas - pra nao
+// reescrever o cabecalho inteiro a cada POST caso alguem renomeie uma coluna
+// antiga de proposito.
+function garantirCabecalho_(sheet, ultimaLinha) {
+  var atual = sheet.getRange(1, 1, 1, HEADERS.length).getValues()[0]
+  var temColunasNovas =
+    String(atual[COLS.lead_id - 1] || "").trim() === "lead_id" &&
+    String(atual[COLS.atualizado_em - 1] || "").trim() === "atualizado_em"
+  if (ultimaLinha > 0 && temColunasNovas) return
+
+  // Limpa as auxiliares antigas ANTES de reaproveitar as colunas novas: sem
+  // isso a ARRAYFORMULA de data_real/lead_valido continuaria ocupando a
+  // mesma coluna e o Sheets recusaria a escrita ("nao e possivel editar
+  // parte de uma formula matricial").
+  limparColunasAuxiliaresAntigas_(sheet)
+  sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS])
+  formatarCabecalho_(sheet)
+  configurarColunasAuxiliares_(sheet, getSeparador_())
+}
+
+// Completa uma linha ja existente sem apagar o que ja estava la: so escreve
+// os campos que vieram preenchidos neste envio. "data" guarda o primeiro
+// contato e "atualizado_em" a ultima atualizacao.
+function mesclarLinha_(sheet, linha, data) {
+  var atual = sheet.getRange(linha, 1, 1, HEADERS.length).getValues()[0]
+  var nova = atual.slice()
+
+  for (var i = 0; i < HEADERS.length; i++) {
+    var h = HEADERS[i]
+    if (h === "data" || h === "atualizado_em") continue
+    var v = data[h]
+    if (campoVazio_(v)) continue
+    // Um diagnostico completo nunca volta para "nao" por causa de um envio
+    // parcial atrasado que chegou depois.
+    if (h === "diagnostico_completo" && atual[i] === "sim" && v === "nao") {
+      continue
+    }
+    nova[i] = v
+  }
+
+  nova[COLS.data - 1] = campoVazio_(atual[COLS.data - 1])
+    ? data.data
+      ? new Date(data.data)
+      : new Date()
+    : atual[COLS.data - 1]
+
+  // atualizado_em nunca anda para tras: um envio parcial atrasado nao pode
+  // fazer a coluna "ultima atualizacao" voltar no tempo.
+  var atualizadoAtual = atual[COLS.atualizado_em - 1]
+  var novoAtualizado = data.atualizado_em
+    ? new Date(data.atualizado_em)
+    : new Date()
+  nova[COLS.atualizado_em - 1] =
+    atualizadoAtual instanceof Date && atualizadoAtual > novoAtualizado
+      ? atualizadoAtual
+      : novoAtualizado
+
+  sheet.getRange(linha, 1, 1, nova.length).setValues([nova])
+}
+
 function doPost(e) {
   // Rodar o doPost pelo botao "Executar" do editor chega aqui sem evento
   // nenhum (e === undefined) - o payload HTTP so existe quando o Google
@@ -315,22 +405,39 @@ function doPost(e) {
     ).setMimeType(ContentService.MimeType.JSON)
   }
 
+  // Envio progressivo: cada tela concluida manda um pedaco do lead com o
+  // mesmo lead_id. As telas 1-4 ainda nao tem e-mail, entao a chave do rate
+  // limit e o proprio lead_id.
+  var ehParcial = data.parcial === true
+  if (ehParcial && !data.lead_id) {
+    return ContentService.createTextOutput(
+      JSON.stringify({ ok: false, erro: "lead_id ausente" })
+    ).setMimeType(ContentService.MimeType.JSON)
+  }
+
   // Validacao minima server-side - barra chamadas diretas ao webhook (fora
-  // do site) com payload incompleto ou email obviamente invalido.
-  if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(data.email))) {
+  // do site) com payload incompleto ou email obviamente invalido. Parciais
+  // das telas 1-4 nao tem e-mail e passam por aqui de proposito.
+  if (
+    !ehParcial &&
+    (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(data.email)))
+  ) {
     return ContentService.createTextOutput(
       JSON.stringify({ ok: false, erro: "email invalido" })
     ).setMimeType(ContentService.MimeType.JSON)
   }
 
-  // Rate limit por e-mail: um lead legitimo manda no maximo 2 chamadas
-  // (parcial em submitLead() + completo em finalizeReport()). 8 numa janela
-  // de 10 minutos ja sobra de folga pra reenvios/dupla aba, mas barra
-  // flood automatizado batendo direto no webhook com o mesmo e-mail.
+  // Rate limit: o lead completo manda no maximo ~4 chamadas (submitLead,
+  // finalize, retry e dupla aba), enquanto o envio progressivo chega a 6
+  // telas + reenvios. Tetos separados por tipo de chamada, mas ambos
+  // continuam barrando flood automatizado na URL do webhook.
   var cache = CacheService.getScriptCache()
-  var rlKey = "rl_" + String(data.email).toLowerCase().trim()
+  var rlKey = ehParcial
+    ? "rl_lead_" + String(data.lead_id).toLowerCase().trim()
+    : "rl_" + String(data.email).toLowerCase().trim()
+  var rlMax = ehParcial ? 40 : 30
   var chamadasRecentes = Number(cache.get(rlKey) || 0)
-  if (chamadasRecentes >= 8) {
+  if (chamadasRecentes >= rlMax) {
     return ContentService.createTextOutput(
       JSON.stringify({ ok: false, erro: "limite de envios atingido" })
     ).setMimeType(ContentService.MimeType.JSON)
@@ -345,59 +452,51 @@ function doPost(e) {
   // LockService serializa esse trecho entre execucoes concorrentes.
   var lock = LockService.getScriptLock()
   lock.waitLock(30000)
-  var pulouEscrita = false
   try {
     var sheet = getLeadsSheet_()
 
     var ultimaLinha = getUltimaLinhaComDados_(sheet)
-    if (ultimaLinha === 0) {
-      sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS])
-      formatarCabecalho_(sheet)
-      configurarColunasAuxiliares_(sheet, getSeparador_())
-      ultimaLinha = 1
+    garantirCabecalho_(sheet, ultimaLinha)
+    if (ultimaLinha === 0) ultimaLinha = 1
+
+    // Cada prospect tem UMA linha na aba Leads. Ordem de busca: lead_id
+    // (envio progressivo, funciona desde a tela 1) e, se nao achar, e-mail
+    // (leads antigos, de antes do envio progressivo existir).
+    var linhaExistente = encontrarLinhaPorLeadId_(
+      sheet,
+      data.lead_id,
+      ultimaLinha
+    )
+    if (linhaExistente === 0) {
+      linhaExistente = encontrarLinhaPorEmail_(sheet, data.email, ultimaLinha)
     }
 
-    // Cada prospect (identificado pelo e-mail) so pode ter UMA linha na aba
-    // Leads. Se ja existe uma linha com esse e-mail, atualiza ela em vez de
-    // acrescentar uma nova - assim o lead parcial (diagnostico_completo:
-    // 'nao', gravado ao autorizar contato) e o lead completo (gravado ao
-    // terminar a simulacao) viram a MESMA linha, nao duas.
-    var linhaExistente = encontrarLinhaPorEmail_(sheet, data.email, ultimaLinha)
+    var linhaAlvo = linhaExistente > 0 ? linhaExistente : ultimaLinha + 1
 
-    // Protecao contra reenvio fora de ordem: nao deixa um lead parcial
-    // atrasado sobrescrever um diagnostico que ja chegou completo pro mesmo
-    // e-mail.
     if (linhaExistente > 0) {
-      var completoAtual = sheet
-        .getRange(linhaExistente, COLS.diagnostico_completo)
-        .getValue()
-      if (completoAtual === "sim" && data.diagnostico_completo === "nao") {
-        pulouEscrita = true
-      }
-    }
-
-    if (!pulouEscrita) {
+      // Linha ja existe: completa so as colunas ainda vazias. E isso que
+      // permite o envio progressivo compor a mesma linha tela a tela sem
+      // apagar o que ja foi gravado.
+      mesclarLinha_(sheet, linhaExistente, data)
+    } else {
       var row = HEADERS.map(function (h) {
         var v = data[h]
         return v === undefined || v === null ? "" : v
       })
       row[COLS.data - 1] = data.data ? new Date(data.data) : new Date()
+      row[COLS.atualizado_em - 1] = data.atualizado_em
+        ? new Date(data.atualizado_em)
+        : new Date()
 
-      // Escreve so nas colunas A:AH (o tamanho exato de "row"), nunca em
+      // Escreve so nas colunas A:AM (o tamanho exato de "row"), nunca em
       // colunas calculadas que existam depois delas.
-      var linhaAlvo = linhaExistente > 0 ? linhaExistente : ultimaLinha + 1
       sheet.getRange(linhaAlvo, 1, 1, row.length).setValues([row])
-      formatarLinha_(sheet, linhaAlvo)
-      aplicarFormatacaoCondicionalScore_(sheet)
     }
+
+    formatarLinha_(sheet, linhaAlvo)
+    aplicarFormatacaoCondicionalScore_(sheet)
   } finally {
     lock.releaseLock()
-  }
-
-  if (pulouEscrita) {
-    return ContentService.createTextOutput(
-      JSON.stringify({ ok: true })
-    ).setMimeType(ContentService.MimeType.JSON)
   }
 
   // Leads parciais (diagnostico_completo === 'nao', gravados assim que a
@@ -1001,6 +1100,8 @@ function formatarCabecalho_(sheet) {
   sheet.setColumnWidth(COLS.nome, 170)
   sheet.setColumnWidth(COLS.email, 190)
   sheet.setColumnWidth(COLS.diagnostico_avancado_alocacao_por_classe, 260)
+  sheet.setColumnWidth(COLS.lead_id, 280)
+  sheet.setColumnWidth(COLS.atualizado_em, 150)
 }
 
 function formatarLinha_(sheet, row) {
@@ -1021,6 +1122,7 @@ function formatarLinha_(sheet, row) {
   })
 
   sheet.getRange(row, COLS.data).setNumberFormat("dd/mm/yyyy hh:mm")
+  sheet.getRange(row, COLS.atualizado_em).setNumberFormat("dd/mm/yyyy hh:mm")
   sheet.getRange(row, COLS.score_patrimonial).setNumberFormat(FORMATO_SCORE)
   sheet.getRange(row, COLS.fit_score).setNumberFormat("0")
   sheet.getRange(row, COLS.taxa_atual).setNumberFormat("0.00%")
@@ -1984,7 +2086,11 @@ function construirComoUsar_(ss) {
   var linhas = [
     [
       "Como o webhook alimenta",
-      "O simulador do site grava um lead novo por linha na aba Leads, sempre nas colunas A ate AH (34 colunas), incluindo AD (perfil_investidor), AE (estado), AF (consentimento_contato), AG (consentimento_data_hora) e AH (diagnostico_completo). O script nunca escreve nas colunas AI (data_real) e AJ (lead_valido) - essas sao calculadas automaticamente pela planilha."
+      "O simulador do site grava um lead por linha na aba Leads, sempre nas colunas A ate AM (39 colunas), incluindo AD (perfil_investidor), AE (estado), AF (consentimento_contato), AG (consentimento_data_hora), AH (diagnostico_completo), AL (lead_id) e AM (atualizado_em). O script nunca escreve nas colunas AN (data_real) e AO (lead_valido) - essas sao calculadas automaticamente pela planilha."
+    ],
+    [
+      "Envio progressivo (colunas AL e AM)",
+      "A cada tela concluida o site manda um pedaco do lead com o mesmo lead_id (AL). O script localiza a linha por esse id (ou pelo e-mail, se a linha for antiga) e completa apenas as colunas que ainda estao vazias - por isso quem abandona no meio do simulador ja aparece na planilha com o que respondeu ate ali. AM (atualizado_em) guarda o momento da ultima atualizacao; A (data) guarda o primeiro contato."
     ],
     [
       "Perfil de investidor (coluna AD)",
@@ -2000,11 +2106,11 @@ function construirComoUsar_(ss) {
     ],
     [
       "Diagnostico completo (coluna AH)",
-      '"nao" = lead parcial: a pessoa autorizou contato e preencheu os dados basicos mas fechou a pagina antes de ver o resultado (score/perfil ainda nao existem para essa linha). "sim" = lead completo: chegou ate o final e recebeu o diagnostico por e-mail. Quem completa aparece duas vezes na aba (uma linha parcial e uma completa) - use esta coluna pra filtrar quem vale a pena reimpactar por nao ter terminado.'
+      '"nao" = lead parcial: a pessoa comecou a preencher mas ainda nao chegou ao resultado (score/perfil ainda nao existem para essa linha). "sim" = lead completo: chegou ate o final e recebeu o diagnostico por e-mail. O envio progressivo nao cria linhas duplicadas: o parcial e o completo caem na MESMA linha, e a coluna so avanca de "nao" para "sim", nunca volta.'
     ],
     [
-      "Colunas auxiliares (AI e AJ)",
-      "AI (data_real) converte o texto de data/hora da coluna A numa data de verdade, formatada dd/mm/aaaa. AJ (lead_valido) marca 1 quando o lead tem e-mail preenchido (coluna D), vazio quando nao tem. Sao formulas ARRAYFORMULA unicas na linha 2 que se expandem sozinhas conforme novas linhas chegam."
+      "Colunas auxiliares (AN e AO)",
+      "AN (data_real) converte o texto de data/hora da coluna A numa data de verdade, formatada dd/mm/aaaa. AO (lead_valido) marca 1 quando o lead tem e-mail preenchido (coluna D), vazio quando nao tem. Sao formulas ARRAYFORMULA unicas na linha 2 que se expandem sozinhas conforme novas linhas chegam."
     ],
     [
       "O que e lead valido",

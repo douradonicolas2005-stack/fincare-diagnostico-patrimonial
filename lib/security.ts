@@ -9,6 +9,7 @@ export function isValidPhoneBR(value: string) {
 export type LeadPayload = z.infer<typeof leadSchema>
 
 export const leadSchema = z.object({
+  lead_id: z.string().uuid().optional(),
   nome: z.string().trim().min(2).max(100),
   telefone: z
     .string()
@@ -59,6 +60,60 @@ export const leadSchema = z.object({
     .optional(),
   diagnostico_avancado_alocacao_por_classe: z.string().max(3000).optional(),
   data: z.string().datetime(),
+  origem_lead: z.string().max(80),
+  utm_campaign: z.string().max(150),
+  utm_source: z.string().max(150),
+  utm_medium: z.string().max(150),
+  utm_content: z.string().max(150),
+  utm_term: z.string().max(150)
+})
+
+// Envio progressivo: a cada tela concluida o front-end manda um "pedaco" do
+// lead, sempre com o mesmo lead_id. O Apps Script usa esse id para achar a
+// linha e ir completando as colunas que ainda estao vazias (ver doPost no
+// google-sheets-integration.gs). Por isso todos os campos de conteudo sao
+// opcionais - o que importa aqui e identificar a linha e a etapa.
+export const partialEtapaSchema = z.enum([
+  "1_patrimonio",
+  "2_aporte",
+  "3_renda",
+  "4_premissas",
+  "5_contato"
+])
+
+export type PartialLeadPayload = z.infer<typeof partialLeadSchema>
+
+export const partialLeadSchema = z.object({
+  parcial: z.literal(true),
+  lead_id: z.string().uuid(),
+  etapa: partialEtapaSchema,
+  nome: z.string().trim().max(100).optional(),
+  telefone: z.string().trim().max(30).optional(),
+  email: z.string().trim().email().max(180).optional(),
+  cidade: z.string().trim().max(100).optional(),
+  estado: z.string().max(2).optional(),
+  faixa_patrimonio: z
+    .enum(["ate_500k", "500k_1m", "1m_5m", "5m_mais"])
+    .optional(),
+  faixa_renda: z
+    .enum(["ate_15k", "15k_40k", "40k_100k", "100k_mais"])
+    .optional(),
+  instituicao_financeira_atual: z.string().max(120).optional(),
+  possui_assessor: z.enum(["sim", "nao"]).optional(),
+  possui_gerente_banco: z.enum(["sim", "nao"]).optional(),
+  objetivo_financeiro: z.string().max(100).optional(),
+  consentimento_contato: z.literal(true).optional(),
+  consentimento_data_hora: z.string().datetime().optional(),
+  diagnostico_completo: z.literal("nao").optional(),
+  honeypot: z.string().max(0).optional(),
+  patrimonio_atual: z.number().nonnegative().max(1e12).optional(),
+  aporte_mensal: z.number().nonnegative().max(1e10).optional(),
+  renda_desejada: z.number().nonnegative().max(1e10).optional(),
+  rentabilidade_esperada: z.number().min(0).max(1).optional(),
+  taxa_retirada: z.number().min(0.001).max(1).optional(),
+  idade_atual: z.number().int().min(0).max(120).optional(),
+  data: z.string().datetime(),
+  atualizado_em: z.string().datetime(),
   origem_lead: z.string().max(80),
   utm_campaign: z.string().max(150),
   utm_source: z.string().max(150),
