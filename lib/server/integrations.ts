@@ -1,4 +1,8 @@
-import type { FunnelPayload, LeadPayload } from "../security"
+import type {
+  FunnelPayload,
+  LeadPayload,
+  PartialLeadPayload
+} from "../security"
 
 type RequestJob = Promise<Response>
 
@@ -26,7 +30,9 @@ function configured(name: string): string | undefined {
   return process.env[name]
 }
 
-export async function forwardLead(payload: LeadPayload): Promise<boolean> {
+export async function forwardLead(
+  payload: LeadPayload | PartialLeadPayload
+): Promise<boolean> {
   const formspreeUrl = configured("FORMSPREE_ENDPOINT")
   const sheetsUrl = configured("GOOGLE_SHEETS_WEBHOOK_URL")
   const token = configured("GOOGLE_SHEETS_WEBHOOK_TOKEN")
