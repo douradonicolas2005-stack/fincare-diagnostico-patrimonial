@@ -4,7 +4,7 @@ import type {
   PartialLeadPayload
 } from "../security"
 
-type RequestJob = Promise<Response>
+type RequestJob = Promise<boolean>
 
 // Timeout curto o bastante pra nao segurar a function inteira caso o Apps
 // Script (que tem cold start e lock proprio, ver LockService no .gs) trave -
@@ -12,18 +12,39 @@ type RequestJob = Promise<Response>
 // limite de execucao da Vercel, em vez do fetch travado derrubar tudo.
 const REQUEST_TIMEOUT_MS = 8_000
 
-function post(
+// O Apps Script SEMPRE responde HTTP 200 - inclusive quando rejeita o
+// payload ({"ok":false,"erro":"email invalido"}) e quando a implantacao esta
+// sem autorizacao (devolve uma pagina HTML de login). Checar so response.ok
+// dava falso positivo: o lead era dado como recebido e nao chegava em lugar
+// nenhum. Por isso o corpo e inspecionado.
+async function post(
   url: string,
   body: unknown,
   contentType = "application/json"
-): RequestJob {
-  return fetch(url, {
+): Promise<boolean> {
+  const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": contentType, Accept: "application/json" },
     body: JSON.stringify(body),
     cache: "no-store",
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
   })
+
+  if (!response.ok) return false
+
+  const texto = (await response.text()).trim()
+  if (!texto) return true
+
+  // Pagina de login/permissao do Google: 200, mas nao gravou nada.
+  if (texto.startsWith("<")) return false
+
+  try {
+    const json = JSON.parse(texto)
+    if (json && typeof json === "object" && "ok" in json) return json.ok === true
+    return true
+  } catch {
+    return true
+  }
 }
 
 function configured(name: string): string | undefined {
@@ -59,7 +80,7 @@ export async function forwardLead(
   const results = await Promise.allSettled(jobs)
 
   return results.some(
-    result => result.status === "fulfilled" && result.value.ok
+    result => result.status === "fulfilled" && result.value === true
   )
 }
 
@@ -71,11 +92,9 @@ export async function forwardFunnelEvent(
 
   if (!sheetsUrl || !token) return false
 
-  const response = await post(
+  return post(
     sheetsUrl,
     { ...payload, tipo: "funil", webhook_token: token },
     "text/plain;charset=utf-8"
   )
-
-  return response.ok
 }
