@@ -270,6 +270,21 @@ function encontrarLinhaPorEmail_(sheet, email, ultimaLinha) {
 }
 
 function doPost(e) {
+  // Rodar o doPost pelo botao "Executar" do editor chega aqui sem evento
+  // nenhum (e === undefined) - o payload HTTP so existe quando o Google
+  // chama esta funcao via URL /exec do webhook. Sem este guarda, o teste
+  // manual morre com "TypeError: cannot read properties of undefined
+  // (reading 'postData')" na linha de baixo, parecendo que o script esta
+  // quebrado quando nao esta.
+  if (!e || !e.postData) {
+    return ContentService.createTextOutput(
+      JSON.stringify({
+        ok: false,
+        erro: "chamada sem payload - teste pela URL /exec do webhook, nao pelo botao Executar"
+      })
+    ).setMimeType(ContentService.MimeType.JSON)
+  }
+
   var data = JSON.parse(e.postData.contents)
 
   // Barra chamadas diretas na URL do webhook, fora do formulario do site
